@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @file
@@ -139,6 +138,3 @@ function commerce_stock_rules_order_has_out_of_stock($order) {
   return commerce_stock_order_has_out_of_stock($order);
 }
 
-/**
- * @}
- */

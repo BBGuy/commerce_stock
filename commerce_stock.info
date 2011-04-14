@@ -1,6 +1,5 @@
-; $Id $
 name = Stock
-description = Manage stock levels of your Commerce products
+description = Manage stock levels of Commerce products
 package = Commerce - extra
 dependencies[] = number
 ;dependencies[] = commerce_product
