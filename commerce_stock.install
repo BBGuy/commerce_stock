@@ -1,0 +1,24 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install, update and uninstall functions for the commerce_stock module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function commerce_stock_field_schema($field) {
+  if ($field['type'] == 'commerce_stock') {
+    return array(
+      'columns' => array(
+        'value' => array(
+          'description' => 'The stock level.',
+          'type' => 'int',
+          'not null' => FALSE,
+        ),
+      ),
+    );
+  }
+}
