@@ -4,7 +4,7 @@
  * @file
  * Allow commerce products to have stock levels associated with their SKU
  *
- * commerce_stock enables commerce to manage stock for products. Store admins 
+ * commerce_stock enables commerce to manage stock for products. Store admins
  * can set the stock levels and a threshold on a product edit page.
  * When that threshold is reached admins can be optionally notified about the
  * current stock level. Store admins can view all stock levels in the reports
@@ -38,8 +38,8 @@ function commerce_stock_field_is_empty($item, $field) {
 
 /**
  * Implements hook_field_widget_info_alter().
- * 
- * We create own widget form as number_field_widget_validate() doesn't 
+ *
+ * We create own widget form as number_field_widget_validate() doesn't
  * allow for field types other than those defined by the number module itself.
  * -> Notice: Undefined variable: regexp in number_field_widget_validate();
  *    Which causes Warning: preg_replace(): Empty regular expression in number_field_widget_validate()
@@ -62,7 +62,7 @@ function commerce_stock_field_widget_info() {
 
 /**
  * Implements hook_field_widget_form().
- * 
+ *
  * Based on number_field_widget_form();
  *  deleted all non-integer and prefix-suffix stuff,
  *  hardcode number_type so we can re-use number_field_widget_validate().
@@ -99,80 +99,77 @@ function commerce_stock_field_formatter_info_alter(&$info) {
 
 
 
-
+/**
+ * Implements hook_form_alter().
+ * Alters the add-to-cart form to show out-of-stock items and add a validator.
+ */
 function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   if(strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
-
     $stock = array();
     // check to see if product has attributes
-  
-    if(isset($form['product_id']['#options']) ){     
-      $options = $form['product_id']['#options'];          
+    if(isset($form['product_id']['#options']) ){
+      $options = $form['product_id']['#options'];
       foreach ($options as $key=>$value) {
         $product = commerce_product_load($key);
         //dpm ($product);
-        if($product->field_stock['und']){
-            $stock[$key] = $product->field_stock['und'][0]['value'];
-         }
-        if(($product->field_stock['und'][0]['value'] == 0) && ($product->field_stock['und'])){
-            $form['product_id']['#options'][$key]  .= " - Out of Stock";
-         }
-      }//foreach
+        // @todo: Does the stock field *have* to be called field_stock?
+        if(!empty($product->field_stock['und'])){
+          $stock[$key] = $product->field_stock['und'][0]['value'];
+          if(($product->field_stock['und'][0]['value'] <= 0) && ($product->field_stock['und'])){
+            $form['product_id']['#options'][$key]  .= ' - ' . t('Out of Stock');
+          }
+        }
+      }//end foreach
       $form['product_id']['#element_validate'] = array ('commerce_stock_option_validate');
       $form['product_id']['#stock'] = $stock;
 
     }
-    // product has options  
-  else {
-    $product = commerce_product_load($form['product_id']['#value']);
-    
-    if(isset($product->field_stock['und']) ){
-      if($product->field_stock['und'][0]['value'] <= 0){
-        $form['submit']['#value'] = t('Out of Stock');
-        $form['submit']['#disabled'] = TRUE;
-      } 
-    }
-     
+    // product has options
+    else {
+      $product = commerce_product_load($form['product_id']['#value']);
 
-  }// product has no options
-  }//end fi
+      if(isset($product->field_stock['und']) ){
+        if($product->field_stock['und'][0]['value'] <= 0){
+          $form['submit']['#value'] = t('Out of Stock');
+          $form['submit']['#disabled'] = TRUE;
+        }
+      }
+    }// product has no options
+  }//end if
 }
 
 /**
  * Form validate handler: validate the product and quantity to add to the cart.
  */
 function commerce_stock_option_validate($element, &$form_state) {
-    $stock = array();
-    $options = $element['#options'];    
-    
-    foreach ($options as $key=>$value) {
-      $product = commerce_product_load($key);
-      if($product->field_stock['und']){
-          $stock[$key] = $product->field_stock['und'][0]['value'];
-        }
+  $stock = array();
+  $options = $element['#options'];
+
+  foreach ($options as $key=>$value) {
+    $product = commerce_product_load($key);
+    if(!empty($product->field_stock['und'])){
+      $stock[$key] = $product->field_stock['und'][0]['value'];
     }
+  }
 
   if($form_state['values']['quantity'] > $element['#stock'][$form_state['values']['product_id']]) {
-     form_error($element, t('Product is out of Stock'));
+    form_error($element, t('Product is out of Stock'));
   }
-  
 }
 
 
 
 function commerce_stock_order_has_out_of_stock($order) {
   $line_items = $order->commerce_line_items['und'];
-   foreach ($line_items as $line_item_id ) {
-       
-      $line_item = commerce_line_item_load($line_item_id['line_item_id']);
-      if($line_item->type == 'product') {              
-        $product = commerce_product_load($line_item->commerce_product['und'][0]['product_id']);
-        if(commmerce_stock_product_check_out_of_stock($line_item->commerce_product['und'][0]['product_id'],$line_item->quantity ) != FALSE) {
-          return TRUE;
-        }
-        
-    }//if line item == product
-  }//foreach
+  foreach ($line_items as $line_item_id ) {
+    $line_item = commerce_line_item_load($line_item_id['line_item_id']);
+    if($line_item->type == 'product') {
+      $product = commerce_product_load($line_item->commerce_product['und'][0]['product_id']);
+      if(commmerce_stock_product_check_out_of_stock($line_item->commerce_product['und'][0]['product_id'],$line_item->quantity ) != FALSE) {
+        return TRUE;
+      }
+    }// end if line item == product
+  }// end foreach
   return FALSE;
 
 }//function
@@ -181,7 +178,7 @@ function commerce_stock_order_has_out_of_stock($order) {
 /*
 check is a product id has more stock that $quantity
 if so  it returns false
-if there are not enough in stock it returns the stock level of product 
+if there are not enough in stock it returns the stock level of product
 */
 
 function commmerce_stock_product_check_out_of_stock($product_id ,$quantity) {
@@ -191,7 +188,7 @@ function commmerce_stock_product_check_out_of_stock($product_id ,$quantity) {
       return $product->field_stock['und'][0]['value'];
     }
     else  {
-      return FALSE;  
+      return FALSE;
     }
   }
 }

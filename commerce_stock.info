@@ -1,11 +1,7 @@
-name = Stock
+name = Commerce Stock
 description = Manage stock levels of Commerce products
 package = Commerce - extra
 dependencies[] = number
 ;dependencies[] = commerce_product
 dependencies[] = commerce_order
 core = 7.x
-
-; Base module files
-files[] = commerce_stock.module
-files[] = commerce_stock.install
