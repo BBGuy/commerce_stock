@@ -165,7 +165,7 @@ function commerce_stock_order_has_out_of_stock($order) {
     $line_item = commerce_line_item_load($line_item_id['line_item_id']);
     if($line_item->type == 'product') {
       $product = commerce_product_load($line_item->commerce_product['und'][0]['product_id']);
-      if(commmerce_stock_product_check_out_of_stock($line_item->commerce_product['und'][0]['product_id'],$line_item->quantity ) != FALSE) {
+      if(commerce_stock_product_check_out_of_stock($line_item->commerce_product['und'][0]['product_id'],$line_item->quantity ) != FALSE) {
         return TRUE;
       }
     }// end if line item == product
@@ -181,7 +181,7 @@ if so  it returns false
 if there are not enough in stock it returns the stock level of product
 */
 
-function commmerce_stock_product_check_out_of_stock($product_id ,$quantity) {
+function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
   $product = commerce_product_load($product_id);
   if(isset($product->field_stock['und'])){
     if($product->field_stock['und'][0]['value'] < $quantity) {
