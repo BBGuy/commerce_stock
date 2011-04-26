@@ -13,7 +13,7 @@ To configure:
 -------------
 
 1. Install and enable the module.
-2. Add a field of type stock (and named field_stock) to your product.
+2. Add a field of type stock (and named commerce_stock) to your product.
 3. Set the starting value of stock on each product.
 4. (Optional) create a rule which decrements stock when an order is completed.
 

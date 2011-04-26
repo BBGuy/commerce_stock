@@ -103,7 +103,7 @@ function commerce_stock_adjust($product, $qty) {
 //drupal_set_message(var_export($product,true));
   //TODO: dynamically get stock field,
   // can't remain a hardcoded untranslated field name, I guess
-  $product->field_stock['und'][0]['value'] += intval($qty);
+  $product->commerce_stock['und'][0]['value'] += intval($qty);
   $result = commerce_product_save($product);
   if ($result) {
     watchdog('commerce_stock', 'Modified stock level of product %sku by %amount', array('%sku' => $product->sku, '%amount' => $qty));

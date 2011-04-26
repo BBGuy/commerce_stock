@@ -27,92 +27,6 @@ function commerce_stock_menu() {
   return $items;
 }
 
-/**
- * Implements hook_field_info().
- */
-function commerce_stock_field_info() {
-  return array(
-    'commerce_stock' => array(
-      'label' => t('Stock'),
-      'description' => t('This field stores the stock level of a product.'),
-//TODO implement 'active' as a checkbox as it was in uc_stock?
-//      'instance_settings' => array('active' => 0),
-//TODO write a patch for number.module? see comments at number_field_widget_info_alter()
-//      'default_widget' => 'number',
-      'default_widget' => 'commerce_stock_simple',
-      'default_formatter' => 'number_integer',
-  ),
-  );
-}
-
-/**
- * Implements hook_field_is_empty().
- */
-function commerce_stock_field_is_empty($item, $field) {
-  return number_field_is_empty($item, $field);
-}
-
-/**
- * Implements hook_field_widget_info_alter().
- *
- * We create own widget form as number_field_widget_validate() doesn't
- * allow for field types other than those defined by the number module itself.
- * -> Notice: Undefined variable: regexp in number_field_widget_validate();
- *    Which causes Warning: preg_replace(): Empty regular expression in number_field_widget_validate()
-function number_field_widget_info_alter(&$info) {
-  // Let a new field type re-use an existing widget.
-  $info['number']['field types'][] = 'commerce_stock';
-}
- */
-/**
- * Implements hook_field_widget_info().
- */
-function commerce_stock_field_widget_info() {
-  return array(
-    'commerce_stock_simple' => array(
-      'label' => t('Text field'),
-      'field types' => array('commerce_stock'),
-    ),
-  );
-}
-
-/**
- * Implements hook_field_widget_form().
- *
- * Based on number_field_widget_form();
- *  deleted all non-integer and prefix-suffix stuff,
- *  hardcode number_type so we can re-use number_field_widget_validate().
- */
-function commerce_stock_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $value = isset($items[$delta]['value']) ? $items[$delta]['value'] : '';
-
-  $element += array(
-    '#type' => 'textfield',
-    '#default_value' => $value,
-    '#size' => 12,
-    '#maxlength' => 10,
-    //hardcode type so we can re-use number_field_widget_validate()
-    '#number_type' => 'integer',
-  );
-
-  $element['#element_validate'][] = 'number_field_widget_validate';
-
-  return array('value' => $element);
-}
-
-/**
- * Implements hook_field_formatter_info_alter().
- */
-function commerce_stock_field_formatter_info_alter(&$info) {
-  // Let a new field type re-use an existing formatter.
-  $info['number_integer']['field types'][] = 'commerce_stock';
-  //number_field_formatter_settings_form() doesn't honor this setting
-  //but number_field_formatter_settings_summary() and number_field_formatter_view() do
-  //TODO: create patch for number.module?
-  $info['number_integer']['settings']['prefix_suffix'] = FALSE;
-  $info['number_unformatted']['field types'][] = 'commerce_stock';
-}
-
 
 
 /**
@@ -128,9 +42,9 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       foreach ($options as $key=>$value) {
         $product = commerce_product_load($key);
         //dpm ($product);
-        if(!empty($product->field_stock['und'])){
-          $stock[$key] = $product->field_stock['und'][0]['value'];
-          if(($product->field_stock['und'][0]['value'] <= 0) && ($product->field_stock['und'])){
+        if(!empty($product->commerce_stock['und'])){
+          $stock[$key] = $product->commerce_stock['und'][0]['value'];
+          if(($product->commerce_stock['und'][0]['value'] <= 0) && ($product->commerce_stock['und'])){
             $form['product_id']['#options'][$key]  .= ' - ' . t('Out of Stock');
           }
         }
@@ -143,8 +57,8 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     else {
       $product = commerce_product_load($form['product_id']['#value']);
 
-      if(isset($product->field_stock['und']) ){
-        if($product->field_stock['und'][0]['value'] <= 0){
+      if(isset($product->commerce_stock['und']) ){
+        if($product->commerce_stock['und'][0]['value'] <= 0){
           $form['submit']['#value'] = t('Out of Stock');
           $form['submit']['#disabled'] = TRUE;
         }
@@ -162,8 +76,8 @@ function commerce_stock_option_validate($element, &$form_state) {
 
   foreach ($options as $key=>$value) {
     $product = commerce_product_load($key);
-    if(!empty($product->field_stock['und'])){
-      $stock[$key] = $product->field_stock['und'][0]['value'];
+    if(!empty($product->commerce_stock['und'])){
+      $stock[$key] = $product->commerce_stock['und'][0]['value'];
     }
   }
 
@@ -198,9 +112,9 @@ if there are not enough in stock it returns the stock level of product
 
 function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
   $product = commerce_product_load($product_id);
-  if(isset($product->field_stock['und'])){
-    if($product->field_stock['und'][0]['value'] < $quantity) {
-      return $product->field_stock['und'][0]['value'];
+  if(isset($product->commerce_stock['und'])){
+    if($product->commerce_stock['und'][0]['value'] < $quantity) {
+      return $product->commerce_stock['und'][0]['value'];
     }
     else  {
       return FALSE;
