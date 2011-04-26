@@ -8,9 +8,9 @@
 
 /**
 * Implements hook_rules_action_info().
-* 
+*
 * Provides an action to adjust stock level
-*   of a certain product 
+*   of a certain product
 *   by a certain quantity.
 */
 function commerce_stock_rules_action_info() {
@@ -18,15 +18,15 @@ function commerce_stock_rules_action_info() {
 /*
   $actions['commerce_stock_adjust'] = array(
     'label' => t('Adjust the product stock level by a set amount'),
-    'group' => t('Commerce - stock'),
+    'group' => t('Commerce Stock'),
     'parameter' => array(
       'commerce_product' => array(
-        'type' => 'commerce_product', 
+        'type' => 'commerce_product',
         'label' => t('Product'),
         'save' => TRUE //save the changes after executing the rule
       ),
       'amount' => array(
-        'type' => 'integer', 
+        'type' => 'integer',
         'label' => t('Amount')
       ),
     ),
@@ -34,10 +34,10 @@ function commerce_stock_rules_action_info() {
 
   $actions['commerce_stock_adjust_by_order'] = array(
     'label' => t('Adjust the product stock level, given an order'),
-    'group' => t('Commerce - stock'),
+    'group' => t('Commerce Stock'),
     'parameter' => array(
       'commerce_order' => array(
-        'type' => 'commerce_order', 
+        'type' => 'commerce_order',
         'label' => t('Order')
       ),
     ),
@@ -46,10 +46,10 @@ function commerce_stock_rules_action_info() {
   //TODO provide "setting"/parameter to ameliorate or de- the stock level, + or -
   $actions['commerce_stock_adjust_by_line_item'] = array(
     'label' => t('Adjust the product stock level, given a line item'),
-    'group' => t('Commerce - stock'),
+    'group' => t('Commerce Stock'),
     'parameter' => array(
       'commerce_line_item' => array(
-        'type' => 'commerce_line_item', 
+        'type' => 'commerce_line_item',
         'label' => t('Line item')
       ),
     ),
@@ -66,21 +66,25 @@ watchdog('commerce_stock',var_export($order,true));
 //loop order line items
 
 //commerce_order
-//each (product) line item, adjust stock 
+//each (product) line item, adjust stock
 
 //}
 
+/**
+ * If the line item is stock-enabled, subtract the sold amount in a line item
+ * from stock.
+ * @param $line_item
+ */
 function commerce_stock_adjust_by_line_item($line_item) {
-//watchdog('commerce_stock',var_export($line_item,true));
-  //TODO line_item / product type should be configurable, we only need stock enabled products
-  // or should we leave that check to commerce_stock_adjust()
   if ($line_item->type == 'product') {
     // The product SKU that will have its stock level adjusted.
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
-    $qty = intval($line_item->quantity);
-    // Substract the sold amound from the available stock level.
-    commerce_stock_adjust($product, -$qty);
+    if (commerce_stock_product_type_enabled($product->type)) {
+      $qty = intval($line_item->quantity);
+      // Subtract the sold amount from the available stock level.
+      commerce_stock_adjust($product, -$qty);
+    }
   }
 }
 
@@ -88,11 +92,14 @@ function commerce_stock_adjust_by_line_item($line_item) {
  * Somewhat the equivalent of uc_stock_adjust().
  *  This function adjust a particular product SKU by a certain value
  *  (a positive integer will add to stock, a negative integer will remove from stock).
- * 
- * @param $product The product for which to change the stock level 
+ *
+ * @param $product The product for which to change the stock level
  * @param $qty The quantity to add to the stock level
  */
 function commerce_stock_adjust($product, $qty) {
+  if (!commerce_stock_product_type_enabled($product->type)) {
+    return;
+  }
 //drupal_set_message(var_export($product,true));
   //TODO: dynamically get stock field,
   // can't remain a hardcoded untranslated field name, I guess
@@ -125,6 +132,17 @@ function commerce_stock_rules_condition_info() {
     'group' => t('Commerce Stock'),
     'callbacks' => array(
       'execute' => 'commerce_stock_rules_order_has_out_of_stock',
+    ),
+  );
+  $conditions['commerce_stock_stock_enabled_on_line_item'] = array(
+    'label' => t('Line item has a product of product type that has stock management enabled'),
+    'parameter' => array(
+      'type' => 'commerce_line_item',
+      'label' => t('Product'),
+    ),
+    'group' => t('Commerce Stock'),
+    'callbacks' => array(
+      'execute' => 'commerce_stock_line_item_product_enabled',
     ),
   );
 

@@ -7,8 +7,7 @@
  * commerce_stock enables commerce to manage stock for products. Store admins
  * can set the stock levels and a threshold on a product edit page.
  * When that threshold is reached admins can be optionally notified about the
- * current stock level. Store admins can view all stock levels in the reports
- * section of Ubercart.
+ * current stock level. Store admins can view all stock levels using views.
  */
 
 /**
@@ -107,7 +106,7 @@ function commerce_stock_field_widget_form(&$form, &$form_state, $field, $instanc
 function commerce_stock_field_formatter_info_alter(&$info) {
   // Let a new field type re-use an existing formatter.
   $info['number_integer']['field types'][] = 'commerce_stock';
-  //number_field_formatter_settings_form() doesn't honour this setting
+  //number_field_formatter_settings_form() doesn't honor this setting
   //but number_field_formatter_settings_summary() and number_field_formatter_view() do
   //TODO: create patch for number.module?
   $info['number_integer']['settings']['prefix_suffix'] = FALSE;
@@ -129,7 +128,6 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       foreach ($options as $key=>$value) {
         $product = commerce_product_load($key);
         //dpm ($product);
-        // @todo: Does the stock field *have* to be called field_stock?
         if(!empty($product->field_stock['und'])){
           $stock[$key] = $product->field_stock['und'][0]['value'];
           if(($product->field_stock['und'][0]['value'] <= 0) && ($product->field_stock['und'])){
@@ -236,9 +234,9 @@ function commerce_stock_configure_product_type($type) {
  */
 function commerce_stock_create_instance($field_name, $entity_type, $bundle, $label, $weight = 0) {
   // If a field type we know should exist isn't found, clear the Field cache.
-  if (!field_info_field_types('commerce_stock')) {
-    field_cache_clear();
-  }
+//  if (!field_info_field_types('commerce_stock')) {
+//    field_cache_clear();
+//  }
 
   // Look for or add the specified stock field to the requested entity bundle.
   $field = field_info_field($field_name);
@@ -247,7 +245,7 @@ function commerce_stock_create_instance($field_name, $entity_type, $bundle, $lab
   if (empty($field)) {
     $field = array(
       'field_name' => $field_name,
-      'type' => 'commerce_stock',
+      'type' => 'number_integer',
       'cardinality' => 1,
       'entity_types' => array($entity_type),
       'translatable' => FALSE,
@@ -288,4 +286,30 @@ function commerce_stock_create_instance($field_name, $entity_type, $bundle, $lab
 function commerce_stock_product_type_enabled($type) {
   $instance = field_info_instance('commerce_product', 'commerce_stock', $type);
   return (!empty($instance));
+}
+
+/**
+ * Given a product, determine whether stock management is enabled for that
+ * product.
+ *
+ * @param $product
+ *   The product to check.
+ * @return
+ *   Boolean: TRUE if stock management is enabled on the product's product type.
+ */
+function commerce_stock_product_enabled($product) {
+  return commerce_stock_product_type_enabled($product->type);
+}
+
+/**
+ * Given a product, determine whether stock management is enabled for that
+ * product.
+ *
+ * @param $product
+ *   The product to check.
+ * @return
+ *   Boolean: TRUE if stock management is enabled on the product's product type.
+ */
+function commerce_stock_line_item_product_enabled($line_item) {
+  return commerce_stock_product_type_enabled($line_item->product->type);
 }
