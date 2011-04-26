@@ -13,7 +13,7 @@ function commerce_stock_field_schema($field) {
     return array(
       'columns' => array(
         'value' => array(
-          'description' => 'The stock level.',
+          'description' => 'The stock level of the product.',
           'type' => 'int',
           'not null' => FALSE,
         ),

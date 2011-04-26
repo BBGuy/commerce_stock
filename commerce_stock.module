@@ -12,6 +12,23 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function commerce_stock_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/stock'] = array(
+    'title' => 'Stock management',
+    'description' => 'Configure stock management.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_stock_admin_form'),
+    'access arguments' => array('administer products'),
+    'file' => 'includes/commerce_stock.admin.inc',
+  );
+  return $items;
+}
+
+/**
  * Implements hook_field_info().
  */
 function commerce_stock_field_info() {
@@ -191,4 +208,84 @@ function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
       return FALSE;
     }
   }
+}
+
+/**
+ * Ensures a stock field is present on a product type bundle.
+ */
+function commerce_stock_configure_product_type($type) {
+  commerce_stock_create_instance('commerce_stock', 'commerce_product', $type, t('Stock'));
+}
+
+
+/**
+ * Creates a required, locked instance of a stock field on the specified bundle.
+ *
+ * @param $field_name
+ *   The name of the field; if it already exists, a new instance of the existing
+ *     field will be created. For fields governed by the Commerce modules, this
+ *     should begin with commerce_.
+ * @param $entity_type
+ *   The type of entity the field instance will be attached to.
+ * @param $bundle
+ *   The bundle name of the entity the field instance will be attached to.
+ * @param $label
+ *   The label of the field instance.
+ * @param $weight
+ *   The default weight of the field instance widget and display.
+ */
+function commerce_stock_create_instance($field_name, $entity_type, $bundle, $label, $weight = 0) {
+  // If a field type we know should exist isn't found, clear the Field cache.
+  if (!field_info_field_types('commerce_stock')) {
+    field_cache_clear();
+  }
+
+  // Look for or add the specified stock field to the requested entity bundle.
+  $field = field_info_field($field_name);
+  $instance = field_info_instance($entity_type, $field_name, $bundle);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'commerce_stock',
+      'cardinality' => 1,
+      'entity_types' => array($entity_type),
+      'translatable' => FALSE,
+      'locked' => TRUE,
+    );
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => $field_name,
+      'entity_type' => $entity_type,
+      'bundle' => $bundle,
+      'label' => $label,
+      'required' => TRUE,
+      'settings' => array(),
+      'display' => array(),
+    );
+
+    $entity_info = entity_get_info($entity_type);
+
+    // Spoof the default view mode so its display type is set.
+    $entity_info['view modes']['default'] = array();
+
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Given a product type, determine whether stock management is enabled on that
+ * product type.
+ *
+ * @param $type
+ *   The product type.
+ * @return
+ *   Boolean: TRUE if stock management is enabled.
+ */
+function commerce_stock_product_type_enabled($type) {
+  $instance = field_info_instance('commerce_product', 'commerce_stock', $type);
+  return (!empty($instance));
 }
