@@ -37,18 +37,18 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   if(strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
     $stock = array();
     // check to see if product has attributes
+    // @todo: We don't have to do any of this do we?
     if(isset($form['product_id']['#options']) ){
       $options = $form['product_id']['#options'];
       foreach ($options as $key=>$value) {
         $product = commerce_product_load($key);
-        //dpm ($product);
         if(!empty($product->commerce_stock['und'])){
           $stock[$key] = $product->commerce_stock['und'][0]['value'];
           if(($product->commerce_stock['und'][0]['value'] <= 0) && ($product->commerce_stock['und'])){
             $form['product_id']['#options'][$key]  .= ' - ' . t('Out of Stock');
           }
         }
-      }//end foreach
+      }
       $form['product_id']['#element_validate'] = array ('commerce_stock_option_validate');
       $form['product_id']['#stock'] = $stock;
 
@@ -63,8 +63,36 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
           $form['submit']['#disabled'] = TRUE;
         }
       }
-    }// product has no options
-  }//end if
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() to alter the cart form to provide a
+ * validator for the cart form.
+ */
+function commerce_stock_form_commerce_line_item_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
+  $form['#validate'][] = 'commerce_stock_form_commerce_line_item_validate';
+}
+
+/**
+ * Form validator function for cart form.
+ *
+ * Checks each line item to make sure that they have not requested more items
+ * than we have in stock.
+ */
+function commerce_stock_form_commerce_line_item_validate($form, &$form_state) {
+  foreach ($form['view']['#value']->result as $index => $row) {
+    // Check for quantity in $form_state.
+    $line_item = $row->_field_data['commerce_line_item_field_data_commerce_line_items_line_item_'];
+    $line_item_id = $line_item['entity']->line_item_id;
+    $product_id = $line_item['entity']->commerce_product['und'][0]['product_id'];
+    $product = commerce_product_load($product_id);
+    $desired_purchase = $form_state['values']['edit_quantity'][$line_item_id];
+    if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $desired_purchase)) {
+      form_set_error("edit_quantity][$line_item_id", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+    }
+  }
 }
 
 /**
@@ -87,7 +115,11 @@ function commerce_stock_option_validate($element, &$form_state) {
 }
 
 
-
+/**
+ * Determine whether an order has items which are out of stock.
+ * @param $order
+ *   Order object
+ */
 function commerce_stock_order_has_out_of_stock($order) {
   $line_items = $order->commerce_line_items['und'];
   foreach ($line_items as $line_item_id ) {
@@ -97,21 +129,25 @@ function commerce_stock_order_has_out_of_stock($order) {
       if(commerce_stock_product_check_out_of_stock($line_item->commerce_product['und'][0]['product_id'],$line_item->quantity ) != FALSE) {
         return TRUE;
       }
-    }// end if line item == product
-  }// end foreach
+    }
+  }
   return FALSE;
+}
 
-}//function
 
-
-/*
-check is a product id has more stock that $quantity
-if so  it returns false
-if there are not enough in stock it returns the stock level of product
-*/
-
+/**
+ * Check whether a purrchase quantity exceeds what is available.
+ * @param $product_id
+ *   The numeric product ID
+ * @param $quantity
+ *   Quantity to be purchased.
+ * @return
+ *   FALSE if the product request can be satisfied.
+ *   The number available otherwise.
+ */
 function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
   $product = commerce_product_load($product_id);
+  // @todo: We shouldn't be using 'und' here should we?
   if(isset($product->commerce_stock['und'])){
     if($product->commerce_stock['und'][0]['value'] < $quantity) {
       return $product->commerce_stock['und'][0]['value'];
