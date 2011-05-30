@@ -4,7 +4,7 @@
  * @file
  * Allow commerce products to have stock levels associated with their SKU
  *
- * commerce_stock enables commerce to manage stock for products. Store admins
+ * Commerce Stock enables Commerce to manage stock for products. Store admins
  * can set the stock levels and a threshold on a product edit page.
  * When that threshold is reached admins can be optionally notified about the
  * current stock level. Store admins can view all stock levels using views.
@@ -27,16 +27,15 @@ function commerce_stock_menu() {
   return $items;
 }
 
-
-
 /**
  * Implements hook_form_alter().
+ *
  * Alters the add-to-cart form to show out-of-stock items and add a validator.
  */
 function commerce_stock_form_alter(&$form, &$form_state, $form_id){
-  if(strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
+  if (strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
     $stock = array();
-    // check to see if product has attributes
+    // Check to see if product has attributes.
     // @todo: We don't have to do any of this do we?
     if(isset($form['product_id']['#options']) ){
       $options = $form['product_id']['#options'];
@@ -53,7 +52,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       $form['product_id']['#stock'] = $stock;
 
     }
-    // product has options
+    // Product has options.
     else {
       $product = commerce_product_load($form['product_id']['#value']);
 
@@ -68,8 +67,9 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
 }
 
 /**
- * Implements hook_form_FORM_ID_alter() to alter the cart form to provide a
- * validator for the cart form.
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Alters the cart form to provide a validator for it.
  */
 function commerce_stock_form_commerce_line_item_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
   $form['#validate'][] = 'commerce_stock_form_commerce_line_item_validate';
@@ -89,6 +89,7 @@ function commerce_stock_form_commerce_line_item_validate($form, &$form_state) {
     $product_id = $line_item['entity']->commerce_product['und'][0]['product_id'];
     $product = commerce_product_load($product_id);
     $desired_purchase = $form_state['values']['edit_quantity'][$line_item_id];
+
     if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $desired_purchase)) {
       form_set_error("edit_quantity][$line_item_id", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
     }
@@ -102,23 +103,27 @@ function commerce_stock_option_validate($element, &$form_state) {
   $stock = array();
   $options = $element['#options'];
 
-  foreach ($options as $key=>$value) {
+  foreach ($options as $key => $value) {
     $product = commerce_product_load($key);
     if(!empty($product->commerce_stock['und'])){
       $stock[$key] = $product->commerce_stock['und'][0]['value'];
     }
   }
 
-  if($form_state['values']['quantity'] > $element['#stock'][$form_state['values']['product_id']]) {
+  if ($form_state['values']['quantity'] > $element['#stock'][$form_state['values']['product_id']]) {
     form_error($element, t('Product is out of Stock'));
   }
 }
 
-
 /**
  * Determine whether an order has items which are out of stock.
+ *
  * @param $order
- *   Order object
+ *   An order object
+ *
+ * @return
+ *   Boolean: TRUE if the order has items which are out of stock and
+ *   FALSE otherwise.
  */
 function commerce_stock_order_has_out_of_stock($order) {
   $line_items = $order->commerce_line_items['und'];
@@ -131,16 +136,18 @@ function commerce_stock_order_has_out_of_stock($order) {
       }
     }
   }
+
   return FALSE;
 }
 
-
 /**
  * Check whether a purrchase quantity exceeds what is available.
+ *
  * @param $product_id
  *   The numeric product ID
  * @param $quantity
  *   Quantity to be purchased.
+ *
  * @return
  *   FALSE if the product request can be satisfied.
  *   The number available otherwise.
@@ -165,14 +172,13 @@ function commerce_stock_configure_product_type($type) {
   commerce_stock_create_instance('commerce_stock', 'commerce_product', $type, t('Stock'));
 }
 
-
 /**
  * Creates a required, locked instance of a stock field on the specified bundle.
  *
  * @param $field_name
  *   The name of the field; if it already exists, a new instance of the existing
- *     field will be created. For fields governed by the Commerce modules, this
- *     should begin with commerce_.
+ *   field will be created. For fields governed by the Commerce modules, this
+ *   should begin with commerce_.
  * @param $entity_type
  *   The type of entity the field instance will be attached to.
  * @param $bundle
@@ -230,6 +236,7 @@ function commerce_stock_create_instance($field_name, $entity_type, $bundle, $lab
  *
  * @param $type
  *   The product type.
+ *
  * @return
  *   Boolean: TRUE if stock management is enabled.
  */
@@ -244,6 +251,7 @@ function commerce_stock_product_type_enabled($type) {
  *
  * @param $product
  *   The product to check.
+ *
  * @return
  *   Boolean: TRUE if stock management is enabled on the product's product type.
  */
@@ -252,11 +260,12 @@ function commerce_stock_product_enabled($product) {
 }
 
 /**
- * Given a product, determine whether stock management is enabled for that
- * product.
+ * Given a line item, determine whether stock management is enabled for that
+ * line item.
  *
- * @param $product
- *   The product to check.
+ * @param $line_item
+ *   The line item to check.
+ *
  * @return
  *   Boolean: TRUE if stock management is enabled on the product's product type.
  */

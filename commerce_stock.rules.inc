@@ -2,17 +2,15 @@
 
 /**
  * @file
- * Rules integration for stock.
+ * Rules integration for Commerce Stock.
  */
 
-
 /**
-* Implements hook_rules_action_info().
-*
-* Provides an action to adjust stock level
-*   of a certain product
-*   by a certain quantity.
-*/
+ * Implements hook_rules_action_info().
+ *
+ * Provides an action to adjust stock level of a certain product
+ * by a certain quantity.
+ */
 function commerce_stock_rules_action_info() {
   $actions = array();
 /*
@@ -73,7 +71,9 @@ watchdog('commerce_stock',var_export($order,true));
 /**
  * If the line item is stock-enabled, subtract the sold amount in a line item
  * from stock.
+ *
  * @param $line_item
+ *   A line item object.
  */
 function commerce_stock_adjust_by_line_item($line_item) {
   if ($line_item->type == 'product') {
@@ -81,7 +81,7 @@ function commerce_stock_adjust_by_line_item($line_item) {
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
     if (commerce_stock_product_type_enabled($product->type)) {
-      $qty = intval($line_item->quantity);
+      $qty = (int) $line_item->quantity;
       // Subtract the sold amount from the available stock level.
       commerce_stock_adjust($product, -$qty);
     }
@@ -89,12 +89,14 @@ function commerce_stock_adjust_by_line_item($line_item) {
 }
 
 /**
- * Somewhat the equivalent of uc_stock_adjust().
- *  This function adjust a particular product SKU by a certain value
- *  (a positive integer will add to stock, a negative integer will remove from stock).
+ * Adjusts a particular product SKU by a certain value.
+ * A positive integer will add to stock, a negative integer will remove from
+ * stock. Somewhat the equivalent of uc_stock_adjust().
  *
- * @param $product The product for which to change the stock level
- * @param $qty The quantity to add to the stock level
+ * @param $product
+ *   The product for which to change the stock level.
+ * @param $qty
+ *   The quantity to add to the stock level.
  */
 function commerce_stock_adjust($product, $qty) {
   if (!commerce_stock_product_type_enabled($product->type)) {
@@ -111,9 +113,6 @@ function commerce_stock_adjust($product, $qty) {
     watchdog('commerce_stock', 'Failed attempt to modify stock level of product %sku by %amount', array('%sku' => $product->sku, '%amount' => $qty), WATCHDOG_ERROR);
   }
 }
-
-
-
 
 /**
  * Implements hook_rules_condition_info().
@@ -155,4 +154,3 @@ function commerce_stock_rules_condition_info() {
 function commerce_stock_rules_order_has_out_of_stock($order) {
   return commerce_stock_order_has_out_of_stock($order);
 }
-

@@ -2,15 +2,13 @@
 
 /**
  * @file
- * Administrative callbacks and form builder functions for the Commerce Stock
- * module.
+ * Administrative callbacks and form builder functions for Commerce Stock.
  */
 
 /**
- * Stock admin form.
+ * Commerce Stock admin form.
  */
 function commerce_stock_admin_form($form, &$form_state) {
-
   // Find out what our status is. Use both the state of existing fields
   // and the state of variables to determine what's right.
 
@@ -60,6 +58,7 @@ function commerce_stock_admin_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Submit'),
   );
+
   // If they're deleting, show the confirmation checkbox.
   if (!empty($form_state['commerce_stock']['delete_instances'])) {
     $form['confirmation']['#access'] = TRUE;

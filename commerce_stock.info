@@ -2,6 +2,6 @@ name = Commerce Stock
 description = Manage stock levels of Commerce products
 package = Commerce (contrib)
 dependencies[] = number
-;dependencies[] = commerce_product
+dependencies[] = commerce_product
 dependencies[] = commerce_order
 core = 7.x

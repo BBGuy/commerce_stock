@@ -22,5 +22,6 @@ function commerce_stock_default_rules_configuration() {
     }
   }';
   $configs['rules_decrement_stock_completing_order'] = rules_import($rules_decrement_stock_completing_order);
+
   return $configs;
 }
