@@ -41,9 +41,25 @@ function commerce_stock_rules_action_info() {
     ),
   );
 */
-  //TODO provide "setting"/parameter to ameliorate or de- the stock level, + or -
-  $actions['commerce_stock_adjust_by_line_item'] = array(
-    'label' => t('Adjust the product stock level, given a line item'),
+  $actions['commerce_stock_decrease_by_line_item'] = array(
+    'label' => t('Decrease the product stock level, given a line item'),
+    'group' => t('Commerce Stock'),
+    'parameter' => array(
+      'commerce_line_item' => array(
+        'type' => 'commerce_line_item',
+        'label' => t('Line item')
+      ),
+    ),
+  );
+
+  // 'Adjust by line item' was the old name. To avoid breaking existing
+  // installations we'll keep a copy around. Sad. Couldn't figure out
+  // a way to update it using hook_update_N().
+  $actions['commerce_stock_adjust_by_line_item'] = $actions['commerce_stock_decrease_by_line_item'];
+  $actions['commerce_stock_adjust_by_line_item']['label'] = t('(legacy) Decrease the product stock level');
+
+  $actions['commerce_stock_increase_by_line_item'] = array(
+    'label' => t('Increase the product stock level, given a line item'),
     'group' => t('Commerce Stock'),
     'parameter' => array(
       'commerce_line_item' => array(
@@ -75,7 +91,7 @@ watchdog('commerce_stock',var_export($order,true));
  * @param $line_item
  *   A line item object.
  */
-function commerce_stock_adjust_by_line_item($line_item) {
+function commerce_stock_decrease_by_line_item($line_item) {
   if ($line_item->type == 'product') {
     // The product SKU that will have its stock level adjusted.
     $sku = $line_item->line_item_label;
@@ -84,6 +100,38 @@ function commerce_stock_adjust_by_line_item($line_item) {
       $qty = (int) $line_item->quantity;
       // Subtract the sold amount from the available stock level.
       commerce_stock_adjust($product, -$qty);
+    }
+  }
+}
+
+/**
+ * For backward compatibility, keep a function by the old name.
+ *
+ * @todo: Remove this after a decent interval.
+ *
+ * @param $line_item
+ */
+function commerce_stock_adjust_by_line_item($line_item) {
+  commerce_stock_decrease_by_line_item($line_item);
+}
+
+/**
+ * If the line item is stock-enabled, add the sold amount in a line item
+ * to stock. Typically used when a line item is removed from an order
+ * (as when items are added to and removed from cart).
+ *
+ * @param $line_item
+ *   A line item object.
+ */
+function commerce_stock_increase_by_line_item($line_item) {
+  if ($line_item->type == 'product') {
+    // The product SKU that will have its stock level adjusted.
+    $sku = $line_item->line_item_label;
+    $product = commerce_product_load_by_sku($sku);
+    if (commerce_stock_product_type_enabled($product->type)) {
+      $qty = (int) $line_item->quantity;
+      // Subtract the sold amount from the available stock level.
+      commerce_stock_adjust($product, $qty);
     }
   }
 }
