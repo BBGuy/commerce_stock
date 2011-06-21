@@ -12,7 +12,7 @@ function commerce_stock_default_rules_configuration() {
       "ON" : [ "commerce_checkout_complete" ],
       "DO" : [
         { "LOOP" : {
-            "USING" : { "list" : [ "order:commerce-line-items" ] },
+            "USING" : { "list" : [ "commerce_order:commerce-line-items" ] },
             "DO" : [
               { "commerce_stock_adjust_by_line_item" : { "commerce_line_item" : [ "list-item" ] } }
             ]
