@@ -60,6 +60,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
         if($product->commerce_stock['und'][0]['value'] <= 0){
           $form['submit']['#value'] = t('Out of Stock');
           $form['submit']['#disabled'] = TRUE;
+          $form['submit']['#attributes'] = array('class' => array('out-of-stock'));
         }
       }
     }
