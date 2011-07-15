@@ -55,7 +55,8 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     // Product has options.
     else {
       $product = commerce_product_load($form['product_id']['#value']);
-
+      // Add validation to the add to cart
+      $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
       if(isset($product->commerce_stock['und']) ){
         if($product->commerce_stock['und'][0]['value'] <= 0){
           $form['submit']['#value'] = t('Out of Stock');
@@ -66,6 +67,21 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     }
   }
 }
+
+/**
+ * Form validate handler: validate checkout form.
+ *
+ * Make sure all items in the cart are in stock
+ */
+function commerce_stock_add_to_cart_validate($form, &$form_state) {
+  $qty = $form_state['input']['quantity'];
+  $product_id = $form_state['input']['product_id'];
+  $product = commerce_product_load($product_id);
+  if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
+      form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+  }
+}
+
 
 /**
  * Implements hook_form_FORM_ID_alter().
