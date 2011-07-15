@@ -88,8 +88,8 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
  *
  * Alters the cart form to provide a validator for it.
  */
-function commerce_stock_form_commerce_line_item_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
-  $form['#validate'][] = 'commerce_stock_form_commerce_line_item_validate';
+function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
+  $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
 }
 
 /**
@@ -98,17 +98,15 @@ function commerce_stock_form_commerce_line_item_views_form_commerce_cart_form_de
  * Checks each line item to make sure that they have not requested more items
  * than we have in stock.
  */
-function commerce_stock_form_commerce_line_item_validate($form, &$form_state) {
-  foreach ($form['view']['#value']->result as $index => $row) {
-    // Check for quantity in $form_state.
-    $line_item = $row->_field_data['commerce_line_item_field_data_commerce_line_items_line_item_'];
-    $line_item_id = $line_item['entity']->line_item_id;
-    $product_id = $line_item['entity']->commerce_product['und'][0]['product_id'];
+function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
+  $line_item_index = array_keys($form_state['line_items']);
+  foreach ($form_state['input']['edit_quantity'] as $index => $qty) {
+    $line_item = $form_state['line_items'][$line_item_index[$index]];
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    $product_id = $line_item_wrapper->commerce_product->product_id->value();
     $product = commerce_product_load($product_id);
-    $desired_purchase = $form_state['values']['edit_quantity'][$line_item_id];
-
-    if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $desired_purchase)) {
-      form_set_error("edit_quantity][$line_item_id", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+    if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
+      form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
     }
   }
 }
