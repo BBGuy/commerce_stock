@@ -66,6 +66,39 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       }
     }
   }
+  elseif ($form_id == 'commerce_checkout_form_checkout') {
+    // Add validate function to the checkout form
+    $form['#validate'][] = 'commerce_stock_checkout_form_validate';
+  }
+}
+
+/**
+ * Form validate handler: validate checkout form.
+ *
+ * Make sure all items in the cart are in stock
+ */
+function commerce_stock_checkout_form_validate($form, &$form_state) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
+  $order_wrapper->commerce_line_items;
+  $found_errors = FALSE;
+  // Check each line item
+  foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
+    if ($line_item_wrapper->type->value() == 'product') {
+      $product_id = $line_item_wrapper->commerce_product->product_id->value();
+      $product = commerce_product_load($product_id);
+      $desired_purchase = $line_item_wrapper->quantity->value();
+      if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $desired_purchase)) {
+        form_set_error("out_od_stock_$index", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+        $found_errors = TRUE;
+      }
+    }
+  }
+  // if out of stock items send back to the cart form
+  if ($found_errors) {
+    drupal_set_message(t('please adjust quantities before continuing to checkout') );
+    $cart_url = 'http://' . $_SERVER['HTTP_HOST'] . '/cart';
+    drupal_goto( $cart_url);
+  }
 }
 
 /**
