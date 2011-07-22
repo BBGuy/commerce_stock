@@ -35,9 +35,10 @@ function commerce_stock_menu() {
 function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   if (strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
     $stock = array();
-    // Check to see if product has attributes.
-    // @todo: We don't have to do any of this do we?
+    // Check to see if product has options (multiple products using
+    // the default dropdown)
     if(isset($form['product_id']['#options']) ){
+      $form['#after_build'][] = 'commerce_stock_form_after_build';
       $options = $form['product_id']['#options'];
       foreach ($options as $key=>$value) {
         $product = commerce_product_load($key);
@@ -50,9 +51,10 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       }
       $form['product_id']['#element_validate'] = array ('commerce_stock_option_validate');
       $form['product_id']['#stock'] = $stock;
-
+      // @todo: should really be $form['product_id']['#stock'] = $stock[$key];
+      // Code will need updating in all places ['#stock'] is used
     }
-    // Product has options.
+    // A single product or uses attributes (like colour & size).
     else {
       $product = commerce_product_load($form['product_id']['#value']);
       // Add validation to the add to cart
@@ -115,6 +117,25 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
   }
 }
 
+/**
+ * Form after_build handler: validate the product is in stock.
+ */
+function commerce_stock_form_after_build($form, &$form_state) {
+  $prod_id = $form['product_id']['#value'];
+  if ( isset($form['product_id']['#stock']) && isset($form['product_id']['#stock'][$prod_id]) ) {
+    $prod_stock = $form['product_id']['#stock'][$prod_id];
+    if ($prod_stock <= 0) {
+      // remove the add to cart button
+      $form['submit']['#access'] = FALSE;
+      // remove quantity if enabled
+      if (isset($form['submit'])) {
+        $form['quantity']['#access'] = FALSE;
+      }
+    }
+  }
+  return $form;
+}
+
 
 /**
  * Implements hook_form_FORM_ID_alter().
@@ -158,8 +179,12 @@ function commerce_stock_option_validate($element, &$form_state) {
     }
   }
 
-  if ($form_state['values']['quantity'] > $element['#stock'][$form_state['values']['product_id']]) {
-    form_error($element, t('Product is out of Stock'));
+  $stock = $element['#stock'][$form_state['values']['product_id']];
+  if ($element['#stock'][$form_state['values']['product_id']] < 1) {
+    form_error($element, t('Product is out of stock'));
+  }
+  else if ($form_state['values']['quantity'] > $stock) {
+    form_error($element, t("you can only order a maximum of $stock for this item"));
   }
 }
 
