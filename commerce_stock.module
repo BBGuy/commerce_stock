@@ -35,6 +35,7 @@ function commerce_stock_menu() {
 function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   if (strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
     $stock = array();
+    $stock_enabled = array();
     // Check to see if product has options (multiple products using
     // the default dropdown)
     if(isset($form['product_id']['#options']) ){
@@ -43,18 +44,24 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       foreach ($options as $key=>$value) {
         $product = commerce_product_load($key);
         if(!empty($product->commerce_stock['und'])){
+          // Set stock array
           $stock[$key] = $product->commerce_stock['und'][0]['value'];
-          if(($product->commerce_stock['und'][0]['value'] <= 0) && ($product->commerce_stock['und'])){
-            if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+          // set stock enabled array
+          if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+            $stock_enabled[$key] = FALSE;
+          }
+          else {
+            $stock_enabled[$key] = TRUE;
+          }
+          // check if out of stock
+          if( $stock_enabled[$key] && ($product->commerce_stock['und'][0]['value'] <= 0) && ($product->commerce_stock['und'])) {
               $form['product_id']['#options'][$key]  .= ' - ' . t('Out of Stock');
-            }
           }
         }
       }
       $form['product_id']['#element_validate'] = array ('commerce_stock_option_validate');
       $form['product_id']['#stock'] = $stock;
-      // @todo: should really be $form['product_id']['#stock'] = $stock[$key];
-      // Code will need updating in all places ['#stock'] is used
+      $form['product_id']['#stock_enabled'] = $stock_enabled;
     }
     // A single product or uses attributes (like colour & size).
     else {
@@ -62,7 +69,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       // Add validation to the add to cart
       $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
       if(isset($product->commerce_stock['und']) ){
-        if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+       if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
           if($product->commerce_stock['und'][0]['value'] <= 0){
             $form['submit']['#value'] = t('Out of Stock');
             $form['submit']['#disabled'] = TRUE;
@@ -92,10 +99,12 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
     if ($line_item_wrapper->type->value() == 'product') {
       $product_id = $line_item_wrapper->commerce_product->product_id->value();
       $product = commerce_product_load($product_id);
-      $desired_purchase = $line_item_wrapper->quantity->value();
-      if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $desired_purchase)) {
-        form_set_error("out_od_stock_$index", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
-        $found_errors = TRUE;
+      if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+        $desired_purchase = $line_item_wrapper->quantity->value();
+        if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $desired_purchase)) {
+          form_set_error("out_od_stock_$index", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+          $found_errors = TRUE;
+        }
       }
     }
   }
@@ -116,8 +125,10 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
   $qty = $form_state['input']['quantity'];
   $product_id = $form_state['input']['product_id'];
   $product = commerce_product_load($product_id);
-  if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
-      form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+  if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+    if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
+        form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+    }
   }
 }
 
@@ -126,14 +137,16 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
  */
 function commerce_stock_form_after_build($form, &$form_state) {
   $prod_id = $form['product_id']['#value'];
-  if ( isset($form['product_id']['#stock']) && isset($form['product_id']['#stock'][$prod_id]) ) {
-    $prod_stock = $form['product_id']['#stock'][$prod_id];
-    if ($prod_stock <= 0) {
-      // remove the add to cart button
-      $form['submit']['#access'] = FALSE;
-      // remove quantity if enabled
-      if (isset($form['submit'])) {
-        $form['quantity']['#access'] = FALSE;
+  if ( isset($form['product_id']['#stock_enabled']) && isset($form['product_id']['#stock_enabled'][$prod_id]) && $form['product_id']['#stock_enabled'][$prod_id] ) {
+    if ( isset($form['product_id']['#stock']) && isset($form['product_id']['#stock'][$prod_id]) ) {
+      $prod_stock = $form['product_id']['#stock'][$prod_id];
+      if ($prod_stock <= 0) {
+        // remove the add to cart button
+        $form['submit']['#access'] = FALSE;
+        // remove quantity if enabled
+        if (isset($form['submit'])) {
+          $form['quantity']['#access'] = FALSE;
+        }
       }
     }
   }
@@ -163,8 +176,10 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $product_id = $line_item_wrapper->commerce_product->product_id->value();
     $product = commerce_product_load($product_id);
-    if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
-      form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+    if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+      if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
+        form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+      }
     }
   }
 }
@@ -238,7 +253,7 @@ function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
   // @todo: We shouldn't be using 'und' here should we?
   if(isset($product->commerce_stock['und'])){
     if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-      return FALSE;
+     return FALSE;
     }
     if($product->commerce_stock['und'][0]['value'] < $quantity) {
       return $product->commerce_stock['und'][0]['value'];
@@ -253,7 +268,7 @@ function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
  * Ensures a stock field is present on a product type bundle.
  */
 function commerce_stock_configure_product_type($type) {
-  commerce_stock_create_instance('commerce_stock', 'commerce_product', $type, t('Stock'));
+  commerce_stock_create_instance('commerce_stock', 'number_integer', TRUE, 'commerce_product', $type, t('Stock'));
 }
 
 /**
@@ -272,7 +287,7 @@ function commerce_stock_configure_product_type($type) {
  * @param $weight
  *   The default weight of the field instance widget and display.
  */
-function commerce_stock_create_instance($field_name, $field_type, $required, $entity_type, $bundle, $label, $weight = 0) {
+function commerce_stock_create_instance($field_name, $field_type, $required, $entity_type, $bundle, $label, $description = NULL, $weight = 0) {
   // If a field type we know should exist isn't found, clear the Field cache.
 //  if (!field_info_field_types('commerce_stock')) {
 //    field_cache_clear();
@@ -292,10 +307,10 @@ function commerce_stock_create_instance($field_name, $field_type, $required, $en
       'locked' => TRUE,
     );
     if ($field_type == 'list_boolean') {
-       $field['settings'] = array(
-         'allowed_values' => array(0, 1),
-         'allowed_values_function' => '',
-       );
+      $field['settings'] = array(
+        'allowed_values' => array(0, 1),
+        'allowed_values_function' => '',
+      );
     }
     $field = field_create_field($field);
   }
@@ -309,14 +324,16 @@ function commerce_stock_create_instance($field_name, $field_type, $required, $en
       'required' => $required,
       'settings' => array(),
       'display' => array(),
+      'description' => $description,
     );
+
     if ($field_type == 'list_boolean') {
       $instance['widget'] = array(
         'type' => 'options_onoff',
         'settings' => array(
-          'display_label' => TRUE,
-        ),
-      );
+        'display_label' => TRUE,
+       ),
+     );
     }
 
     $entity_info = entity_get_info($entity_type);
