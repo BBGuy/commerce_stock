@@ -45,7 +45,9 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
         if(!empty($product->commerce_stock['und'])){
           $stock[$key] = $product->commerce_stock['und'][0]['value'];
           if(($product->commerce_stock['und'][0]['value'] <= 0) && ($product->commerce_stock['und'])){
-            $form['product_id']['#options'][$key]  .= ' - ' . t('Out of Stock');
+            if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+              $form['product_id']['#options'][$key]  .= ' - ' . t('Out of Stock');
+            }
           }
         }
       }
@@ -60,10 +62,12 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       // Add validation to the add to cart
       $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
       if(isset($product->commerce_stock['und']) ){
-        if($product->commerce_stock['und'][0]['value'] <= 0){
-          $form['submit']['#value'] = t('Out of Stock');
-          $form['submit']['#disabled'] = TRUE;
-          $form['submit']['#attributes'] = array('class' => array('out-of-stock'));
+        if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+          if($product->commerce_stock['und'][0]['value'] <= 0){
+            $form['submit']['#value'] = t('Out of Stock');
+            $form['submit']['#disabled'] = TRUE;
+            $form['submit']['#attributes'] = array('class' => array('out-of-stock'));
+          }
         }
       }
     }
@@ -175,6 +179,10 @@ function commerce_stock_option_validate($element, &$form_state) {
   foreach ($options as $key => $value) {
     $product = commerce_product_load($key);
     if(!empty($product->commerce_stock['und'])){
+      if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+        $element['#stock'][$key] = $form_state['values']['quantity'];
+        continue;
+      }
       $stock[$key] = $product->commerce_stock['und'][0]['value'];
     }
   }
@@ -229,6 +237,9 @@ function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
   $product = commerce_product_load($product_id);
   // @todo: We shouldn't be using 'und' here should we?
   if(isset($product->commerce_stock['und'])){
+    if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+      return FALSE;
+    }
     if($product->commerce_stock['und'][0]['value'] < $quantity) {
       return $product->commerce_stock['und'][0]['value'];
     }
@@ -261,7 +272,7 @@ function commerce_stock_configure_product_type($type) {
  * @param $weight
  *   The default weight of the field instance widget and display.
  */
-function commerce_stock_create_instance($field_name, $entity_type, $bundle, $label, $weight = 0) {
+function commerce_stock_create_instance($field_name, $field_type, $required, $entity_type, $bundle, $label, $weight = 0) {
   // If a field type we know should exist isn't found, clear the Field cache.
 //  if (!field_info_field_types('commerce_stock')) {
 //    field_cache_clear();
@@ -274,12 +285,18 @@ function commerce_stock_create_instance($field_name, $entity_type, $bundle, $lab
   if (empty($field)) {
     $field = array(
       'field_name' => $field_name,
-      'type' => 'number_integer',
+      'type' => $field_type,
       'cardinality' => 1,
       'entity_types' => array($entity_type),
       'translatable' => FALSE,
       'locked' => TRUE,
     );
+    if ($field_type == 'list_boolean') {
+       $field['settings'] = array(
+         'allowed_values' => array(0, 1),
+         'allowed_values_function' => '',
+       );
+    }
     $field = field_create_field($field);
   }
 
@@ -289,10 +306,18 @@ function commerce_stock_create_instance($field_name, $entity_type, $bundle, $lab
       'entity_type' => $entity_type,
       'bundle' => $bundle,
       'label' => $label,
-      'required' => TRUE,
+      'required' => $required,
       'settings' => array(),
       'display' => array(),
     );
+    if ($field_type == 'list_boolean') {
+      $instance['widget'] = array(
+        'type' => 'options_onoff',
+        'settings' => array(
+          'display_label' => TRUE,
+        ),
+      );
+    }
 
     $entity_info = entity_get_info($entity_type);
 
@@ -315,6 +340,21 @@ function commerce_stock_create_instance($field_name, $entity_type, $bundle, $lab
  */
 function commerce_stock_product_type_enabled($type) {
   $instance = field_info_instance('commerce_product', 'commerce_stock', $type);
+  return (!empty($instance));
+}
+
+/**
+ * Given a product type, determine whether stock management override is enabled
+ * on that product type.
+ *
+ * @param $type
+ *   The product type.
+ *
+ * @return
+ *   Boolean: TRUE if stock management override is enabled.
+ */
+function commerce_stock_product_type_override_enabled($type) {
+  $instance = field_info_instance('commerce_product', 'commerce_stock_override', $type);
   return (!empty($instance));
 }
 
