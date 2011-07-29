@@ -101,7 +101,7 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
       $product = commerce_product_load($product_id);
       if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
         $desired_purchase = $line_item_wrapper->quantity->value();
-        if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $desired_purchase)) {
+        if (commerce_stock_product_check_out_of_stock($product_id, $desired_purchase, $remaining_stock)) {
           form_set_error("out_od_stock_$index", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
           $found_errors = TRUE;
         }
@@ -126,7 +126,7 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
   $product_id = $form_state['input']['product_id'];
   $product = commerce_product_load($product_id);
   if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-    if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
+    if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
         form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
     }
   }
@@ -177,7 +177,7 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     $product_id = $line_item_wrapper->commerce_product->product_id->value();
     $product = commerce_product_load($product_id);
     if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-      if ($remaining_stock = commerce_stock_product_check_out_of_stock($product_id, $qty)) {
+      if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
         form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
       }
     }
@@ -227,7 +227,9 @@ function commerce_stock_order_has_out_of_stock($order) {
     $line_item = commerce_line_item_load($line_item_id['line_item_id']);
     if($line_item->type == 'product') {
       $product = commerce_product_load($line_item->commerce_product['und'][0]['product_id']);
-      if(commerce_stock_product_check_out_of_stock($line_item->commerce_product['und'][0]['product_id'],$line_item->quantity ) != FALSE) {
+      $prod_id = $line_item->commerce_product['und'][0]['product_id'];
+      $qry = $line_item->quantity;
+      if(commerce_stock_product_check_out_of_stock($prod_id, $qry, $remaining_stock) != FALSE) {
         return TRUE;
       }
     }
@@ -243,24 +245,35 @@ function commerce_stock_order_has_out_of_stock($order) {
  *   The numeric product ID
  * @param $quantity
  *   Quantity to be purchased.
+ * @param $remaining_stock
+ *   the level of stock that can be ordered if
+ *   commerce_stock_override is not enabled will not be less then 0.
  *
  * @return
  *   FALSE if the product request can be satisfied.
  *   The number available otherwise.
  */
-function commerce_stock_product_check_out_of_stock($product_id ,$quantity) {
+function commerce_stock_product_check_out_of_stock($product_id ,$quantity, &$remaining_stock) {
   $product = commerce_product_load($product_id);
   // @todo: We shouldn't be using 'und' here should we?
   if(isset($product->commerce_stock['und'])){
     if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
      return FALSE;
     }
-    if($product->commerce_stock['und'][0]['value'] < $quantity) {
-      return $product->commerce_stock['und'][0]['value'];
+    // how many do we have for sale, cant be less than zero
+    $remaining_stock = $product->commerce_stock['und'][0]['value'];
+    if ($remaining_stock < 0) {
+      $remaining_stock = 0;
+    }
+    if( ($remaining_stock < $quantity)) {
+      return TRUE;
     }
     else  {
       return FALSE;
     }
+  }
+  else {
+    return FALSE;
   }
 }
 
