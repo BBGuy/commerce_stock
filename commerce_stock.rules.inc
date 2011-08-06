@@ -154,11 +154,13 @@ function commerce_stock_adjust($product, $qty) {
   if (!commerce_stock_product_type_enabled($product->type)) {
     return;
   }
-//drupal_set_message(var_export($product,true));
-  //TODO: dynamically get stock field,
-  // can't remain a hardcoded untranslated field name, I guess
-  $product->commerce_stock['und'][0]['value'] += intval($qty);
-  $result = commerce_product_save($product);
+
+  $wrapper = entity_metadata_wrapper('commerce_product', $product);
+
+  $new_stock = $wrapper->commerce_stock->value() + intval($qty);
+  $wrapper->commerce_stock->set($new_stock);
+  $result = $wrapper->save();
+
   if ($result) {
     watchdog('commerce_stock', 'Modified stock level of product %sku by %amount', array('%sku' => $product->sku, '%amount' => $qty));
   } else {
