@@ -59,7 +59,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
           }
         }
       }
-      $form['product_id']['#element_validate'] = array ('commerce_stock_option_validate');
+      $form['product_id']['#element_validate'][] = 'commerce_stock_option_validate';
       $form['product_id']['#stock'] = $stock;
       $form['product_id']['#stock_enabled'] = $stock_enabled;
     }
