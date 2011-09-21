@@ -39,11 +39,15 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     // Check to see if product has options (multiple products using
     // the default dropdown)
     if(isset($form['product_id']['#options']) ){
-      $form['#after_build'][] = 'commerce_stock_form_after_build';
       $options = $form['product_id']['#options'];
+      // Stock validation only true if stock field exist
+      // @todo: for version 2 we need a better way to determine if
+      // stock enabled and not rely on the existence of the stock field
+      $stock_validation = FALSE;
       foreach ($options as $key=>$value) {
         $product = commerce_product_load($key);
         if(!empty($product->commerce_stock['und'])){
+          $stock_validation = TRUE;
           // Set stock array
           $stock[$key] = $product->commerce_stock['und'][0]['value'];
           // set stock enabled array
@@ -59,9 +63,12 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
           }
         }
       }
-      $form['product_id']['#element_validate'][] = 'commerce_stock_option_validate';
-      $form['product_id']['#stock'] = $stock;
-      $form['product_id']['#stock_enabled'] = $stock_enabled;
+      if ($stock_validation) {
+        $form['#after_build'][] = 'commerce_stock_form_after_build';
+        $form['product_id']['#element_validate'][] = 'commerce_stock_option_validate';
+        $form['product_id']['#stock'] = $stock;
+        $form['product_id']['#stock_enabled'] = $stock_enabled;
+      }
     }
     // A single product or uses attributes (like colour & size).
     else {
