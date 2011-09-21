@@ -189,6 +189,10 @@ function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form,
  * than we have in stock.
  */
 function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
+  // if user chose to remove an item then valid
+  if ($form_state['triggering_element']['#value'] == 'Remove') {
+    return;
+  }
   $line_item_index = array_keys($form_state['line_items']);
   foreach ($form_state['input']['edit_quantity'] as $index => $qty) {
     $line_item = $form_state['line_items'][$line_item_index[$index]];
