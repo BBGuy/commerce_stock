@@ -36,6 +36,10 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   if (strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
     $stock = array();
     $stock_enabled = array();
+    // check if product is disabled
+    if ( isset($form['submit']['#disabled']) && ($form['submit']['#disabled']) ) {
+      return;
+    }
     // Check to see if product has options (multiple products using
     // the default dropdown)
     if(isset($form['product_id']['#options']) ){
