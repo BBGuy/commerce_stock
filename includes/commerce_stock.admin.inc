@@ -106,7 +106,7 @@ function commerce_stock_admin_form_submit($form, &$form_state) {
     $currently_enabled = commerce_stock_product_type_enabled($type);
     // If they want us to enable it and it doesn't currently exist, do the work.
     if ($enable && !$currently_enabled) {
-      commerce_stock_create_instance('commerce_stock', 'number_integer', TRUE, 'commerce_product', $type, t('Stock'));
+      commerce_stock_admin_create_instance('commerce_stock', 'number_integer', TRUE, 'commerce_product', $type, t('Stock'));
       drupal_set_message(t('Stock management has been enabled on the %type product type', array('%type' => $type)));
     }
     // Conversely, if they *don't* want it and it's currently enabled,
@@ -142,7 +142,7 @@ function commerce_stock_admin_form_submit($form, &$form_state) {
       $stock_enabled = commerce_stock_product_type_enabled($type);
       // If they want us to enable it and it doesn't currently exist, do the work.
       if ($enable && $stock_enabled && !$currently_enabled) {
-        commerce_stock_create_instance('commerce_stock_override', 'list_boolean', FALSE, 'commerce_product', $type, t('Disable stock for this product'));
+        commerce_stock_admin_create_instance('commerce_stock_override', 'list_boolean', FALSE, 'commerce_product', $type, t('Disable stock for this product'));
         drupal_set_message(t('Stock management override has been enabled on the %type product type', array('%type' => $type)));
       }
       // Conversely, if they *don't* want it and it's currently enabled,
@@ -162,5 +162,86 @@ function commerce_stock_admin_form_submit($form, &$form_state) {
         }
       }
     }
+  }
+}
+
+/**
+ * Ensures a stock field is present on a product type bundle.
+ */
+function commerce_stock_admin_configure_product_type($type) {
+  commerce_stock_admin_create_instance('commerce_stock', 'number_integer', TRUE, 'commerce_product', $type, t('Stock'));
+}
+
+/**
+ * Creates a required, locked instance of a stock field on the specified bundle.
+ *
+ * @param $field_name
+ *   The name of the field; if it already exists, a new instance of the existing
+ *   field will be created. For fields governed by the Commerce modules, this
+ *   should begin with commerce_.
+ * @param $entity_type
+ *   The type of entity the field instance will be attached to.
+ * @param $bundle
+ *   The bundle name of the entity the field instance will be attached to.
+ * @param $label
+ *   The label of the field instance.
+ * @param $weight
+ *   The default weight of the field instance widget and display.
+ */
+function commerce_stock_admin_create_instance($field_name, $field_type, $required, $entity_type, $bundle, $label, $description = NULL, $weight = 0) {
+  // If a field type we know should exist isn't found, clear the Field cache.
+//  if (!field_info_field_types('commerce_stock')) {
+//    field_cache_clear();
+//  }
+
+  // Look for or add the specified stock field to the requested entity bundle.
+  $field = field_info_field($field_name);
+  $instance = field_info_instance($entity_type, $field_name, $bundle);
+
+  if (empty($field)) {
+    $field = array(
+      'field_name' => $field_name,
+      'type' => $field_type,
+      'cardinality' => 1,
+      'entity_types' => array($entity_type),
+      'translatable' => FALSE,
+      'locked' => TRUE,
+    );
+    if ($field_type == 'list_boolean') {
+      $field['settings'] = array(
+        'allowed_values' => array(0, 1),
+        'allowed_values_function' => '',
+      );
+    }
+    $field = field_create_field($field);
+  }
+
+  if (empty($instance)) {
+    $instance = array(
+      'field_name' => $field_name,
+      'entity_type' => $entity_type,
+      'bundle' => $bundle,
+      'label' => $label,
+      'required' => $required,
+      'settings' => array(),
+      'display' => array(),
+      'description' => $description,
+    );
+
+    if ($field_type == 'list_boolean') {
+      $instance['widget'] = array(
+        'type' => 'options_onoff',
+        'settings' => array(
+        'display_label' => TRUE,
+       ),
+     );
+    }
+
+    $entity_info = entity_get_info($entity_type);
+
+    // Spoof the default view mode so its display type is set.
+    $entity_info['view modes']['default'] = array();
+
+    field_create_instance($instance);
   }
 }
