@@ -10,22 +10,6 @@
  * current stock level. Store admins can view all stock levels using views.
  */
 
-/**
- * Implements hook_menu().
- */
-function commerce_stock_menu() {
-  $items = array();
-
-  $items['admin/commerce/config/stock'] = array(
-    'title' => 'Stock management',
-    'description' => 'Configure stock management.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_stock_admin_form'),
-    'access arguments' => array('administer commerce_product entities'),
-    'file' => 'includes/commerce_stock.admin.inc',
-  );
-  return $items;
-}
 
 /**
  * Implements hook_form_alter().
@@ -148,12 +132,40 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
   $qty = $form_state['input']['quantity'];
   $product_id = $form_state['input']['product_id'];
   $product = commerce_product_load($product_id);
-  if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-    if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
-        form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
-    }
+
+  commerce_stock_check_product_rule($product, $qty, $stock_state, $message);
+
+  if ($stock_state == 1) {
+    form_set_error("stock_error", $message);
   }
+
+  //original code
+//  if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+//    if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
+//        form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+//    }
+//  }
 }
+
+/**
+ *
+ * check stock using rules
+ * Invoke the rule event and return the result of its action
+ *
+ */
+function commerce_stock_check_product_rule($product, $qty, &$stock_state, &$message) {
+  global $stock_check_state;
+  global $stock_check_message;
+  $stock_check_state = 0; // default to ok
+  $stock_check_message = '';
+  // invoke
+  rules_invoke_event('commerce_stock_check_product', $product, $qty );
+  // return
+  $stock_state = $stock_check_state;
+  $message = $stock_check_message;
+}
+
+
 
 /**
  * Form after_build handler: validate the product is in stock.
@@ -362,4 +374,55 @@ function commerce_stock_product_enabled($product) {
  */
 function commerce_stock_line_item_product_enabled($line_item) {
   return commerce_stock_product_type_enabled($line_item->product->type);
+}
+
+
+// New code
+
+
+// @todo: move to sub module
+
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_stock_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/stock'] = array(
+    'title' => 'Stock management',
+    'description' => 'Configure stock management.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_stock_admin_form'),
+    'access arguments' => array('administer commerce_product entities'),
+    'file' => 'includes/commerce_stock.admin.inc',
+  );
+  return $items;
+}
+
+/**
+* Implements hook_entity_property_info_alter()
+*
+*/
+function commerce_stock_entity_property_info_alter(&$info) {
+  // Copy metadata about our stock field from the product bundle to the
+  // commerce_product entity
+  if (!empty($info['commerce_product']['bundles'])) {
+    // Move the default price property to the product by default; as it is a
+    // required default field, this makes dealing with it more convenient.
+    $properties = array();
+
+    foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
+      $bundle_info += array('properties' => array());
+      $properties += $bundle_info['properties'];
+    }
+
+    if ( isset($properties['commerce_stock'])) {
+      $info['commerce_product']['properties']['commerce_stock'] = $properties['commerce_stock'];
+    }
+    if ( isset($properties['commerce_stock_override'])) {
+      $info['commerce_product']['properties']['commerce_stock_override'] = $properties['commerce_stock_override'];
+    }
+
+  }
 }
