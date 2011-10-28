@@ -11,36 +11,12 @@
  * Provides an action to adjust stock level of a certain product
  * by a certain quantity.
  */
+
+include_once 'commerce_stock.module';
+
 function commerce_stock_rules_action_info() {
   $actions = array();
-/*
-  $actions['commerce_stock_adjust'] = array(
-    'label' => t('Adjust the product stock level by a set amount'),
-    'group' => t('Commerce Stock'),
-    'parameter' => array(
-      'commerce_product' => array(
-        'type' => 'commerce_product',
-        'label' => t('Product'),
-        'save' => TRUE //save the changes after executing the rule
-      ),
-      'amount' => array(
-        'type' => 'integer',
-        'label' => t('Amount')
-      ),
-    ),
-  );
 
-  $actions['commerce_stock_adjust_by_order'] = array(
-    'label' => t('Adjust the product stock level, given an order'),
-    'group' => t('Commerce Stock'),
-    'parameter' => array(
-      'commerce_order' => array(
-        'type' => 'commerce_order',
-        'label' => t('Order')
-      ),
-    ),
-  );
-*/
   $actions['commerce_stock_decrease_by_line_item'] = array(
     'label' => t('Decrease the product stock level, given a line item'),
     'group' => t('Commerce Stock'),
@@ -69,20 +45,30 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
+  // The Stock check action
+  $actions['commerce_stock_check_state'] = array(
+    'label' => t('Set the result of a stock check'),
+    'parameter' => array(
+      'stock_action' => array(
+        'type' => 'integer',
+        'label' => t('Stock Action'),
+        'description' => t('the action to take .'),
+        'options list' => 'commerce_stock_check_state_options_list',
+      ),
+      'message' => array(
+        'type' => 'text',
+        'label' => t('User message'),
+      ),
+    ),
+    'group' => t('Commerce Stock'),
+    'callbacks' => array(
+      'execute' => 'commerce_stock_rules_update_state',
+    ),
+  );
+
   return $actions;
 }
 
-/**
- * TODO finish
-function commerce_stock_adjust_by_order($order) {
-watchdog('commerce_stock',var_export($order,true));
- */
-//loop order line items
-
-//commerce_order
-//each (product) line item, adjust stock
-
-//}
 
 /**
  * If the line item is stock-enabled, subtract the sold amount in a line item
@@ -207,4 +193,70 @@ function commerce_stock_rules_condition_info() {
  */
 function commerce_stock_rules_order_has_out_of_stock($order) {
   return commerce_stock_order_has_out_of_stock($order);
+}
+
+
+/**
+ * Implements hook_rules_event_info().
+ */
+function commerce_stock_rules_event_info() {
+  $events = array();
+
+  $events['commerce_stock_check_product'] = array(
+    'label' => t('Check if a product is in stock'),
+    'group' => t('Commerce Stock'),
+    'variables' => commerce_stock_rules_event_variables(),
+    'access callback' => 'commerce_stock_rules_access',
+  );
+
+  return $events;
+}
+
+
+/**
+ * Returns a variables array for stock check event.
+ */
+function commerce_stock_rules_event_variables() {
+  $variables = array(
+    'commerce_product' => array(
+      'label' => t('Product'),
+      'type' => 'commerce_product',
+    ),
+    'stock_quantity' => array(
+      'label' => t('Requested Quantity'),
+      'type' => 'integer',
+    ),
+
+    'stock_check_type' => array(
+      'label' => t('Stock check Type'),
+      'type' => 'integer',
+    ),
+  );
+  return $variables;
+}
+
+/**
+ * Rules integration access callback.
+ */
+function commerce_stock_rules_access() {
+  // @todo
+  return TRUE;
+}
+
+
+/**
+ * Rules action: updates an order's status to the default status of the given
+ *   order state.
+ */
+function commerce_stock_rules_update_state($stock_action, $message) {
+  global $stock_check_state;
+  global $stock_check_message;
+  $stock_check_state = $stock_action;
+  $stock_check_message = $message;
+}
+
+
+function commerce_stock_check_state_options_list() {
+  return array( 0 => 'do nothing' , 1 => 'block transection', 2 => 'display message only');
+
 }
