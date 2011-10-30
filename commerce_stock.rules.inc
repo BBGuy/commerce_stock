@@ -226,11 +226,6 @@ function commerce_stock_rules_event_variables() {
       'label' => t('Requested Quantity'),
       'type' => 'integer',
     ),
-
-    'stock_check_type' => array(
-      'label' => t('Stock check Type'),
-      'type' => 'integer',
-    ),
   );
   return $variables;
 }

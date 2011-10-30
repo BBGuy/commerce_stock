@@ -92,6 +92,77 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   }
 }
 
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Alters the cart form to provide a validator for it.
+ *
+ * @todo can we move this to hook_form_alter have so all code in one place
+ */
+function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
+  $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+}
+
+
+/**
+* Form validate handler: validate the product and quantity to add to the cart.
+* for product dispaly with one product or attributes
+*/
+function commerce_stock_add_to_cart_validate($form, &$form_state) {
+  if ($form_state['submitted']) {
+  // Get product and qty
+    $qty = $form_state['input']['quantity'];
+    $product_id = $form_state['input']['product_id'];
+    $product = commerce_product_load($product_id);
+    // check using rules
+    commerce_stock_check_product_rule($product, $qty, $stock_state, $message);
+    // action
+    if ($stock_state == 1) {
+      form_set_error("stock_error", $message);
+    }
+  }
+}
+
+/**
+ * Form validate handler: validate the product and quantity to add to the cart.
+ * for product dispaly with options
+ */
+function commerce_stock_option_validate($element, &$form_state) {
+  // Get product and qty
+  $prod_id = $form_state['values']['product_id'];
+  $product = commerce_product_load($prod_id);
+  $qty = $form_state['values']['quantity'];
+  // check using rules
+  commerce_stock_check_product_rule($product, $qty, $stock_state, $message);
+  // action
+  if ($stock_state == 1) {
+    form_error($element, $message);
+  }
+}
+
+
+/**
+ *
+ * check stock using rules
+ * Invoke the rule event and return the result of its action
+ *
+ */
+function commerce_stock_check_product_rule($product, $qty, &$stock_state, &$message) {
+  global $stock_check_state;
+  global $stock_check_message;
+  $stock_check_state = 0; // default to ok
+  $stock_check_message = '';
+  // invoke
+  rules_invoke_event('commerce_stock_check_product', $product, $qty );
+  // return
+  $stock_state = $stock_check_state;
+  $message = $stock_check_message;
+}
+
+
+
+
 /**
  * Form validate handler: validate checkout form.
  *
@@ -123,47 +194,6 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
   }
 }
 
-/**
- * Form validate handler: validate checkout form.
- *
- * Make sure all items in the cart are in stock
- */
-function commerce_stock_add_to_cart_validate($form, &$form_state) {
-  $qty = $form_state['input']['quantity'];
-  $product_id = $form_state['input']['product_id'];
-  $product = commerce_product_load($product_id);
-
-  commerce_stock_check_product_rule($product, $qty, $stock_state, $message);
-
-  if ($stock_state == 1) {
-    form_set_error("stock_error", $message);
-  }
-
-  //original code
-//  if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-//    if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
-//        form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
-//    }
-//  }
-}
-
-/**
- *
- * check stock using rules
- * Invoke the rule event and return the result of its action
- *
- */
-function commerce_stock_check_product_rule($product, $qty, &$stock_state, &$message) {
-  global $stock_check_state;
-  global $stock_check_message;
-  $stock_check_state = 0; // default to ok
-  $stock_check_message = '';
-  // invoke
-  rules_invoke_event('commerce_stock_check_product', $product, $qty );
-  // return
-  $stock_state = $stock_check_state;
-  $message = $stock_check_message;
-}
 
 
 
@@ -189,14 +219,6 @@ function commerce_stock_form_after_build($form, &$form_state) {
 }
 
 
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * Alters the cart form to provide a validator for it.
- */
-function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
-  $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
-}
 
 /**
  * Form validator function for cart form.
@@ -215,41 +237,22 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $product_id = $line_item_wrapper->commerce_product->product_id->value();
     $product = commerce_product_load($product_id);
-    if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-      if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
-        form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
-      }
+
+    // @todo: TEST and update error structure
+    // check using rules
+    commerce_stock_check_product_rule($product, $qty, $stock_state, $message);
+    if ($stock_state == 1) {
+      form_set_error("stock_error", $message);
     }
+
+//    if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+//      if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
+//        form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+//      }
+//    }
   }
 }
 
-/**
- * Form validate handler: validate the product and quantity to add to the cart.
- */
-function commerce_stock_option_validate($element, &$form_state) {
-  // validate the stock level
-  // @todo we really don�t need to cycle and load all the products
-  // only $form_state['values']['product_id']
-  $options = $element['#options'];
-  foreach ($options as $key => $value) {
-    $product = commerce_product_load($key);
-    if(!empty($product->commerce_stock['und'])){
-      // if stock override set stock to be the same as quantity so will validate
-      if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-        $element['#stock'][$key] = $form_state['values']['quantity'];
-        continue;
-      }
-    }
-  }
-
-  $stock = $element['#stock'][$form_state['values']['product_id']];
-  if ($element['#stock'][$form_state['values']['product_id']] < 1) {
-    form_error($element, t('Product is out of stock'));
-  }
-  else if ($form_state['values']['quantity'] > $stock) {
-    form_error($element, t("you can only order a maximum of $stock for this item"));
-  }
-}
 
 /**
  * Determine whether an order has items which are out of stock.
@@ -408,8 +411,6 @@ function commerce_stock_entity_property_info_alter(&$info) {
   // Copy metadata about our stock field from the product bundle to the
   // commerce_product entity
   if (!empty($info['commerce_product']['bundles'])) {
-    // Move the default price property to the product by default; as it is a
-    // required default field, this makes dealing with it more convenient.
     $properties = array();
 
     foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
