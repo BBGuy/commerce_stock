@@ -113,7 +113,7 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
   if ($form_state['submitted']) {
   // Get product and qty
     $qty = $form_state['values']['quantity'];
-    $product_id = $form_state['input']['product_id'];
+    $product_id = $form_state['values']['product_id'];
     $product = commerce_product_load($product_id);
     $qty_ordered = commerce_stock_check_cart_product_level($product_id);
     // check using rules
@@ -123,7 +123,6 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
       form_set_error("stock_error", $message);
     }
     else if ($stock_state == 2) {
-      $form_state['input']['quantity'] = $qty;
       $form_state['values']['quantity'] = $qty;
       drupal_set_message($message);
     }
@@ -147,7 +146,6 @@ function commerce_stock_option_validate($element, &$form_state) {
     form_error($element, $message);
   }
   else if ($stock_state == 2) {
-    $form_state['input']['quantity'] = $qty;
     $form_state['values']['quantity'] = $qty;
     drupal_set_message($message);
   }
@@ -275,11 +273,12 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     return;
   }
   $line_item_index = array_keys($form_state['line_items']);
-  foreach ($form_state['input']['edit_quantity'] as $index => $qty) {
+  foreach ($form_state['values']['edit_quantity'] as $index => $qty) {
     $line_item = $form_state['line_items'][$line_item_index[$index]];
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $product_id = $line_item_wrapper->commerce_product->product_id->value();
     $product = commerce_product_load($product_id);
+    $qty = 0;
     $qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
     // @todo: TEST and update error structure
