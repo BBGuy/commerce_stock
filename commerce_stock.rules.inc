@@ -59,6 +59,10 @@ function commerce_stock_rules_action_info() {
         'type' => 'text',
         'label' => t('User message'),
       ),
+      'approved_quantity' => array(
+        'type' => 'integer',
+        'label' => t('Approved Quantity'),
+      ),
     ),
     'group' => t('Commerce Stock'),
     'callbacks' => array(
@@ -222,8 +226,16 @@ function commerce_stock_rules_event_variables() {
       'label' => t('Product'),
       'type' => 'commerce_product',
     ),
-    'stock_quantity' => array(
+    'stock_requested_quantity' => array(
       'label' => t('Requested Quantity'),
+      'type' => 'integer',
+    ),
+    'stock_already_ordered' => array(
+      'label' => t('Quantity already ordered (in the cart)'),
+      'type' => 'integer',
+    ),
+    'stock_requested_total' => array(
+      'label' => t('Quantity requested + already ordered'),
       'type' => 'integer',
     ),
   );
@@ -243,11 +255,20 @@ function commerce_stock_rules_access() {
  * Rules action: updates an order's status to the default status of the given
  *   order state.
  */
-function commerce_stock_rules_update_state($stock_action, $message) {
-  global $stock_check_state;
-  global $stock_check_message;
-  $stock_check_state = $stock_action;
-  $stock_check_message = $message;
+function commerce_stock_rules_update_state($stock_action, $message, $approved_quantity) {
+
+  if ($approved_quantity < 0) {
+    $approved_quantity = 0;
+    // if zero transection must be blocked as it you are not allowed
+    // to add zero quantity to the cart
+    $stock_action = 1;
+  }
+  // set the global stock check array
+  global $stock_check_data;
+  $stock_check_data['state'] = $stock_action;
+  $stock_check_data['message'] = $message;
+  $stock_check_data['qty'] = $approved_quantity;
+
 }
 
 
