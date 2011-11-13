@@ -14,6 +14,123 @@
 
 include_once 'commerce_stock.module';
 
+
+
+/**
+ * Implements hook_rules_event_info().
+ */
+function commerce_stock_rules_event_info() {
+  $events = array();
+
+  $events['commerce_stock_check_product'] = array(
+    'label' => t('Check if a product is in stock'),
+    'group' => t('Commerce Stock'),
+    'variables' => commerce_stock_rules_event_variables(),
+    'access callback' => 'commerce_stock_rules_access',
+  );
+
+  $events['commerce_stock_check_add_to_cart_state'] = array(
+    'label' => t('Check if a product add to cart should be enabled (is in stock)'),
+    'group' => t('Commerce Stock'),
+    'variables' => commerce_stock_rules_cart_event_variables(),
+    'access callback' => 'commerce_stock_rules_access',
+  );
+
+  return $events;
+}
+
+
+/**
+ * Returns a variables array for stock check event.
+ */
+function commerce_stock_rules_event_variables() {
+  $variables = array(
+    'commerce_product' => array(
+      'label' => t('Product'),
+      'type' => 'commerce_product',
+    ),
+    'stock_requested_quantity' => array(
+      'label' => t('Requested Quantity'),
+      'type' => 'integer',
+    ),
+    'stock_already_ordered' => array(
+      'label' => t('Quantity already ordered (in the cart)'),
+      'type' => 'integer',
+    ),
+    'stock_requested_total' => array(
+      'label' => t('Quantity requested + already ordered'),
+      'type' => 'integer',
+    ),
+  );
+  return $variables;
+}
+
+
+/**
+ * Returns a variables array for stock enable cart check event.
+ */
+function commerce_stock_rules_cart_event_variables() {
+  $variables = array(
+    'commerce_product' => array(
+      'label' => t('Product'),
+      'type' => 'commerce_product',
+    ),
+    'stock_already_ordered' => array(
+      'label' => t('Quantity already ordered (in the cart)'),
+      'type' => 'integer',
+    ),
+  );
+  return $variables;
+}
+
+
+
+/**
+ * Implements hook_rules_condition_info().
+ */
+function commerce_stock_rules_condition_info() {
+  $conditions = array();
+
+  $conditions['commerce_stock_order_has_out_of_stock'] = array(
+    'label' => t('Order has products that are out of stock'),
+    'parameter' => array(
+      'order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order'),
+      ),
+    ),
+    'group' => t('Commerce Stock'),
+    'callbacks' => array(
+      'execute' => 'commerce_stock_rules_order_has_out_of_stock',
+    ),
+  );
+  $conditions['commerce_stock_stock_enabled_on_line_item'] = array(
+    'label' => t('Line item has a product of product type that has stock management enabled'),
+    'parameter' => array(
+      'type' => 'commerce_line_item',
+      'label' => t('Product'),
+    ),
+    'group' => t('Commerce Stock'),
+    'callbacks' => array(
+      'execute' => 'commerce_stock_line_item_product_enabled',
+    ),
+  );
+
+  return $conditions;
+}
+
+/**
+ *
+ * Rules condition: checks to see if the given order is in a cart status.
+ */
+function commerce_stock_rules_order_has_out_of_stock($order) {
+  return commerce_stock_order_has_out_of_stock($order);
+}
+
+/**
+ *
+ * Implementation of hook_rules_event_info().
+ */
 function commerce_stock_rules_action_info() {
   $actions = array();
 
@@ -67,6 +184,36 @@ function commerce_stock_rules_action_info() {
     'group' => t('Commerce Stock'),
     'callbacks' => array(
       'execute' => 'commerce_stock_rules_update_state',
+    ),
+  );
+
+
+
+  // The Stock enable add to cart check action
+  $actions['commerce_stock_add_to_cart_state'] = array(
+    'label' => t('Set the state of the add to cart'),
+    'parameter' => array(
+
+      'disabled' => array(
+        'type' => 'boolean',
+        'label' => t('Disable the add to cart?'),
+      ),
+
+      'text' => array(
+        'type' => 'text',
+        'label' => t('The text to set the action to'),
+      ),
+
+      'class_name' => array(
+        'type' => 'text',
+        'label' => t('add a class to the add to cart form'),
+      ),
+
+
+    ),
+    'group' => t('Commerce Stock'),
+    'callbacks' => array(
+      'execute' => 'commerce_stock_rules_set_add_to_cart_state',
     ),
   );
 
@@ -158,89 +305,8 @@ function commerce_stock_adjust($product, $qty) {
   }
 }
 
-/**
- * Implements hook_rules_condition_info().
- */
-function commerce_stock_rules_condition_info() {
-  $conditions = array();
-
-  $conditions['commerce_stock_order_has_out_of_stock'] = array(
-    'label' => t('Order has products that are out of stock'),
-    'parameter' => array(
-      'order' => array(
-        'type' => 'commerce_order',
-        'label' => t('Order'),
-      ),
-    ),
-    'group' => t('Commerce Stock'),
-    'callbacks' => array(
-      'execute' => 'commerce_stock_rules_order_has_out_of_stock',
-    ),
-  );
-  $conditions['commerce_stock_stock_enabled_on_line_item'] = array(
-    'label' => t('Line item has a product of product type that has stock management enabled'),
-    'parameter' => array(
-      'type' => 'commerce_line_item',
-      'label' => t('Product'),
-    ),
-    'group' => t('Commerce Stock'),
-    'callbacks' => array(
-      'execute' => 'commerce_stock_line_item_product_enabled',
-    ),
-  );
-
-  return $conditions;
-}
-
-/**
- * Rules condition: checks to see if the given order is in a cart status.
- */
-function commerce_stock_rules_order_has_out_of_stock($order) {
-  return commerce_stock_order_has_out_of_stock($order);
-}
 
 
-/**
- * Implements hook_rules_event_info().
- */
-function commerce_stock_rules_event_info() {
-  $events = array();
-
-  $events['commerce_stock_check_product'] = array(
-    'label' => t('Check if a product is in stock'),
-    'group' => t('Commerce Stock'),
-    'variables' => commerce_stock_rules_event_variables(),
-    'access callback' => 'commerce_stock_rules_access',
-  );
-
-  return $events;
-}
-
-
-/**
- * Returns a variables array for stock check event.
- */
-function commerce_stock_rules_event_variables() {
-  $variables = array(
-    'commerce_product' => array(
-      'label' => t('Product'),
-      'type' => 'commerce_product',
-    ),
-    'stock_requested_quantity' => array(
-      'label' => t('Requested Quantity'),
-      'type' => 'integer',
-    ),
-    'stock_already_ordered' => array(
-      'label' => t('Quantity already ordered (in the cart)'),
-      'type' => 'integer',
-    ),
-    'stock_requested_total' => array(
-      'label' => t('Quantity requested + already ordered'),
-      'type' => 'integer',
-    ),
-  );
-  return $variables;
-}
 
 /**
  * Rules integration access callback.
@@ -270,6 +336,29 @@ function commerce_stock_rules_update_state($stock_action, $message, $approved_qu
   $stock_check_data['qty'] = $approved_quantity;
 
 }
+
+
+/**
+ * Rules action:
+ *
+ */
+function commerce_stock_rules_set_add_to_cart_state($disabled, $text, $class_name) {
+   // drupal_set_message('test 2');
+
+  global $stock_cart_check_data;
+  $stock_cart_check_data['form']['submit']['#value'] = $text;
+  $stock_cart_check_data['form']['submit']['#disabled'] = $disabled;
+  $stock_cart_check_data['form']['#attributes']['class']['stock'] = $class_name;
+
+//  $stock_cart_check_data['form']['submit']['#value'] = t('Out of stock');
+//  $stock_cart_check_data['form']['submit']['#disabled'] = TRUE;
+//  $stock_cart_check_data['form']['#attributes'][] = array('class' => array('out-of-stock'));
+
+
+}
+
+
+
 
 
 function commerce_stock_check_state_options_list() {

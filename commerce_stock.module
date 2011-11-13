@@ -63,8 +63,9 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
           }
         }
         // Set validation
+        $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
         $form['#after_build'][] = 'commerce_stock_form_after_build';
-        $form['product_id']['#element_validate'][] = 'commerce_stock_option_validate';
+        //$form['product_id']['#element_validate'][] = 'commerce_stock_option_validate';
         $form['product_id']['#stock'] = $stock;
         $form['product_id']['#stock_enabled'] = $stock_enabled;
       }
@@ -72,18 +73,10 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
 
     // A single product or uses attributes (like colour & size).
     else {
-      $product = commerce_product_load($form['product_id']['#value']);
       // Add validation to the add to cart
       $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
-      if(isset($product->commerce_stock['und']) ){
-       if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-          if($product->commerce_stock['und'][0]['value'] <= 0){
-            $form['submit']['#value'] = t('Out of Stock');
-            $form['submit']['#disabled'] = TRUE;
-            $form['submit']['#attributes'] = array('class' => array('out-of-stock'));
-          }
-        }
-      }
+      // check if the add to cart form should be enabled (in stock)
+      commerce_stock_cart_state_validate($form);
     }
   }
   elseif ($form_id == 'commerce_checkout_form_checkout') {
@@ -103,6 +96,34 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
 function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
   $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
 }
+
+
+
+/**
+* check if the add to cart form should be enabled (in stock)
+*
+*/
+function commerce_stock_cart_state_validate(&$form) {
+
+  $product_id = $form['product_id']['#value'];
+  $product = commerce_product_load($product_id);
+  $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+
+  // Initialize the form
+  $form['submit']['#value'] = 'Add to cart';
+  $form['submit']['#disabled'] = FALSE;
+  $form['#attributes']['class']['stock'] = 'in-stock';
+
+
+
+  global $stock_cart_check_data;
+  $stock_cart_check_data = array(
+    'form' => &$form,
+  );
+  // invoke the stock check event
+  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered, $form);
+}
+
 
 
 /**
@@ -130,6 +151,7 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
 }
 
 /**
+ * @todo - THis is not needed as we use one function check for all
  * Form validate handler: validate the product and quantity to add to the cart.
  * for product dispaly with options
  */
@@ -328,6 +350,7 @@ function commerce_stock_order_has_out_of_stock($order) {
 
   return FALSE;
 }
+
 
 /**
  * Check whether a purrchase quantity exceeds what is available.
