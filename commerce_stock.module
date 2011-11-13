@@ -27,50 +27,10 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     // Check to see if product has options (multiple products using
     // the default dropdown)
     if(isset($form['product_id']['#options']) ){
-      $options = $form['product_id']['#options'];
-      // Stock validation (for options):
-      // Stock validation only true if stock field exist
-      // @todo: for version 2 we need a better way to determine if
-      // stock enabled and not rely on the existence of the stock field
-      $stock_validation = FALSE;
-      foreach ($options as $key=>$value) {
-        $product = commerce_product_load($key);
-        if(!empty($product->commerce_stock['und'])){
-          $stock_validation = TRUE;
-          // Set stock array
-          $stock[$key] = $product->commerce_stock['und'][0]['value'];
-          // set stock enabled array
-          if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-            $stock_enabled[$key] = FALSE;
-          }
-          else {
-            $stock_enabled[$key] = TRUE;
-          }
-        }
-        else {
-          // stock is disabled or the product has no value (we will handle it as 0)
-          // @todo if stock field had a default of 0 this wont be needed
-          $stock_enabled[$key] = TRUE;
-          $stock[$key] = 0;
-        }
-      }
-      // Stock validation actions (for options):
-      if ($stock_validation) {
-        // set "out of stock"  Message
-        foreach ($options as $key=>$value) {
-          if($stock_enabled[$key] && ($stock[$key] <= 0)) {
-            $form['product_id']['#options'][$key]  .= ' - ' . t('Out of Stock');
-          }
-        }
-        // Set validation
-        $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
-        $form['#after_build'][] = 'commerce_stock_form_after_build';
-        //$form['product_id']['#element_validate'][] = 'commerce_stock_option_validate';
-        $form['product_id']['#stock'] = $stock;
-        $form['product_id']['#stock_enabled'] = $stock_enabled;
-      }
+      // Set validation
+      $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
+      commerce_stock_cart_state_validate_options($form);
     }
-
     // A single product or uses attributes (like colour & size).
     else {
       // Add validation to the add to cart
@@ -127,6 +87,36 @@ function commerce_stock_cart_state_validate(&$form) {
 
 
 /**
+* check if the add to cart form should be enabled (in stock)
+ * for product with options
+*
+*/
+function commerce_stock_cart_state_validate_options(&$form) {
+
+  $product_id = $form['product_id']['#default_value'];
+  $product = commerce_product_load($product_id);
+  $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+
+  // Initialize the form
+  $form['submit']['#value'] = 'Add to cart';
+  $form['submit']['#disabled'] = FALSE;
+  $form['#attributes']['class']['stock'] = 'in-stock';
+
+
+
+  global $stock_cart_check_data;
+  $stock_cart_check_data = array(
+    'form' => &$form,
+  );
+  // invoke the stock check event
+  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered, $form);
+}
+
+
+
+
+
+/**
 * Form validate handler: validate the product and quantity to add to the cart.
 * for product dispaly with one product or attributes
 */
@@ -149,6 +139,9 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
     }
   }
 }
+
+
+
 
 /**
  * @todo - THis is not needed as we use one function check for all
