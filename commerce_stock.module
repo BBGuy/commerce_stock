@@ -18,8 +18,6 @@
  */
 function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   if (strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
-    $stock = array();
-    $stock_enabled = array();
     // check if product is disabled
     if ( isset($form['submit']['#disabled']) && ($form['submit']['#disabled']) ) {
       return;
@@ -33,6 +31,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     }
     // A single product or uses attributes (like colour & size).
     else {
+      // @todo new rules event for handling options - do we need it?
       // Add validation to the add to cart
       $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
       // check if the add to cart form should be enabled (in stock)
@@ -230,7 +229,7 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
   $found_errors = FALSE;
   // Check each line item
   foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
-    if ($line_item_wrapper->type->value() == 'product') {
+    if(in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
       $product_id = $line_item_wrapper->commerce_product->product_id->value();
       $product = commerce_product_load($product_id);
       if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
@@ -331,7 +330,7 @@ function commerce_stock_order_has_out_of_stock($order) {
   $line_items = $order->commerce_line_items['und'];
   foreach ($line_items as $line_item_id ) {
     $line_item = commerce_line_item_load($line_item_id['line_item_id']);
-    if($line_item->type == 'product') {
+    if(in_array($line_item->type, commerce_product_line_item_types())) {
       $product = commerce_product_load($line_item->commerce_product['und'][0]['product_id']);
       $prod_id = $line_item->commerce_product['und'][0]['product_id'];
       $qry = $line_item->quantity;

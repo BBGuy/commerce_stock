@@ -95,6 +95,28 @@ function commerce_stock_admin_form_validate($form, &$form_state) {
   }
 }
 
+
+/**
+ * This functions parses all the product of the specified bundle, and initialize its stock field (commerce_stock) to a value
+ * @param  String $bundle
+ *  Commerce product bundle type to initialize
+ * @param  int $init_stock_value
+ *  Stock value to initialize to
+ * @return void
+ */
+function commerce_stock_admin_init($bundle, $init_stock_value) {
+  //Load every product of $bundle type
+  $products = commerce_product_load_multiple(array(), array('type' => $bundle));
+  //Parses each product to initialize its stock value
+  foreach($products as $product) {
+    $wrapper = entity_metadata_wrapper('commerce_product', $product);
+    //dpm($wrapper->getPropertyInfo());
+    $wrapper->commerce_stock = $init_stock_value; //@todo: the name of the stock field should probably be a variable for commerce_stock v2
+    $wrapper->save();
+  }
+}
+
+
 /**
  * Add or remove the Stock field from product types.
  */
@@ -107,6 +129,7 @@ function commerce_stock_admin_form_submit($form, &$form_state) {
     // If they want us to enable it and it doesn't currently exist, do the work.
     if ($enable && !$currently_enabled) {
       commerce_stock_admin_create_instance('commerce_stock', 'number_integer', TRUE, 'commerce_product', $type, t('Stock'));
+      commerce_stock_admin_init($type, 0);
       drupal_set_message(t('Stock management has been enabled on the %type product type', array('%type' => $type)));
     }
     // Conversely, if they *don't* want it and it's currently enabled,
@@ -173,7 +196,7 @@ function commerce_stock_admin_configure_product_type($type) {
 }
 
 /**
- * Creates a required, locked instance of a stock field on the specified bundle.
+ * Creates a required instance of a stock field on the specified bundle.
  *
  * @param $field_name
  *   The name of the field; if it already exists, a new instance of the existing
@@ -205,7 +228,7 @@ function commerce_stock_admin_create_instance($field_name, $field_type, $require
       'cardinality' => 1,
       'entity_types' => array($entity_type),
       'translatable' => FALSE,
-      'locked' => TRUE,
+      'locked' => FALSE,
     );
     if ($field_type == 'list_boolean') {
       $field['settings'] = array(
@@ -226,6 +249,7 @@ function commerce_stock_admin_create_instance($field_name, $field_type, $require
       'settings' => array(),
       'display' => array(),
       'description' => $description,
+      'default_value' => array(array('value' => "0")),
     );
 
     if ($field_type == 'list_boolean') {
