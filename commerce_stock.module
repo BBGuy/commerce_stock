@@ -216,7 +216,7 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
  */
 function commerce_stock_option_validate($element, &$form_state) {
   // validate the stock level
-  // @todo we really don’t need to cycle and load all the products
+  // @todo we really dont need to cycle and load all the products
   // only $form_state['values']['product_id']
   $options = $element['#options'];
   foreach ($options as $key => $value) {
@@ -313,7 +313,7 @@ function commerce_stock_configure_product_type($type) {
 }
 
 /**
- * Creates a required, locked instance of a stock field on the specified bundle.
+ * Creates a required instance of a stock field on the specified bundle.
  *
  * @param $field_name
  *   The name of the field; if it already exists, a new instance of the existing
@@ -345,7 +345,7 @@ function commerce_stock_create_instance($field_name, $field_type, $required, $en
       'cardinality' => 1,
       'entity_types' => array($entity_type),
       'translatable' => FALSE,
-      'locked' => TRUE,
+      'locked' => FALSE,
     );
     if ($field_type == 'list_boolean') {
       $field['settings'] = array(
@@ -366,6 +366,7 @@ function commerce_stock_create_instance($field_name, $field_type, $required, $en
       'settings' => array(),
       'display' => array(),
       'description' => $description,
+      'default_value' => array(array('value' => "0")),
     );
 
     if ($field_type == 'list_boolean') {
