@@ -104,9 +104,10 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   }
   elseif ($form_id == 'commerce_checkout_form_checkout') {
     // Add validate function to the checkout form
-    $form['#validate'][] = 'commerce_stock_checkout_form_validate';
+    $form['buttons']['continue']['#validate'][] = 'commerce_stock_checkout_form_validate';
   }
 }
+
 
 /**
  * Form validate handler: validate checkout form.
@@ -134,7 +135,7 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
   // if out of stock items send back to the cart form
   if ($found_errors) {
     drupal_set_message(t('please adjust quantities before continuing to checkout') );
-    $cart_url = 'http://' . $_SERVER['HTTP_HOST'] . '/cart';
+    $cart_url = url('cart', array('absolute' => TRUE));
     drupal_goto( $cart_url);
   }
 }
