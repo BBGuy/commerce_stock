@@ -38,6 +38,10 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       commerce_stock_cart_state_validate($form);
     }
   }
+  elseif ($form_id == 'views_form_commerce_cart_form_default') {
+    // Add validate function to the checkout form
+    $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+  }
   elseif ($form_id == 'commerce_checkout_form_checkout') {
     // Add validate function to the checkout form
     $form['buttons']['continue']['#validate'][] = 'commerce_stock_checkout_form_validate';
@@ -45,16 +49,16 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
 }
 
 
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * Alters the cart form to provide a validator for it.
- *
- * @todo can we move this to hook_form_alter have so all code in one place
- */
-function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
-  $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
-}
+///**
+// * Implements hook_form_FORM_ID_alter().
+// *
+// * Alters the cart form to provide a validator for it.
+// *
+// * @todo can we move this to hook_form_alter have so all code in one place
+// */
+//function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
+//  $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+//}
 
 
 /**
@@ -317,10 +321,10 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
     // @todo: TEST and update error structure
     if ($stock_state == 1) {
-      form_set_error("stock_error", $message . $stock_state);
+      form_set_error("stock_error", $message);
     }
     else if ($stock_state == 2) {
-      drupal_set_message($message. $stock_state);
+      drupal_set_message($message);
       // @todo set aproved qty ????
     }
 
