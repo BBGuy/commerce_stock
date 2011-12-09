@@ -34,6 +34,13 @@ function commerce_stock_rules_event_info() {
     'access callback' => 'commerce_stock_rules_access',
   );
 
+  $events['commerce_stock_check_product_checkout'] = array(
+    'label' => t('Check if a product is in stock before continuing to checkout'),
+    'group' => t('Commerce Stock'),
+    'variables' => commerce_stock_rules_cart_event_variables(),
+    'access callback' => 'commerce_stock_rules_access',
+  );
+
   return $events;
 }
 
@@ -215,6 +222,32 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
+
+  // The Stock checkout check action
+  $actions['commerce_stock_checkout_state'] = array(
+    'label' => t('Set the state of the checkout process (called one per an item)'),
+    'parameter' => array(
+      'stock_action' => array(
+        'type' => 'integer',
+        'label' => t('Stock Action'),
+        'description' => t('the action to take .'),
+        'options list' => 'commerce_stock_check_state_options_list',
+      ),
+      'message' => array(
+        'type' => 'text',
+        'label' => t('User message'),
+      ),
+      'approved_quantity' => array(
+        'type' => 'integer',
+        'label' => t('Approved Quantity'),
+      ),
+    ),
+    'group' => t('Commerce Stock'),
+    'callbacks' => array(
+      'execute' => 'commerce_stock_rules_set_checkout_state',
+    ),
+  );
+
   return $actions;
 }
 
@@ -359,6 +392,29 @@ function commerce_stock_rules_set_add_to_cart_state($disabled, $text, $class_nam
 
 }
 
+
+
+/**
+ * Rules action:
+ *
+ */
+function commerce_stock_rules_set_checkout_state($stock_action, $message, $approved_quantity) {
+if ($approved_quantity < 0) {
+    $approved_quantity = 0;
+    // if zero transection must be blocked as it you are not allowed
+    // to add zero quantity to the cart
+    $stock_action = 1;
+  }
+//  if ($stock_action > $stock_check_data['state']) {
+//    $stock_check_data['state'] = $stock_action;
+//  }
+  // set the global stock check array
+  global $stock_check_data;
+  $stock_check_data['state'] = $stock_action;
+  $stock_check_data['message'] = $message;
+  $stock_check_data['qty'] = $approved_quantity;
+
+}
 
 
 

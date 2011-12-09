@@ -80,7 +80,7 @@ function commerce_stock_cart_state_validate(&$form) {
     'form' => &$form,
   );
   // invoke the stock check event
-  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered, $form);
+  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered);
 }
 
 
@@ -215,39 +215,36 @@ function commerce_stock_check_product_rule($product, &$qty, $qty_ordered, &$stoc
 
 }
 
-
-
-
 /**
- * Form validate handler: validate checkout form.
  *
- * Make sure all items in the cart are in stock
+ * check stock using rules at the point of checkout
+ * Invoke the rule event and return the result of its action
+ *
  */
-function commerce_stock_checkout_form_validate($form, &$form_state) {
-  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
-  $order_wrapper->commerce_line_items;
-  $found_errors = FALSE;
-  // Check each line item
-  foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
-    if(in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
-      $product_id = $line_item_wrapper->commerce_product->product_id->value();
-      $product = commerce_product_load($product_id);
-      if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-        $desired_purchase = $line_item_wrapper->quantity->value();
-        if (commerce_stock_product_check_out_of_stock($product_id, $desired_purchase, $remaining_stock)) {
-          form_set_error("out_od_stock_$index", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
-          $found_errors = TRUE;
-        }
-      }
-    }
+function commerce_stock_check_product_checkout_rule($product, $qty_ordered, &$stock_state, &$message) {
+
+  // set defaults to the global stock check array
+  global $stock_check_data;
+  $stock_check_data = array(
+    'state' => '0',  // default to ok
+    'message' => '',
+    'qty' => $qty_ordered
+  );
+
+  // invoke the stock check event
+  rules_invoke_event('commerce_stock_check_product_checkout', $product, $qty_ordered);
+
+  // if state not ok/do nothing then return the valuse set by the action
+  if ($stock_check_data['state'] <> 0) {
+    $stock_state = $stock_check_data['state'];
+    $message = $stock_check_data['message'];
+    $qty = $stock_check_data['qty'];
   }
-  // if out of stock items send back to the cart form
-  if ($found_errors) {
-    drupal_set_message(t('please adjust quantities before continuing to checkout') );
-    $cart_url = url('cart', array('absolute' => TRUE));
-    drupal_goto( $cart_url);
-  }
+
 }
+
+
+
 
 
 
@@ -292,28 +289,58 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $product_id = $line_item_wrapper->commerce_product->product_id->value();
     $product = commerce_product_load($product_id);
-    $qty = 0;
     $qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
-    // @todo: TEST and update error structure
     // check using rules
-    commerce_stock_check_product_rule($product, $qty, $qty_ordered, $stock_state, $message);
+    commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
+    // @todo: TEST and update error structure
     if ($stock_state == 1) {
-      form_set_error("stock_error", $message);
+      form_set_error("stock_error", $message . $stock_state);
     }
     else if ($stock_state == 2) {
-      drupal_set_message($message);
+      drupal_set_message($message. $stock_state);
       // @todo set aproved qty ????
     }
 
-
-//    if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-//      if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
-//        form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
-//      }
-//    }
   }
 }
+
+/**
+ * Form validate handler: validate checkout form.
+ *
+ * Make sure all items in the cart are in stock
+ */
+function commerce_stock_checkout_form_validate($form, &$form_state) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
+  $order_wrapper->commerce_line_items;
+  $found_errors = FALSE;
+  // Check each line item
+  foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
+    if(in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+      $product_id = $line_item_wrapper->commerce_product->product_id->value();
+      $product = commerce_product_load($product_id);
+      $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+      // check using rules
+      commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
+      // @todo: TEST and update error structure
+      if ($stock_state == 1) {
+        form_set_error("stock_error", $message . $stock_state);
+        $found_errors = TRUE;
+      }
+      else if ($stock_state == 2) {
+        drupal_set_message($message. $stock_state);
+        // @todo set aproved qty ????
+      }
+    }
+  }
+  // if out of stock items send back to the cart form
+  if ($found_errors) {
+    drupal_set_message(t('please adjust quantities before continuing to checkout') );
+    $cart_url = url('cart', array('absolute' => TRUE));
+    drupal_goto( $cart_url);
+  }
+}
+
 
 
 /**
