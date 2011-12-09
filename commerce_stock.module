@@ -139,7 +139,7 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
  */
 function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
   // if user chose to remove an item then valid
-  if ($form_state['triggering_element']['#value'] == 'Remove') {
+  if ($form_state['triggering_element']['#value'] == t('Remove') ) {
     return;
   }
   $line_item_index = array_keys($form_state['line_items']);
@@ -148,10 +148,10 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     $product_id = $line_item_wrapper->commerce_product->product_id->value();
     $product = commerce_product_load($product_id);
-    $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+    //$qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
     // check using rules
-    commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
+    commerce_stock_check_product_checkout_rule($product, $qty, $stock_state, $message);
     // @todo: TEST and update error structure
     if ($stock_state == 1) {
       form_set_error("stock_error", $message);
@@ -226,21 +226,17 @@ function commerce_stock_cart_state_validate(&$form) {
 
 
 
-
-
-
-
-
-
 /**
  *
  * check if product is in the cart and return the quentity if it is
+ *
  */
 function commerce_stock_check_cart_product_level($product_id) {
   $cart_qty = 0;
   global $user;
   // load the current cart
   $order = commerce_cart_order_load($user->uid);
+  // @todo: use entity_metadata_wrapper as this is called from lots of places
   if ($order) {
     // cycle throw each line item ID
     foreach($order->commerce_line_items['und'] as $line_item_id){
