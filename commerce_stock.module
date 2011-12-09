@@ -57,6 +57,28 @@ function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form,
 }
 
 
+/**
+ * Implements hook_commerce_checkout_pane_info().
+ *
+ * Creates the stock checkout pane:
+ * Should be placed on the first stage of checkout.
+ * when loads checks if all items in stock and if not redirects
+ * you to the cart.
+ */
+function commerce_stock_commerce_checkout_pane_info() {
+  $checkout_panes = array();
+
+  $checkout_panes['stock_validation_checkout_pane'] = array(
+    'title' => t('check if all items are in stock at checkout'),
+    'base' => 'commerce_stock_commerce_checkout_pane',
+    'page' => 'checkout',
+    'fieldset' => FALSE,
+  );
+
+  return $checkout_panes;
+}
+
+
 
 /**
 * check if the add to cart form should be enabled (in stock)
@@ -308,11 +330,29 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
 /**
  * Form validate handler: validate checkout form.
  *
- * Make sure all items in the cart are in stock
+ * Make sure all items in the cart are in stock before continuing
+ * should not get this far as this is now handled by the
+ * stock checkout pane, but as that can be disabled may be safe to
+ * keep this extra check.
  */
 function commerce_stock_checkout_form_validate($form, &$form_state) {
   $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
-  $order_wrapper->commerce_line_items;
+  commerce_stock_checkout_validate($order_wrapper);
+}
+
+/**
+ * The stock checkout pane form: call stock the validation when
+ * displaying the form this will alow us to redirect the user
+ * before he starts checkout
+ */
+function commerce_stock_commerce_checkout_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
+  commerce_stock_checkout_validate($order_wrapper);
+}
+
+
+
+function commerce_stock_checkout_validate($order_wrapper) {
   $found_errors = FALSE;
   // Check each line item
   foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
