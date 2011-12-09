@@ -49,17 +49,6 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
 }
 
 
-///**
-// * Implements hook_form_FORM_ID_alter().
-// *
-// * Alters the cart form to provide a validator for it.
-// *
-// * @todo can we move this to hook_form_alter have so all code in one place
-// */
-//function commerce_stock_form_views_form_commerce_cart_form_default_alter(&$form, &$form_state) {
-//  $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
-//}
-
 
 /**
  * Implements hook_commerce_checkout_pane_info().
@@ -81,6 +70,130 @@ function commerce_stock_commerce_checkout_pane_info() {
 
   return $checkout_panes;
 }
+
+
+/***[ form validation ]****/
+
+
+
+/**
+* Form validate handler: add to cart
+* For products with options (product dropdown)
+* check if the add to cart form should be enabled (in stock)
+*
+*/
+function commerce_stock_cart_state_validate_options(&$form) {
+
+  $product_id = $form['product_id']['#default_value'];
+  $product = commerce_product_load($product_id);
+  $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+
+  // Initialize the form
+  $form['submit']['#value'] = 'Add to cart';
+  $form['submit']['#disabled'] = FALSE;
+  $form['#attributes']['class']['stock'] = 'in-stock';
+
+
+
+  global $stock_cart_check_data;
+  $stock_cart_check_data = array(
+    'form' => &$form,
+  );
+  // invoke the stock check event
+  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered, $form);
+}
+
+
+/**
+* Form validate handler: add to cart
+* For product dispaly with one product or attributes
+* validate the product and quantity to add to the cart.
+* check if the add to cart form should be enabled (in stock)
+*/
+function commerce_stock_add_to_cart_validate($form, &$form_state) {
+  if ($form_state['submitted']) {
+  // Get product and qty
+    $qty = $form_state['values']['quantity'];
+    $product_id = $form_state['values']['product_id'];
+    $product = commerce_product_load($product_id);
+    $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+    // check using rules
+    commerce_stock_check_product_rule($product, $qty, $qty_ordered, $stock_state, $message);
+    // action
+    if ($stock_state == 1) {
+      form_set_error("stock_error", $message);
+    }
+    else if ($stock_state == 2) {
+      $form_state['values']['quantity'] = $qty;
+      drupal_set_message($message);
+    }
+  }
+}
+
+
+/**
+ * Form validate handler: Cart form.
+ *
+ * Checks each line item to make sure that they have not requested more items
+ * than we have in stock.
+ */
+function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
+  // if user chose to remove an item then valid
+  if ($form_state['triggering_element']['#value'] == 'Remove') {
+    return;
+  }
+  $line_item_index = array_keys($form_state['line_items']);
+  foreach ($form_state['values']['edit_quantity'] as $index => $qty) {
+    $line_item = $form_state['line_items'][$line_item_index[$index]];
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    $product_id = $line_item_wrapper->commerce_product->product_id->value();
+    $product = commerce_product_load($product_id);
+    $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+
+    // check using rules
+    commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
+    // @todo: TEST and update error structure
+    if ($stock_state == 1) {
+      form_set_error("stock_error", $message);
+    }
+    else if ($stock_state == 2) {
+      drupal_set_message($message);
+      // @todo set aproved qty ????
+    }
+
+  }
+}
+
+
+/**
+ * Form validate handler: validate checkout form.
+ *
+ * Make sure all items in the cart are in stock before continuing
+ * should not get this far as this is now handled by the
+ * stock checkout pane, but as that can be disabled may be safe to
+ * keep this extra check.
+ */
+function commerce_stock_checkout_form_validate($form, &$form_state) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
+  commerce_stock_checkout_validate($order_wrapper);
+}
+
+
+
+/***[ pane validation ]****/
+
+/**
+ * The stock checkout pane form: call stock the validation when
+ * displaying the form this will alow us to redirect the user
+ * before he starts checkout
+ */
+function commerce_stock_commerce_checkout_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
+  commerce_stock_checkout_validate($order_wrapper);
+}
+
+
+/***[ util funcs ]****/
 
 
 
@@ -111,85 +224,13 @@ function commerce_stock_cart_state_validate(&$form) {
 
 
 
-/**
-* check if the add to cart form should be enabled (in stock)
- * for product with options
-*
-*/
-function commerce_stock_cart_state_validate_options(&$form) {
-
-  $product_id = $form['product_id']['#default_value'];
-  $product = commerce_product_load($product_id);
-  $qty_ordered = commerce_stock_check_cart_product_level($product_id);
-
-  // Initialize the form
-  $form['submit']['#value'] = 'Add to cart';
-  $form['submit']['#disabled'] = FALSE;
-  $form['#attributes']['class']['stock'] = 'in-stock';
-
-
-
-  global $stock_cart_check_data;
-  $stock_cart_check_data = array(
-    'form' => &$form,
-  );
-  // invoke the stock check event
-  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered, $form);
-}
 
 
 
 
 
-/**
-* Form validate handler: validate the product and quantity to add to the cart.
-* for product dispaly with one product or attributes
-*/
-function commerce_stock_add_to_cart_validate($form, &$form_state) {
-  if ($form_state['submitted']) {
-  // Get product and qty
-    $qty = $form_state['values']['quantity'];
-    $product_id = $form_state['values']['product_id'];
-    $product = commerce_product_load($product_id);
-    $qty_ordered = commerce_stock_check_cart_product_level($product_id);
-    // check using rules
-    commerce_stock_check_product_rule($product, $qty, $qty_ordered, $stock_state, $message);
-    // action
-    if ($stock_state == 1) {
-      form_set_error("stock_error", $message);
-    }
-    else if ($stock_state == 2) {
-      $form_state['values']['quantity'] = $qty;
-      drupal_set_message($message);
-    }
-  }
-}
 
 
-
-
-/**
- * @todo - THis is not needed as we use one function check for all
- * Form validate handler: validate the product and quantity to add to the cart.
- * for product dispaly with options
- */
-function commerce_stock_option_validate($element, &$form_state) {
-  // Get product and qty
-  $product_id = $form_state['values']['product_id'];
-  $product = commerce_product_load($product_id);
-  $qty = $form_state['values']['quantity'];
-  $qty_ordered = commerce_stock_check_cart_product_level($product_id);
-  // check using rules
-  commerce_stock_check_product_rule($product, $qty, $qty_ordered, $stock_state, $message);
-  // action
-  if ($stock_state == 1) {
-    form_error($element, $message);
-  }
-  else if ($stock_state == 2) {
-    $form_state['values']['quantity'] = $qty;
-    drupal_set_message($message);
-  }
-}
 
 /**
  *
@@ -298,61 +339,8 @@ function commerce_stock_form_after_build($form, &$form_state) {
 
 
 
-/**
- * Form validator function for cart form.
- *
- * Checks each line item to make sure that they have not requested more items
- * than we have in stock.
- */
-function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
-  // if user chose to remove an item then valid
-  if ($form_state['triggering_element']['#value'] == 'Remove') {
-    return;
-  }
-  $line_item_index = array_keys($form_state['line_items']);
-  foreach ($form_state['values']['edit_quantity'] as $index => $qty) {
-    $line_item = $form_state['line_items'][$line_item_index[$index]];
-    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $product_id = $line_item_wrapper->commerce_product->product_id->value();
-    $product = commerce_product_load($product_id);
-    $qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
-    // check using rules
-    commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
-    // @todo: TEST and update error structure
-    if ($stock_state == 1) {
-      form_set_error("stock_error", $message);
-    }
-    else if ($stock_state == 2) {
-      drupal_set_message($message);
-      // @todo set aproved qty ????
-    }
 
-  }
-}
-
-/**
- * Form validate handler: validate checkout form.
- *
- * Make sure all items in the cart are in stock before continuing
- * should not get this far as this is now handled by the
- * stock checkout pane, but as that can be disabled may be safe to
- * keep this extra check.
- */
-function commerce_stock_checkout_form_validate($form, &$form_state) {
-  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
-  commerce_stock_checkout_validate($order_wrapper);
-}
-
-/**
- * The stock checkout pane form: call stock the validation when
- * displaying the form this will alow us to redirect the user
- * before he starts checkout
- */
-function commerce_stock_commerce_checkout_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
-  $order_wrapper = entity_metadata_wrapper('commerce_order', $form_state['order']);
-  commerce_stock_checkout_validate($order_wrapper);
-}
 
 
 
