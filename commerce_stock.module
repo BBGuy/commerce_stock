@@ -237,16 +237,14 @@ function commerce_stock_check_cart_product_level($product_id) {
   global $user;
   // load the current cart
   $order = commerce_cart_order_load($user->uid);
-  // @todo: use entity_metadata_wrapper as this is called from lots of places
-  if ($order) {
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  if ($order_wrapper) {
     // cycle throw each line item ID
-    foreach($order->commerce_line_items['und'] as $line_item_id){
-       // load each line item in the cart and check if $product_id
-       $line_item = commerce_line_item_load($line_item_id['line_item_id']);
-       if($line_item->commerce_product['und'][0]['product_id'] == $product_id){
-         $cart_qty += $line_item->quantity;
+    foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
+       if($line_item_wrapper->commerce_product->product_id->value() == $product_id){
+         $cart_qty += $line_item_wrapper->quantity->value();
        }
-     }
+    }
   }
   return $cart_qty;
 }
