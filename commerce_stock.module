@@ -403,6 +403,56 @@ function commerce_stock_order_has_out_of_stock($order) {
 }
 
 
+
+
+/**
+ * Implements hook_menu().
+ * @todo divide functionality between this to a sub module
+ */
+function commerce_stock_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/stock'] = array(
+    'title' => 'Stock management',
+    'description' => 'Configure stock management.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_stock_admin_form'),
+    'access arguments' => array('administer commerce_product entities'),
+    'file' => 'includes/commerce_stock.admin.inc',
+  );
+  return $items;
+}
+
+/**
+* Implements hook_entity_property_info_alter()
+*
+* @todo move this to a sub module
+*/
+function commerce_stock_entity_property_info_alter(&$info) {
+  // Copy metadata about our stock field from the product bundle to the
+  // commerce_product entity
+  if (!empty($info['commerce_product']['bundles'])) {
+    $properties = array();
+
+    foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
+      $bundle_info += array('properties' => array());
+      $properties += $bundle_info['properties'];
+    }
+
+    if ( isset($properties['commerce_stock'])) {
+      $info['commerce_product']['properties']['commerce_stock'] = $properties['commerce_stock'];
+    }
+    if ( isset($properties['commerce_stock_override'])) {
+      $info['commerce_product']['properties']['commerce_stock_override'] = $properties['commerce_stock_override'];
+    }
+
+  }
+}
+
+
+// @todo: review the need for the following 4 functions
+// and update or move to sub module
+
 /**
  * Given a product type, determine whether stock management is enabled on that
  * product type.
@@ -459,53 +509,4 @@ function commerce_stock_product_enabled($product) {
  */
 function commerce_stock_line_item_product_enabled($line_item) {
   return commerce_stock_product_type_enabled($line_item->product->type);
-}
-
-
-// New code
-
-
-// @todo: move to sub module
-
-
-/**
- * Implements hook_menu().
- */
-function commerce_stock_menu() {
-  $items = array();
-
-  $items['admin/commerce/config/stock'] = array(
-    'title' => 'Stock management',
-    'description' => 'Configure stock management.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_stock_admin_form'),
-    'access arguments' => array('administer commerce_product entities'),
-    'file' => 'includes/commerce_stock.admin.inc',
-  );
-  return $items;
-}
-
-/**
-* Implements hook_entity_property_info_alter()
-*
-*/
-function commerce_stock_entity_property_info_alter(&$info) {
-  // Copy metadata about our stock field from the product bundle to the
-  // commerce_product entity
-  if (!empty($info['commerce_product']['bundles'])) {
-    $properties = array();
-
-    foreach ($info['commerce_product']['bundles'] as $bundle => $bundle_info) {
-      $bundle_info += array('properties' => array());
-      $properties += $bundle_info['properties'];
-    }
-
-    if ( isset($properties['commerce_stock'])) {
-      $info['commerce_product']['properties']['commerce_stock'] = $properties['commerce_stock'];
-    }
-    if ( isset($properties['commerce_stock_override'])) {
-      $info['commerce_product']['properties']['commerce_stock_override'] = $properties['commerce_stock_override'];
-    }
-
-  }
 }
