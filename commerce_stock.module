@@ -370,6 +370,7 @@ function commerce_stock_checkout_validate($order_wrapper) {
 
 
 
+
 /**
  * Determine whether an order has items which are out of stock.
  *
@@ -381,60 +382,24 @@ function commerce_stock_checkout_validate($order_wrapper) {
  *   FALSE otherwise.
  */
 function commerce_stock_order_has_out_of_stock($order) {
-  $line_items = $order->commerce_line_items['und'];
-  foreach ($line_items as $line_item_id ) {
-    $line_item = commerce_line_item_load($line_item_id['line_item_id']);
-    if(in_array($line_item->type, commerce_product_line_item_types())) {
-      $product = commerce_product_load($line_item->commerce_product['und'][0]['product_id']);
-      $prod_id = $line_item->commerce_product['und'][0]['product_id'];
-      $qry = $line_item->quantity;
-      if(commerce_stock_product_check_out_of_stock($prod_id, $qry, $remaining_stock) != FALSE) {
-        return TRUE;
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $outofstock = FALSE;
+  // Check each line item
+  foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
+    if(in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+      $product_id = $line_item_wrapper->commerce_product->product_id->value();
+      $product = commerce_product_load($product_id);
+      $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+      // check using rules
+      commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
+      // both 1 and 2 are errors
+      if (($stock_state == 1)|| ($stock_state == 2) ){
+        $outofstock = TRUE;
+        break;
       }
     }
   }
-
-  return FALSE;
-}
-
-
-/**
- * Check whether a purrchase quantity exceeds what is available.
- *
- * @param $product_id
- *   The numeric product ID
- * @param $quantity
- *   Quantity to be purchased.
- * @param $remaining_stock
- *   the level of stock that can be ordered if
- *   commerce_stock_override is not enabled will not be less then 0.
- *
- * @return
- *   FALSE if the product request can be satisfied.
- *   The number available otherwise.
- */
-function commerce_stock_product_check_out_of_stock($product_id ,$quantity, &$remaining_stock) {
-  $product = commerce_product_load($product_id);
-  // @todo: We shouldn't be using 'und' here should we?
-  if(isset($product->commerce_stock['und'])){
-    if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-     return FALSE;
-    }
-    // how many do we have for sale, cant be less than zero
-    $remaining_stock = $product->commerce_stock['und'][0]['value'];
-    if ($remaining_stock < 0) {
-      $remaining_stock = 0;
-    }
-    if( ($remaining_stock < $quantity)) {
-      return TRUE;
-    }
-    else  {
-      return FALSE;
-    }
-  }
-  else {
-    return FALSE;
-  }
+  return $outofstock;
 }
 
 
