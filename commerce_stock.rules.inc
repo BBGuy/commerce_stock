@@ -56,15 +56,15 @@ function commerce_stock_rules_event_variables() {
     ),
     'stock_requested_quantity' => array(
       'label' => t('Requested Quantity'),
-      'type' => 'integer',
+      'type' => 'decimal',
     ),
     'stock_already_ordered' => array(
       'label' => t('Quantity already ordered (in the cart)'),
-      'type' => 'integer',
+      'type' => 'decimal',
     ),
     'stock_requested_total' => array(
       'label' => t('Quantity requested + already ordered'),
-      'type' => 'integer',
+      'type' => 'decimal',
     ),
   );
   return $variables;
@@ -82,7 +82,7 @@ function commerce_stock_rules_cart_event_variables() {
     ),
     'stock_already_ordered' => array(
       'label' => t('Quantity already ordered (in the cart)'),
-      'type' => 'integer',
+      'type' => 'decimal',
     ),
   );
   return $variables;
@@ -172,7 +172,7 @@ function commerce_stock_rules_action_info() {
     'label' => t('Set the result of a stock check'),
     'parameter' => array(
       'stock_action' => array(
-        'type' => 'integer',
+        'type' => 'decimal',
         'label' => t('Stock Action'),
         'description' => t('the action to take .'),
         'options list' => 'commerce_stock_check_state_options_list',
@@ -182,7 +182,7 @@ function commerce_stock_rules_action_info() {
         'label' => t('User message'),
       ),
       'approved_quantity' => array(
-        'type' => 'integer',
+        'type' => 'decimal',
         'label' => t('Approved Quantity'),
       ),
     ),
@@ -228,7 +228,7 @@ function commerce_stock_rules_action_info() {
     'label' => t('Set the state of the checkout process (called one per an item)'),
     'parameter' => array(
       'stock_action' => array(
-        'type' => 'integer',
+        'type' => 'decimal',
         'label' => t('Stock Action'),
         'description' => t('the action to take .'),
         'options list' => 'commerce_stock_check_state_options_list',
@@ -238,7 +238,7 @@ function commerce_stock_rules_action_info() {
         'label' => t('User message'),
       ),
       'approved_quantity' => array(
-        'type' => 'integer',
+        'type' => 'decimal',
         'label' => t('Approved Quantity'),
       ),
     ),
@@ -268,7 +268,7 @@ function commerce_stock_decrease_by_line_item($line_item) {
       if (!(commerce_stock_product_type_override_enabled($product->type)
           && isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
 
-        $qty = (int) $line_item->quantity;
+        $qty = $line_item->quantity;
         // Subtract the sold amount from the available stock level.
         commerce_stock_adjust($product, -$qty);
       }
@@ -304,7 +304,7 @@ function commerce_stock_increase_by_line_item($line_item) {
       if (!(commerce_stock_product_type_override_enabled($product->type)
            && isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
 
-        $qty = (int) $line_item->quantity;
+        $qty = $line_item->quantity;
         // Subtract the sold amount from the available stock level.
         commerce_stock_adjust($product, $qty);
       }
@@ -314,7 +314,7 @@ function commerce_stock_increase_by_line_item($line_item) {
 
 /**
  * Adjusts a particular product SKU by a certain value.
- * A positive integer will add to stock, a negative integer will remove from
+ * A positive number will add to stock, a negative number will remove from
  * stock. Somewhat the equivalent of uc_stock_adjust().
  *
  * @param $product
@@ -329,7 +329,7 @@ function commerce_stock_adjust($product, $qty) {
 
   $wrapper = entity_metadata_wrapper('commerce_product', $product);
 
-  $new_stock = $wrapper->commerce_stock->value() + intval($qty);
+  $new_stock = $wrapper->commerce_stock->value() + $qty;
   $wrapper->commerce_stock->set($new_stock);
   $result = $wrapper->save();
 

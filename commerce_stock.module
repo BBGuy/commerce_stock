@@ -139,6 +139,7 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
  */
 function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
   // if user chose to remove an item then valid
+  // @todo: is it safe to check for remove do we have a better way?
   if ($form_state['triggering_element']['#value'] == t('Remove') ) {
     return;
   }

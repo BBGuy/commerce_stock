@@ -128,7 +128,7 @@ function commerce_stock_admin_form_submit($form, &$form_state) {
     $currently_enabled = commerce_stock_product_type_enabled($type);
     // If they want us to enable it and it doesn't currently exist, do the work.
     if ($enable && !$currently_enabled) {
-      commerce_stock_admin_create_instance('commerce_stock', 'number_integer', TRUE, 'commerce_product', $type, t('Stock'));
+      commerce_stock_admin_create_instance('commerce_stock', 'number_decimal', TRUE, 'commerce_product', $type, t('Stock'));
       commerce_stock_admin_init($type, 0);
       drupal_set_message(t('Stock management has been enabled on the %type product type', array('%type' => $type)));
     }
@@ -192,7 +192,7 @@ function commerce_stock_admin_form_submit($form, &$form_state) {
  * Ensures a stock field is present on a product type bundle.
  */
 function commerce_stock_admin_configure_product_type($type) {
-  commerce_stock_admin_create_instance('commerce_stock', 'number_integer', TRUE, 'commerce_product', $type, t('Stock'));
+  commerce_stock_admin_create_instance('commerce_stock', 'number_decimal', TRUE, 'commerce_product', $type, t('Stock'));
 }
 
 /**
