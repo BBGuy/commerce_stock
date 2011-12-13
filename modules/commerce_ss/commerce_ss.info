@@ -1,0 +1,8 @@
+name = Commerce Simple Stock
+description = Manage stock levels of Commerce products using a decimal level field and rules
+package = Commerce (contrib)
+dependencies[] = number
+dependencies[] = commerce_product
+dependencies[] = commerce_order
+dependencies[] = commerce_stock
+core = 7.x

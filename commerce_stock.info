@@ -1,5 +1,5 @@
-name = Commerce Stock
-description = Manage stock levels of Commerce products
+name = Commerce Stock API
+description = Provides a stock management framework basked on rulesManage stock levels of commerce products
 package = Commerce (contrib)
 dependencies[] = number
 dependencies[] = commerce_product
