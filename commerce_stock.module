@@ -87,7 +87,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     }
 
     // A single product or uses attributes (like colour & size).
-    else {
+    elseif (isset($form['product_id']['#value'])) {
       $product = commerce_product_load($form['product_id']['#value']);
       // Add validation to the add to cart
       $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
