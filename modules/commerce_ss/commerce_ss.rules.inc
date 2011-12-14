@@ -35,9 +35,12 @@ function commerce_ss_rules_condition_info() {
     ),
     'group' => t('Commerce Stock (ss)'),
     'callbacks' => array(
+      // @todo add a function that also checked that the "Disable stock for this product" is not on
+      // or maybe add another condision forœœ
       'execute' => 'commerce_ss_product_enabled',
     ),
   );
+
 
   return $conditions;
 }
