@@ -132,7 +132,7 @@ function commerce_stock_cart_state_validate_options(&$form) {
     'form' => &$form,
   );
   // invoke the stock check event
-  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered, $form);
+  rules_invoke_event('commerce_stock_check_add_to_cart_form_state', $product, $qty_ordered, $form);
 }
 
 
@@ -301,7 +301,7 @@ function commerce_stock_check_product_rule($product, &$qty, $qty_ordered, &$stoc
   );
 
   // invoke the stock check event
-  rules_invoke_event('commerce_stock_check_product', $product, $qty, $qty_ordered, $qty + $qty_ordered);
+  rules_invoke_event('commerce_stock_add_to_cart_check_product', $product, $qty, $qty_ordered, $qty + $qty_ordered);
 
   // if state not ok/do nothing then return the valuse set by the action
   if ($stock_check_data['state'] <> 0) {
@@ -366,8 +366,6 @@ function commerce_stock_form_after_build($form, &$form_state) {
   }
   return $form;
 }
-
-
 
 
 

@@ -111,3 +111,16 @@ function commerce_ss_product_enabled($product) {
 function commerce_ss_line_item_product_enabled($line_item) {
   return commerce_ss_product_type_enabled($line_item->product->type);
 }
+
+
+function commerce_ss_product_not_disabled_by_override($product) {
+  $ok = FALSE;
+  // if stop overide enabled for the product type
+  if (commerce_ss_product_type_override_enabled($product->type)) {
+     // if the product has its override set and its not turned on (no override)
+     if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] != 1)) {
+       $ok = TRUE;
+     }
+  }
+  return $ok;
+}

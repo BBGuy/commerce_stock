@@ -11,21 +11,24 @@
 function commerce_ss_rules_condition_info() {
   $conditions = array();
 
-  $conditions['commerce_ss_stock_enabled_on_line_item'] = array(
-    'label' => t('Line item has a product with simple stock enabled'),
-    'parameter' => array(
-      'commerce_line_item' => array(
-        'type' => 'commerce_line_item',
-        'label' => t('Line Item'),
-      ),
-    ),
-    'group' => t('Commerce Stock (ss)'),
-    'callbacks' => array(
-      'execute' => 'commerce_ss_line_item_product_enabled',
-    ),
-  );
+// i dont think we need both this and the product enabled conditions
+// if anyone finds a good reason for it ill put it back
+//  $conditions['commerce_ss_stock_enabled_on_line_item'] = array(
+//    'label' => t('Line item has a product with simple stock enabled'),
+//    'parameter' => array(
+//      'commerce_line_item' => array(
+//        'type' => 'commerce_line_item',
+//        'label' => t('Line Item'),
+//      ),
+//    ),
+//    'group' => t('Commerce Stock (ss)'),
+//    'callbacks' => array(
+//      'execute' => 'commerce_ss_line_item_product_enabled',
+//    ),
+//  );
+
   $conditions['commerce_ss_stock_enabled_on_product'] = array(
-    'label' => t('Product has simple stock enabled'),
+    'label' => t('Product has simple stock enabled for its type'),
 
     'parameter' => array(
       'commerce_product' => array(
@@ -41,6 +44,22 @@ function commerce_ss_rules_condition_info() {
     ),
   );
 
+  $conditions['commerce_ss_stock_not_disabled'] = array(
+    'label' => t('Product simple stock is not disabled by an override'),
+
+    'parameter' => array(
+      'commerce_product' => array(
+        'type' => 'commerce_product',
+        'label' => t('product'),
+      ),
+    ),
+    'group' => t('Commerce Stock (ss)'),
+    'callbacks' => array(
+      // @todo add a function that also checked that the "Disable stock for this product" is not on
+      // or maybe add another condision forœœ
+      'execute' => 'commerce_ss_product_not_disabled_by_override',
+    ),
+  );
 
   return $conditions;
 }

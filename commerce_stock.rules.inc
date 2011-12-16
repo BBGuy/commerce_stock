@@ -20,15 +20,15 @@
 function commerce_stock_rules_event_info() {
   $events = array();
 
-  $events['commerce_stock_check_product'] = array(
-    'label' => t('Check if a product is in stock'),
+  $events['commerce_stock_add_to_cart_check_product'] = array(
+    'label' => t('Check if a product is in stock when adding to cart'),
     'group' => t('Commerce Stock'),
     'variables' => commerce_stock_rules_event_variables(),
     'access callback' => 'commerce_stock_rules_access',
   );
 
-  $events['commerce_stock_check_add_to_cart_state'] = array(
-    'label' => t('Check if a product add to cart should be enabled (is in stock)'),
+  $events['commerce_stock_check_add_to_cart_form_state'] = array(
+    'label' => t('Check if a product add to cart form should be enabled (is in stock)'),
     'group' => t('Commerce Stock'),
     'variables' => commerce_stock_rules_cart_event_variables(),
     'access callback' => 'commerce_stock_rules_access',
@@ -128,8 +128,8 @@ function commerce_stock_rules_action_info() {
   $actions = array();
 
   // The Stock check action
-  $actions['commerce_stock_check_state'] = array(
-    'label' => t('Set the result of a stock check'),
+  $actions['commerce_stock_add_to_cart_set_state'] = array(
+    'label' => t('Set the result of an add to cart stock check'),
     'parameter' => array(
       'stock_action' => array(
         'type' => 'decimal',
@@ -148,15 +148,15 @@ function commerce_stock_rules_action_info() {
     ),
     'group' => t('Commerce Stock'),
     'callbacks' => array(
-      'execute' => 'commerce_stock_rules_update_state',
+      'execute' => 'commerce_stock_rules_add_to_cart_set_state',
     ),
   );
 
 
 
   // The Stock enable add to cart check action
-  $actions['commerce_stock_add_to_cart_state'] = array(
-    'label' => t('Set the state of the add to cart'),
+  $actions['commerce_stock_set_add_to_cart_form_state'] = array(
+    'label' => t('Set the state of the add to cart form'),
     'parameter' => array(
 
       'disabled' => array(
@@ -178,7 +178,7 @@ function commerce_stock_rules_action_info() {
     ),
     'group' => t('Commerce Stock'),
     'callbacks' => array(
-      'execute' => 'commerce_stock_rules_set_add_to_cart_state',
+      'execute' => 'commerce_stock_rules_set_add_to_cart_form_state',
     ),
   );
 
@@ -229,7 +229,7 @@ function commerce_stock_rules_access() {
  * Rules action: updates an order's status to the default status of the given
  *   order state.
  */
-function commerce_stock_rules_update_state($stock_action, $message, $approved_quantity) {
+function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $approved_quantity) {
 
   if ($approved_quantity < 0) {
     $approved_quantity = 0;
@@ -250,7 +250,7 @@ function commerce_stock_rules_update_state($stock_action, $message, $approved_qu
  * Rules action:
  *
  */
-function commerce_stock_rules_set_add_to_cart_state($disabled, $text, $class_name) {
+function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $class_name) {
    // drupal_set_message('test 2');
 
   global $stock_cart_check_data;
