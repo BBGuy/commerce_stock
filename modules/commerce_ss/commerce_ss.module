@@ -122,5 +122,9 @@ function commerce_ss_product_not_disabled_by_override($product) {
        $ok = TRUE;
      }
   }
+  else {
+    // if no override field then product cant be disabled
+    $ok = TRUE;
+  }
   return $ok;
 }
