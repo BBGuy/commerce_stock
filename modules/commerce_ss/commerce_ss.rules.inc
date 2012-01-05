@@ -74,7 +74,7 @@ function commerce_ss_rules_action_info() {
 
   $actions['commerce_ss_decrease_by_line_item'] = array(
     'label' => t('Decrease the product stock level, given a line item'),
-    'group' => t('Commerce Stock'),
+    'group' => t('Commerce Stock (ss)'),
     'parameter' => array(
       'commerce_line_item' => array(
         'type' => 'commerce_line_item',
@@ -85,7 +85,7 @@ function commerce_ss_rules_action_info() {
 
   $actions['commerce_ss_increase_by_line_item'] = array(
     'label' => t('Increase the product stock level, given a line item'),
-    'group' => t('Commerce Stock'),
+    'group' => t('Commerce Stock (ss)'),
     'parameter' => array(
       'commerce_line_item' => array(
         'type' => 'commerce_line_item',
