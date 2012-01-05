@@ -388,7 +388,7 @@ function commerce_stock_checkout_validate($order_wrapper) {
         $found_errors = TRUE;
       }
       else if ($stock_state == 2) {
-        drupal_set_message($message. $stock_state);
+        drupal_set_message($message);
         // @todo set aproved qty ????
       }
     }
