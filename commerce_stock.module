@@ -252,7 +252,7 @@ function commerce_stock_cart_state_validate(&$form) {
     'form' => &$form,
   );
   // invoke the stock check event
-  rules_invoke_event('commerce_stock_check_add_to_cart_state', $product, $qty_ordered);
+  rules_invoke_event('commerce_stock_check_add_to_cart_form_state', $product, $qty_ordered);
 }
 
 
