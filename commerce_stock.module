@@ -149,8 +149,10 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
   $qty = $form_state['input']['quantity'];
   $product_id = $form_state['input']['product_id'];
   $product = commerce_product_load($product_id);
+  $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+  $qty_total = $qty + $qty_ordered;
   if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-    if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
+    if (commerce_stock_product_check_out_of_stock($product_id, $qty_total, $remaining_stock)) {
         form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
     }
   }
@@ -235,8 +237,13 @@ function commerce_stock_option_validate($element, &$form_state) {
   if ($element['#stock'][$form_state['values']['product_id']] < 1) {
     form_error($element, t('Product is out of stock'));
   }
-  else if ($form_state['values']['quantity'] > $stock) {
-    form_error($element, t("you can only order a maximum of $stock for this item"));
+  else {
+    $product_id = $form_state['values']['product_id'];
+    $qty = $form_state['values']['quantity'];
+    $qty_ordered = commerce_stock_check_cart_product_level($product_id);
+    if ( ($qty + $qty_ordered) > $stock) {
+      form_error($element, t("you can only order a maximum of $stock for this item"));
+    }
   }
 }
 
@@ -444,4 +451,31 @@ function commerce_stock_product_enabled($product) {
  */
 function commerce_stock_line_item_product_enabled($line_item) {
   return commerce_stock_product_type_enabled($line_item->product->type);
+}
+
+
+
+/**
+ *
+ * check if product is in the cart and return the quentity if it is
+ *
+ */
+function commerce_stock_check_cart_product_level($product_id) {
+  $cart_qty = 0;
+  global $user;
+  // load the current cart if it exists
+  $order = commerce_cart_order_load($user->uid);
+  if (!$order) {
+    return 0;
+  }
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  if ($order_wrapper) {
+    // cycle throw each line item ID
+    foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
+       if($line_item_wrapper->commerce_product->product_id->value() == $product_id){
+         $cart_qty += $line_item_wrapper->quantity->value();
+       }
+    }
+  }
+  return $cart_qty;
 }
