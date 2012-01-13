@@ -384,7 +384,7 @@ function commerce_stock_checkout_validate($order_wrapper) {
       commerce_stock_check_product_checkout_rule($product, $qty_ordered, $stock_state, $message);
       // @todo: TEST and update error structure
       if ($stock_state == 1) {
-        form_set_error("stock_error", $message . $stock_state);
+        form_set_error("stock_error", $message);
         $found_errors = TRUE;
       }
       else if ($stock_state == 2) {
