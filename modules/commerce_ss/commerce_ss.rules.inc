@@ -112,12 +112,12 @@ function commerce_ss_decrease_by_line_item($line_item) {
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
     if (commerce_ss_product_type_enabled($product->type)) {
-      if (!(commerce_stock_product_type_override_enabled($product->type)
+      if (!(commerce_ss_product_type_override_enabled($product->type)
           && isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
 
         $qty = $line_item->quantity;
         // Subtract the sold amount from the available stock level.
-        commerce_stock_adjust($product, -$qty);
+        commerce_ss_stock_adjust($product, -$qty);
       }
     }
   }
@@ -138,7 +138,7 @@ function commerce_ss_increase_by_line_item($line_item) {
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
     if (commerce_ss_product_type_enabled($product->type)) {
-      if (!(commerce_stock_product_type_override_enabled($product->type)
+      if (!(commerce_ss_product_type_override_enabled($product->type)
            && isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
 
         $qty = $line_item->quantity;
