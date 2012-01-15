@@ -19,4 +19,6 @@ To install and get working
 4. Select the “simple stock management” tab
 5. Check the product types you wont simple stock to manage and hit submit
 
+Important: you may need to clear caches after installing and enabeling stock for your products 
+
 if you wont to be able to disable stock checking for individual products check the “Allow stock override for Product (product)”
