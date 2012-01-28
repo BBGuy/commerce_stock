@@ -113,18 +113,26 @@ function commerce_ss_line_item_product_enabled($line_item) {
 }
 
 
+/**
+ *
+ * This function makes sure stock is enabled for product.
+ * if true is return stock checking is enabled
+ * if false stock checking is disabled
+ *
+ * @todo rename function  confusing name its not product thats not disabled
+ *   its the stock check for the product thats disabled
+ *
+ * @param type $product
+ * @return boolean
+ */
 function commerce_ss_product_not_disabled_by_override($product) {
-  $ok = FALSE;
-  // if stop overide enabled for the product type
+  $stock_check_enabled = TRUE;
+  // if product overide enabled for the product type
   if (commerce_ss_product_type_override_enabled($product->type)) {
-     // if the product has its override set and its not turned on (no override)
-     if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] != 1)) {
-       $ok = TRUE;
+     // if the product has its override set and is turned on
+     if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+       $stock_check_enabled = FALSE;
      }
   }
-  else {
-    // if no override field then product cant be disabled
-    $ok = TRUE;
-  }
-  return $ok;
+  return $stock_check_enabled;
 }
