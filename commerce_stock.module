@@ -472,9 +472,11 @@ function commerce_stock_check_cart_product_level($product_id) {
   if ($order_wrapper) {
     // cycle throw each line item ID
     foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
-       if($line_item_wrapper->commerce_product->product_id->value() == $product_id){
-         $cart_qty += $line_item_wrapper->quantity->value();
-       }
+      if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+        if($line_item_wrapper->commerce_product->product_id->value() == $product_id){
+          $cart_qty += $line_item_wrapper->quantity->value();
+        }
+      }
     }
   }
   return $cart_qty;
