@@ -51,7 +51,7 @@ function commerce_stock_menu() {
 function commerce_stock_form_alter(&$form, &$form_state, $form_id){
   if (strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
     // check if product is disabled
-    if ( isset($form['submit']['#disabled']) && ($form['submit']['#disabled']) ) {
+    if ( isset($form['submit']['#attributes']['disabled']) && ($form['submit']['#attributes']['disabled'] == 'disabled') ) {
       return;
     }
     // Check to see if product has options (multiple products using
