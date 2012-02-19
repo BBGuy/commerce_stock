@@ -126,7 +126,7 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
       if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
         $desired_purchase = $line_item_wrapper->quantity->value();
         if (commerce_stock_product_check_out_of_stock($product_id, $desired_purchase, $remaining_stock)) {
-          form_set_error("out_od_stock_$index", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+          form_set_error("out_od_stock_$index", t('The maximum quantity of %title that can be purchased is %max.', array('%title' => $product->title, '%max' => $remaining_stock)));
           $found_errors = TRUE;
         }
       }
@@ -134,7 +134,7 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
   }
   // if out of stock items send back to the cart form
   if ($found_errors) {
-    drupal_set_message(t('please adjust quantities before continuing to checkout') );
+    drupal_set_message(t('Please adjust quantities before continuing to checkout.') );
     $cart_url = url('cart', array('absolute' => TRUE));
     drupal_goto( $cart_url);
   }
@@ -153,7 +153,7 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
   $qty_total = $qty + $qty_ordered;
   if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
     if (commerce_stock_product_check_out_of_stock($product_id, $qty_total, $remaining_stock)) {
-        form_set_error("stock_error", t('Maximum quantity of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+        form_set_error("stock_error", t('The maximum quantity of %title that can be purchased is %max.', array('%title' => $product->title, '%max' => $remaining_stock)));
     }
   }
 }
@@ -208,7 +208,7 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     $product = commerce_product_load($product_id);
     if (!(isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
       if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
-        form_set_error("edit_quantity][$index", t('Maximum stock of %title that can be purchased is %max', array('%title' => $product->title, '%max' => $remaining_stock)));
+        form_set_error("edit_quantity][$index", t('The maximum stock of %title that can be purchased is %max.', array('%title' => $product->title, '%max' => $remaining_stock)));
       }
     }
   }
@@ -232,17 +232,17 @@ function commerce_stock_option_validate($element, &$form_state) {
       }
     }
   }
-
   $stock = $element['#stock'][$form_state['values']['product_id']];
-  if ($element['#stock'][$form_state['values']['product_id']] < 1) {
+  $stock_enabled = $element['#stock_enabled'][$form_state['values']['product_id']];
+  if (($stock < 1) && $stock_enabled) {
     form_error($element, t('Product is out of stock'));
   }
-  else {
+  elseif ($stock_enabled) {
     $product_id = $form_state['values']['product_id'];
     $qty = $form_state['values']['quantity'];
     $qty_ordered = commerce_stock_check_cart_product_level($product_id);
     if ( ($qty + $qty_ordered) > $stock) {
-      form_error($element, t("you can only order a maximum of $stock for this item"));
+      form_error($element, t("You can only order a maximum of @stock for this item.", array('@stock' => $stock)));
     }
   }
 }

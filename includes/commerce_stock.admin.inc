@@ -57,7 +57,7 @@ function commerce_stock_admin_form($form, &$form_state) {
   // Add a checkbox that requires them to say "I do", but don't show it
   // (#access == FALSE) unless they're deleting.
   if (!empty($form_state['commerce_stock']['delete_instances'])) {
-    $type_plural = format_plural(count($form_state['commerce_stock']['delete_instances']), t('type'), t('types'));
+    $type_plural = format_plural(count($form_state['commerce_stock']['delete_instances']), 'type', 'types');
     $affirmation = t('I understand that all stock data will be permanently removed from the product @type_plural %product_types.',
       array(
         '@type_plural' => $type_plural,
