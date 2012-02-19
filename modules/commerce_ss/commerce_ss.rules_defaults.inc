@@ -68,9 +68,9 @@ $rules_export = '{ "rules_stock_validate_add_to_cart" : {
       { "commerce_ss_stock_enabled_on_product" : { "commerce_product" : [ "commerce_product" ] } },
       { "commerce_ss_stock_not_disabled" : { "commerce_product" : [ "commerce_product" ] } },
       { "data_is" : {
-          "data" : [ "commerce-product:commerce-stock" ],
-          "op" : "\u003c",
-          "value" : [ "stock-requested-total" ]
+          "data" : [ "stock-requested-total" ],
+          "op" : "\u003E",
+          "value" : [ "commerce-product:commerce-stock" ]
         }
       }
     ],
@@ -86,7 +86,7 @@ $rules_export = '{ "rules_stock_validate_add_to_cart" : {
       },
       { "commerce_stock_add_to_cart_set_state" : {
           "stock_action" : "1",
-          "message" : "Maximum Quantity for [commerce-product:title] that can be ordered is [commerce-product:commerce-stock]",
+          "message" : "The maximum quantity for [commerce-product:title] that can be ordered is [commerce-product:commerce-stock-int].\r\n",
           "approved_quantity" : [ "approved-quantity" ]
         }
       }
@@ -94,6 +94,8 @@ $rules_export = '{ "rules_stock_validate_add_to_cart" : {
   }
 }';
 $rules['rules_stock_validate_add_to_cart'] = rules_import($rules_export);
+
+
 
 
 $rules_export = '{ "rules_stock_validate_checkout" : {
@@ -105,16 +107,16 @@ $rules_export = '{ "rules_stock_validate_checkout" : {
       { "commerce_ss_stock_enabled_on_product" : { "commerce_product" : [ "commerce_product" ] } },
       { "commerce_ss_stock_not_disabled" : { "commerce_product" : [ "commerce_product" ] } },
       { "data_is" : {
-          "data" : [ "commerce-product:commerce-stock" ],
-          "op" : "\u003c",
-          "value" : [ "stock-already-ordered" ]
+          "data" : [ "stock-already-ordered" ],
+          "op" : "\u003E",
+          "value" : [ "commerce-product:commerce-stock" ]
         }
       }
     ],
     "DO" : [
       { "commerce_stock_checkout_state" : {
           "stock_action" : "1",
-          "message" : "Maximum Quantity for [commerce-product:title] that can be ordered is [commerce-product:commerce-stock]",
+          "message" : "The maximum quantity for [commerce-product:title] that can be ordered is [commerce-product:commerce-stock-int].",
           "approved_quantity" : [ "commerce-product:commerce-stock" ]
         }
       }
