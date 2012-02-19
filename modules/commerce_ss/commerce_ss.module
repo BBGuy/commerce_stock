@@ -55,6 +55,48 @@ function commerce_ss_entity_property_info_alter(&$info) {
 
 
 /**
+ * Implements hook_token_info().
+ */
+function commerce_ss_token_info() {
+  $info['tokens']['commerce-product']['commerce-stock-int'] = array(
+    'name' => t('Stock level (int)'),
+    'description' => t('The stock level as an integer'),
+  );
+
+  $info['tokens']['commerce-product']['commerce-stock-user'] = array(
+    'name' => t('Stock level available for the user'),
+    'description' => t('The available stock level for the current user'),
+  );
+  return $info;
+}
+
+
+/**
+ * Implements hook_tokens().
+ */
+function commerce_ss_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  if ($type == 'commerce-product' && !empty($data['commerce-product'])) {
+    $product = entity_metadata_wrapper('commerce_product', $data['commerce-product']);
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'commerce-stock-int':
+          $replacements[$original] = (int)$product->commerce_stock->value();
+          break;
+        case 'commerce-stock-user':
+          $replacements[$original] = $product->commerce_stock->value() -
+                commerce_stock_check_cart_product_level($product->product_id->value());
+          break;
+      }
+    }
+  }
+  return $replacements;
+}
+
+
+
+
+/**
  * Given a product type, determine whether stock management is enabled on that
  * product type.
  *
