@@ -241,7 +241,7 @@ function commerce_stock_cart_state_validate(&$form) {
   $qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
   // Initialize the form
-  $form['submit']['#value'] = 'Add to cart';
+  $form['submit']['#value'] = t('Add to cart');
   $form['submit']['#disabled'] = FALSE;
   $form['#attributes']['class']['stock'] = 'in-stock';
 
