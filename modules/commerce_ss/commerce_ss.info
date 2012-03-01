@@ -6,3 +6,4 @@ dependencies[] = commerce_product
 dependencies[] = commerce_order
 dependencies[] = commerce_stock
 core = 7.x
+configure = admin/commerce/config/stock/ss
