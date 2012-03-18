@@ -1,6 +1,6 @@
 name = Commerce Simple Stock
 description = Manage stock levels of Commerce products using a decimal level field and rules
-package = Commerce (contrib)
+package = Commerce (stock)
 dependencies[] = number
 dependencies[] = commerce_product
 dependencies[] = commerce_order
