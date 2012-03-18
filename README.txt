@@ -14,11 +14,24 @@ Commerce Simple stock modules: A basic stock sub module providing a stock field 
 To install and get working
 ============================
 1. download commerce_stock
-2. Enable the Commerce Stock API & Commerce Simple stock modules
+2. Enable the Commerce Stock API & Commerce Simple stock and Commerce Simple stock rules modules
 3. Go to Home » Administration » Store » Configuration » Stock management
 4. Select the “simple stock management” tab
 5. Check the product types you wont simple stock to manage and hit submit
 
-Important: you may need to clear caches after installing and enabeling stock for your products 
+Important: 
+  you may need to clear caches after installing and enabling stock for your products.
+  Rules will show errors for the stock rules until you enable stock on at list one product.
 
-if you wont to be able to disable stock checking for individual products check the “Allow stock override for Product (product)”
+If you wont to be able to disable stock checking for individual products check the “Allow stock override for Product (product)”
+
+
+About the modules:
+Commerce Stock API: The Stock API used by all modules. Implements validation events and actions.
+
+Commerce Simple stock: Creates a stock field and a rule to decrement it on order completion
+
+Commerce Simple stock rules: Provides validation rules for:
+ Disabling add to cart
+ Validate add to cart
+ Validate checkout 
