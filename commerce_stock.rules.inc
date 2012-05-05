@@ -96,9 +96,10 @@ function commerce_stock_decrease_by_line_item($line_item) {
     // The product SKU that will have its stock level adjusted.
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
     if (commerce_stock_product_type_enabled($product->type)) {
       if (!(commerce_stock_product_type_override_enabled($product->type)
-           && isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+           && isset($product_wrapper->commerce_stock_override) && $product_wrapper->commerce_stock_override->value() == 1)) {
 
         $qty = (int) $line_item->quantity;
         // Subtract the sold amount from the available stock level.
@@ -132,9 +133,10 @@ function commerce_stock_increase_by_line_item($line_item) {
     // The product SKU that will have its stock level adjusted.
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
     if (commerce_stock_product_type_enabled($product->type)) {
       if (!(commerce_stock_product_type_override_enabled($product->type)
-          && isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+          && isset($product_wrapper->commerce_stock_override) && $product_wrapper->commerce_stock_override->value() == 1)) {
 
         $qty = (int) $line_item->quantity;
         // Subtract the sold amount from the available stock level.
