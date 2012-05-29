@@ -131,7 +131,7 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
       if (!(isset($product_wrapper->commerce_stock_override) && $product_wrapper->commerce_stock_override->value() == 1)) {
         $desired_purchase = $line_item_wrapper->quantity->value();
         if (commerce_stock_product_check_out_of_stock($product_id, $desired_purchase, $remaining_stock)) {
-          form_set_error("out_of_stock_$index", t('The maximum quantity of %title that can be purchased is %max.', array('%title' => $product->title, '%max' => $remaining_stock)));
+          form_set_error("out_od_stock_$index", t('The maximum quantity of %title that can be purchased is %max.', array('%title' => $product->title, '%max' => $remaining_stock)));
           $found_errors = TRUE;
         }
       }
