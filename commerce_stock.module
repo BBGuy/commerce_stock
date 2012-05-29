@@ -124,7 +124,7 @@ function commerce_stock_checkout_form_validate($form, &$form_state) {
   $found_errors = FALSE;
   // Check each line item
   foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
-    if(in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+    if(in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
       $product_id = $line_item_wrapper->commerce_product->product_id->value();
       $product = commerce_product_load($product_id);
       $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
@@ -210,12 +210,14 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
   foreach ($form_state['input']['edit_quantity'] as $index => $qty) {
     $line_item = $form_state['line_items'][$line_item_index[$index]];
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    $product_id = $line_item_wrapper->commerce_product->product_id->value();
-    $product = commerce_product_load($product_id);
-    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
-    if (!(isset($product_wrapper->commerce_stock_override) && $product_wrapper->commerce_stock_override->value() == 1)) {
-      if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
-        form_set_error("edit_quantity][$index", t('The maximum stock of %title that can be purchased is %max.', array('%title' => $product->title, '%max' => $remaining_stock)));
+    if(in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
+      $product_id = $line_item_wrapper->commerce_product->product_id->value();
+      $product = commerce_product_load($product_id);
+      $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+      if (!(isset($product_wrapper->commerce_stock_override) && $product_wrapper->commerce_stock_override->value() == 1)) {
+        if (commerce_stock_product_check_out_of_stock($product_id, $qty, $remaining_stock)) {
+          form_set_error("edit_quantity][$index", t('The maximum stock of %title that can be purchased is %max.', array('%title' => $product->title, '%max' => $remaining_stock)));
+        }
       }
     }
   }
@@ -268,7 +270,7 @@ function commerce_stock_option_validate($element, &$form_state) {
 function commerce_stock_order_has_out_of_stock($order) {
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
   foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
-    if(in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+    if(in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
       $product_id = $line_item_wrapper->commerce_product->product_id->value();
       $product = commerce_product_load($product_id);
       $qry = $line_item_wrapper->quantity->value();
@@ -479,7 +481,7 @@ function commerce_stock_check_cart_product_level($product_id) {
   if ($order_wrapper) {
     // cycle throw each line item ID
     foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
-      if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+      if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
         if($line_item_wrapper->commerce_product->product_id->value() == $product_id){
           $cart_qty += $line_item_wrapper->quantity->value();
         }
