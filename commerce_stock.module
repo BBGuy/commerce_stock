@@ -110,6 +110,12 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     // Add validate function to the checkout form
     $form['buttons']['continue']['#validate'][] = 'commerce_stock_checkout_form_validate';
   }
+  elseif ($form_id == 'commerce_checkout_form_review') {
+    // Add validate function to the review form
+    // /@todo: would be good to prompt the user with some contextual info
+    // as he was about to pay
+    $form['buttons']['continue']['#validate'][] = 'commerce_stock_checkout_form_validate';
+  }
 }
 
 
