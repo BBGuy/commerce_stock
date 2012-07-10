@@ -320,7 +320,7 @@ function commerce_stock_order_has_out_of_stock($order) {
       $product_id = $line_item_wrapper->commerce_product->product_id->value();
       $product = commerce_product_load($product_id);
       $qry = $line_item_wrapper->quantity->value();
-      if(commerce_stock_product_check_out_of_stock($prod_id, $qry, $remaining_stock) != FALSE) {
+      if(commerce_stock_product_check_out_of_stock($product_id, $qry, $remaining_stock) != FALSE) {
         return TRUE;
       }
     }
