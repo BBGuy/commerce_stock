@@ -6,24 +6,24 @@ This module provides stock management for Drupal Commerce stores.
 
 This module includes two modules:
 
-Commerce Stock API: A common API for managing stock using sub modules
+Commerce Stock API: A common API for managing stock using sub modules.
 
-Commerce Simple stock modules: A basic stock sub module providing a stock field and a set of rules to control stock (it can be configured by modifying the rules or creating new once)
+Commerce Simple stock modules: A basic stock sub-module providing a stock field and a set of rules to control stock (it can be configured by modifying the rules or creating new ones).
 
 
 To install and get working
 ============================
-1. download commerce_stock
+1. Download commerce_stock
 2. Enable the Commerce Stock API & Commerce Simple stock and Commerce Simple stock rules modules
 3. Go to Home » Administration » Store » Configuration » Stock management
 4. Select the “simple stock management” tab
-5. Check the product types you wont simple stock to manage and hit submit
+5. Check the product types you want simple stock to manage and hit submit
 
 Important: 
-  you may need to clear caches after installing and enabling stock for your products.
-  Rules will show errors for the stock rules until you enable stock on at list one product.
+  You may need to clear caches after installing and enabling stock for your products.
+  Rules will show errors for the stock rules until you enable stock on at least one product.
 
-If you wont to be able to disable stock checking for individual products check the “Allow stock override for Product (product)”
+If you want to be able to disable stock checking for individual products check the “Allow stock override for Product (product)”
 
 
 About the modules:
