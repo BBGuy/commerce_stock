@@ -195,9 +195,12 @@ function commerce_stock_rules_condition_info() {
   );
   $conditions['commerce_stock_stock_enabled_on_line_item'] = array(
     'label' => t('Line item has a product of product type that has stock management enabled'),
+
     'parameter' => array(
-      'type' => 'commerce_line_item',
-      'label' => t('Product'),
+      'commerce_product' => array(
+        'type' => 'commerce_product',
+        'label' => t('product'),
+      ),
     ),
     'group' => t('Commerce Stock'),
     'callbacks' => array(
