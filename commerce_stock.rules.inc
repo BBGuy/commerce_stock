@@ -127,7 +127,7 @@ function commerce_stock_rules_order_has_out_of_stock($order) {
 function commerce_stock_rules_action_info() {
   $actions = array();
 
-  // The Stock check action
+  // The Stock cart state action
   $actions['commerce_stock_add_to_cart_set_state'] = array(
     'label' => t('Set the result of an add to cart stock check'),
     'parameter' => array(
@@ -181,6 +181,97 @@ function commerce_stock_rules_action_info() {
       'execute' => 'commerce_stock_rules_set_add_to_cart_form_state',
     ),
   );
+
+  // The Stock custom  cart check action
+  $actions['commerce_stock_custom_cart_form_state'] = array(
+    'label' => t('Advanced configuration of the add to cart form'),
+    'parameter' => array(
+
+      'hide_qty' => array(
+        'type' => 'boolean',
+        'label' => t('Hide the Quantity field if it is visible'),
+      ),
+
+      'text' => array(
+        'type' => 'text',
+        'label' => t('The text to set the action to'),
+      ),
+
+      'class_name' => array(
+        'type' => 'text',
+        'label' => t('Add a class to the add to cart form'),
+      ),
+
+
+
+      'stock_action' => array(
+        'type' => 'decimal',
+        'label' => t('Stock Action'),
+        'description' => t('The action to take.'),
+        'options list' => 'commerce_stock_custom_cart_form_state_action_options_list',
+        'default value' => 0,
+
+      ),
+
+
+      'disabled_cart' => array(
+        'type' => 'boolean',
+        'label' => t('Disable the add to cart?'),
+        'description' => t('Only aplicable if Normal Submit was chosen as the Stock Action'),
+      ),
+
+
+      'custom_submit' => array(
+        'type' => 'text',
+        'label' => t('A new custom submit function'),
+        'optional' => TRUE,
+        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+      ),
+
+      'custom_submit_clear' => array(
+        'type' => 'boolean',
+        'label' => t('Clear the submit array first'),
+        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+      ),
+
+      'custom_validate' => array(
+        'type' => 'text',
+        'label' => t('a new of a custom validation function'),
+        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+        'optional' => TRUE,
+      ),
+
+      'custom_validate_clear' => array(
+        'type' => 'boolean',
+        'label' => t('Clear the validation array first'),
+        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+      ),
+
+
+
+      'custom_url' => array(
+        'type' => 'text',
+        'label' => t('Custom URL'),
+        'description' => t('Only aplicable if URL Action was chosen as the Stock Action  (all submit and validation will be ignored). You can use the [product_id] token and [url] for a return path'),
+        'optional' => TRUE,
+
+      ),
+
+      'custom_html' => array(
+        'type' => 'text',
+        'label' => t('Custom HTML'),
+        'description' => t('Only aplicable if Custom HTML was chosen as the Stock Action  (all submit and validation will be ignored). You can use the [product_id] token and [url] for a return path'),
+        'optional' => TRUE,
+
+      ),
+
+    ),
+    'group' => t('Commerce Stock'),
+    'callbacks' => array(
+      'execute' => 'commerce_stock_custom_cart_form_state',
+    ),
+  );
+
 
 
   // The Stock checkout check action
@@ -266,6 +357,98 @@ function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $clas
 }
 
 
+function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name, $stock_action, $disabled_cart, $custom_submit, $custom_submit_clear, $custom_validate, $custom_validate_clear, $custom_url, $custom_html) {
+  global $stock_cart_check_data;
+
+  // read form values
+  $form_action =  $stock_cart_check_data['form']['#action'];
+  if (isset ($stock_cart_check_data['form']['product_id']['#value'])) {
+    $prod_id = $stock_cart_check_data['form']['product_id']['#value'];
+  }
+  elseif (isset ($stock_cart_check_data['form']['product_id']['#default_value'])) {
+    $prod_id = $stock_cart_check_data['form']['product_id']['#default_value'];
+  }
+
+  // class
+  $stock_cart_check_data['form']['#attributes']['class']['stock'] = $class_name;
+
+  // Quantity field
+  if ($hide_qty) {
+    $stock_cart_check_data['form']['quantity']['#access'] = FALSE;
+  }
+
+
+  switch ($stock_action) {
+
+    //Normal Submit
+    case 0:
+      $stock_cart_check_data['form']['submit']['#value'] = $text;
+      $stock_cart_check_data['form']['submit']['#disabled'] = $disabled_cart;
+      break;
+
+    // Custom Submit
+    case 1:
+      $stock_cart_check_data['form']['submit']['#value'] = $text;
+      // should we clear the submit array
+      if ($custom_submit_clear) {
+        $stock_cart_check_data['form']['#submit'] = array();
+      }
+      // should we clear the validate array
+      if ($custom_validate_clear) {
+        $stock_cart_check_data['form']['#validate'] = array();
+      }
+      // add custom submit function
+      if (!empty($custom_submit)) {
+        $stock_cart_check_data['form']['#submit'][] = $custom_submit;
+      }
+      // add custom validation function
+      if (!empty($custom_validate)) {
+        $stock_cart_check_data['form']['#validate'][] = $custom_validate;
+      }
+      break;
+
+    // URL Action
+    case 2:
+      if (!empty($custom_url)) {
+        // custom url
+        $custom_url = str_replace('[product_id]', $prod_id, $custom_url);
+        $custom_url = str_replace('[url]', $form_action, $custom_url);
+        $stock_cart_check_data['form']['submit']['#type'] = 'link';
+        $stock_cart_check_data['form']['submit']['#title'] = $text;
+        $stock_cart_check_data['form']['submit']['#href'] = $custom_url;
+      }
+      break;
+
+
+    // custom HTML
+    case 3:
+      if (!empty($custom_html)) {
+        // custom url
+        $custom_html = str_replace('[product_id]', $prod_id, $custom_html);
+        $custom_html = str_replace('[url]', $form_action, $custom_html);
+        $stock_cart_check_data['form']['submit']['#type'] = 'markup';
+        $stock_cart_check_data['form']['submit']['#markup'] = $custom_html;
+      }
+      break;
+
+
+
+    default:
+      break;
+  }
+
+
+
+
+
+
+  // add to cart
+    // add to cart form
+
+
+}
+
+
 
 /**
  * Rules action:
@@ -294,5 +477,9 @@ if ($approved_quantity < 0) {
 
 function commerce_stock_check_state_options_list() {
   return array( 0 => 'do nothing' , 1 => 'block transection', 2 => 'display message only');
+}
+
+function commerce_stock_custom_cart_form_state_action_options_list() {
+  return array( 0 => 'Normal Submit' , 1 => 'Custom Submit', 2 => 'URL Action', 3 => 'Custom HTML');
 
 }

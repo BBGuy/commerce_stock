@@ -486,4 +486,16 @@ function commerce_stock_order_has_out_of_stock($order) {
 }
 
 
+/**
+ *  This a demo action for the "Advanced configuration of the add to cart form"
+ *  custom action it shows you how you can write your own custom actions
+ *  to handle the add to cart
+ */
 
+function commerce_stock_test_cart_action($form, &$form_state) {
+  $product_id = $form_state['values']['product_id'];
+  $product = commerce_product_load($product_id);
+  drupal_set_message(t('%title was not added to your cart as this is a test action only.', array('%title' => $product->title)), 'error');
+  // Ensure that page redirects back to its original URL without losing query parameters, such as pagers.
+  // @todo Remove when http://drupal.org/node/171267 is fixed.
+  $form_state['redirect'] = array(current_path(), array('query' => drupal_get_query_parameters()));}
