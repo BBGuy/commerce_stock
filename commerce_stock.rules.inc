@@ -154,7 +154,7 @@ function commerce_stock_rules_action_info() {
 
 
 
-  // The Stock enable add to cart check action
+  // The stock disable cart action
   $actions['commerce_stock_set_add_to_cart_form_state'] = array(
     'label' => t('Set the state of the add to cart form'),
     'parameter' => array(
@@ -182,7 +182,7 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
-  // The Stock custom  cart check action
+  // The stock custom  cart action
   $actions['commerce_stock_custom_cart_form_state'] = array(
     'label' => t('Advanced configuration of the add to cart form'),
     'parameter' => array(
@@ -342,18 +342,10 @@ function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $ap
  *
  */
 function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $class_name) {
-   // drupal_set_message('test 2');
-
   global $stock_cart_check_data;
   $stock_cart_check_data['form']['submit']['#value'] = $text;
   $stock_cart_check_data['form']['submit']['#disabled'] = $disabled;
   $stock_cart_check_data['form']['#attributes']['class']['stock'] = $class_name;
-
-//  $stock_cart_check_data['form']['submit']['#value'] = t('Out of stock');
-//  $stock_cart_check_data['form']['submit']['#disabled'] = TRUE;
-//  $stock_cart_check_data['form']['#attributes'][] = array('class' => array('out-of-stock'));
-
-
 }
 
 
@@ -436,16 +428,6 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name, $s
     default:
       break;
   }
-
-
-
-
-
-
-  // add to cart
-    // add to cart form
-
-
 }
 
 
