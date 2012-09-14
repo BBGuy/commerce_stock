@@ -203,6 +203,17 @@ function commerce_stock_rules_action_info() {
       ),
 
 
+      'action_prefix' => array(
+        'type' => 'text',
+        'label' => t('Prefix'),
+        'optional' => TRUE,
+
+      ),
+      'action_suffix' => array(
+        'type' => 'text',
+        'label' => t('Suffix'),
+        'optional' => TRUE,
+      ),
 
       'stock_action' => array(
         'type' => 'decimal',
@@ -349,7 +360,10 @@ function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $clas
 }
 
 
-function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name, $stock_action, $disabled_cart, $custom_submit, $custom_submit_clear, $custom_validate, $custom_validate_clear, $custom_url, $custom_html) {
+function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
+          $action_prefix, $action_suffix, $stock_action, $disabled_cart,
+          $custom_submit, $custom_submit_clear, $custom_validate,
+          $custom_validate_clear, $custom_url, $custom_html) {
   global $stock_cart_check_data;
 
   // read form values
@@ -369,6 +383,9 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name, $s
     $stock_cart_check_data['form']['quantity']['#access'] = FALSE;
   }
 
+  // prefix & sufix
+  $stock_cart_check_data['form']['submit']['#prefix'] = $action_prefix;
+  $stock_cart_check_data['form']['submit']['#suffix'] = $action_suffix;
 
   switch ($stock_action) {
 
