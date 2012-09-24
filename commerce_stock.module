@@ -59,7 +59,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
     if(isset($form['product_id']['#options']) ){
       // Set validation
       $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
-      commerce_stock_cart_state_validate_options($form);
+      commerce_stock_cart_state_validate_options($form_id, $form, $form_state);
     }
     // A single product or uses attributes (like colour & size).
     elseif (isset($form['product_id']['#value'])) {
@@ -67,7 +67,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id){
       // Add validation to the add to cart
       $form['#validate'][] = 'commerce_stock_add_to_cart_validate';
       // check if the add to cart form should be enabled (in stock)
-      commerce_stock_cart_state_validate($form);
+      commerce_stock_cart_state_validate($form_id, $form, $form_state);
     }
   }
   elseif ($form_id == 'views_form_commerce_cart_form_default') {
@@ -121,7 +121,7 @@ function commerce_stock_commerce_checkout_pane_info() {
 * check if the add to cart form should be enabled (in stock)
 *
 */
-function commerce_stock_cart_state_validate_options(&$form) {
+function commerce_stock_cart_state_validate_options($form_id, &$form, &$form_state) {
 
   $product_id = $form['product_id']['#default_value'];
   $product = commerce_product_load($product_id);
@@ -134,10 +134,23 @@ function commerce_stock_cart_state_validate_options(&$form) {
 
 
 
+  // Set global form for stock actions
   global $stock_cart_check_data;
   $stock_cart_check_data = array(
     'form' => &$form,
   );
+
+  // integration with rules_form_alter
+  if (module_exists('rules_form_alter')) {
+    // make sure rules_form_alter actions work from the stock event
+    global $rules_form_alter_data;
+    $rules_form_alter_data = array(
+      'id'  => $form_id,
+      'form' => &$form,
+      'state' => &$form_state,
+    );
+
+  }
   // invoke the stock check event
   rules_invoke_event('commerce_stock_check_add_to_cart_form_state', $product, $qty_ordered, $form);
 }
@@ -241,7 +254,7 @@ function commerce_stock_commerce_checkout_pane_checkout_form($form, &$form_state
 * check if the add to cart form should be enabled (in stock)
 *
 */
-function commerce_stock_cart_state_validate(&$form) {
+function commerce_stock_cart_state_validate($form_id, &$form, &$form_state) {
 
   $product_id = $form['product_id']['#value'];
   $product = commerce_product_load($product_id);
@@ -258,6 +271,18 @@ function commerce_stock_cart_state_validate(&$form) {
   $stock_cart_check_data = array(
     'form' => &$form,
   );
+
+  // integration with rules_form_alter
+  if (module_exists('rules_form_alter')) {
+    // make sure rules_form_alter actions work from the stock event
+    global $rules_form_alter_data;
+    $rules_form_alter_data = array(
+      'id'  => $form_id,
+      'form' => &$form,
+      'state' => &$form_state,
+    );
+  }
+
   // invoke the stock check event
   rules_invoke_event('commerce_stock_check_add_to_cart_form_state', $product, $qty_ordered);
 }
