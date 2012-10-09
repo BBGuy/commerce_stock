@@ -29,7 +29,7 @@ If you want to be able to disable stock checking for individual products check t
 About the modules:
 Commerce Stock API: The Stock API used by all modules. Implements validation events and actions.
 
-Commerce Simple stock: Creates a stock field and a rule to decrement it on order completion
+Commerce Simple stock: Creates a stock field and a rule condition to decrement it on order completion
 
 Commerce Simple stock rules: Provides validation rules for:
  Disabling add to cart
