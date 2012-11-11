@@ -95,42 +95,36 @@ function commerce_ss_admin_form_validate($form, &$form_state) {
   }
 }
 
-
-/**
- * This functions parses all the product of the specified bundle, and initialize its stock field (commerce_stock) to a value
- * @param  String $bundle
- *  Commerce product bundle type to initialize
- * @param  int $init_stock_value
- *  Stock value to initialize to
- * @return void
- */
-function commerce_ss_admin_init($bundle, $init_stock_value) {
-  //Load every product of $bundle type
-  $products = commerce_product_load_multiple(array(), array('type' => $bundle));
-  //Parses each product to initialize its stock value
-  foreach($products as $product) {
-    $wrapper = entity_metadata_wrapper('commerce_product', $product);
-    //dpm($wrapper->getPropertyInfo());
-    $wrapper->commerce_stock = $init_stock_value; //@todo: the name of the stock field should probably be a variable for commerce_stock v2
-    $wrapper->save();
-  }
-}
-
-
 /**
  * Add or remove the Stock field from product types.
  */
 function commerce_ss_admin_form_submit($form, &$form_state) {
   $form_state['commerce_stock']['delete_instances'] = array();
+
+  // Prepare a batch in case we need it for enabling stock on product types.
+  $batch = array(
+    'operations' => array(
+      // These are set below if needed.
+    ),
+    'file' => drupal_get_path('module', 'commerce_ss') . '/includes/commerce_ss.admin.inc',
+    'finished' => 'commerce_ss_batch_product_type_init_finished',
+    'title' => t('Product stock initialization'),
+    'init_message' => t('Product stock initialization is starting.'),
+    'progress_message' => t('Processed @current out of @total.'),
+    'error_message' => t('Product stock initialization has encountered an error.'),
+  );
+
   foreach ($form_state['values']['product_types'] as $type => $enable) {
     $instance = field_info_instance('commerce_product', 'commerce_stock', $type);
 
     $currently_enabled = commerce_ss_product_type_enabled($type);
     // If they want us to enable it and it doesn't currently exist, do the work.
     if ($enable && !$currently_enabled) {
+      // Create the instance.
       commerce_ss_admin_create_instance('commerce_stock', 'number_decimal', TRUE, 'commerce_product', $type, t('Stock'));
-      commerce_ss_admin_init($type, 0);
-      drupal_set_message(t('Stock management has been enabled on the %type product type', array('%type' => $type)));
+      drupal_set_message(t('Stock field has been added to the %type product type.', array('%type' => $type)));
+      // Add the operation to process this type to the batch.
+      $batch['operations'][] = array('commerce_ss_batch_product_type_init_process', array($type, 0));
     }
     // Conversely, if they *don't* want it and it's currently enabled,
     // warn them about the consequences or do it.
@@ -185,6 +179,86 @@ function commerce_ss_admin_form_submit($form, &$form_state) {
         }
       }
     }
+  }
+
+  // If our batch has operations, run it now.
+  if (count($batch['operations'])) {
+    batch_set($batch);
+  }
+}
+
+/**
+ * Batch Operation Callback.
+ *
+ * @param $type
+ *  The product type to process.
+ * @param $init_stock_value
+ *  The initial value to give to the stock field.
+ */
+function commerce_ss_batch_product_type_init_process($type, $init_stock_value, &$context) {
+  if (!isset($context['sandbox']['progress'])) {
+    $context['sandbox']['progress'] = 0;
+
+    // Get the products to operate on.
+    $result = db_query("SELECT product_id FROM {commerce_product} cp WHERE cp.type = :type", array(
+      ':type' => $type,
+    ));
+    $context['sandbox']['product_data'] = $result->fetchAll();
+    $context['sandbox']['max'] = count($context['sandbox']['product_data']);
+  }
+
+  // We can safely process 10 at a time without a timeout.
+  $limit = 10;
+  $current_count = 0;
+
+  while ($current_count < $limit && count($context['sandbox']['product_data'])) {
+    // Update our counts.
+    $current_count++;
+    $context['sandbox']['progress']++;
+
+    //ddl("$current_count < $limit, progress: " . $context['sandbox']['progress']);
+    // Load the product and get its wrapper.
+    $product_data = array_shift($context['sandbox']['product_data']);
+    $product = commerce_product_load($product_data->product_id);
+
+    $wrapper = entity_metadata_wrapper('commerce_product', $product);
+    $wrapper->commerce_stock = $init_stock_value; //@todo: the name of the stock field should probably be a variable for commerce_stock v2
+    $wrapper->save();
+
+    $context['message'] = t('Processing %title.', array(
+      '%title' => $product->title,
+    ));
+  } // product processing loop
+
+  // Inform the batch engine that we are not finished,
+  // and provide an estimation of the completion level we reached.
+  if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+    $context['finished'] = $context['sandbox']['progress'] >= $context['sandbox']['max'];
+  }
+}
+
+/**
+ * Batch 'finished' callback.
+ */
+function commerce_ss_batch_product_type_init_finished($success, $results, $operations) {
+  if ($success) {
+    // We display the number of things we processed...
+    drupal_set_message(t('All stock levels have been initialized to zero'));
+
+    // @todo: get the batch process to provide more meaningfull information
+    // using $context['results']
+//    drupal_set_message(t('@count results processed.', array(
+//      '@count' => count($results),
+//    )));
+//    foreach ($results as $result) {
+//      drupal_set_message($result);
+//    }
+  }
+  else {
+    // An error occurred.
+    // $operations contains the operations that remained unprocessed.
+    $error_operation = reset($operations);
+    drupal_set_message(t('An error occurred while processing @operation with arguments : @args', array('@operation' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE))));
   }
 }
 
