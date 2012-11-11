@@ -195,23 +195,25 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
     return;
   }
   $line_item_index = array_keys($form_state['line_items']);
-  foreach ($form_state['values']['edit_quantity'] as $index => $qty) {
-    $line_item = $form_state['line_items'][$line_item_index[$index]];
-    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    if(in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
-      $product_id = $line_item_wrapper->commerce_product->product_id->value();
-      $product = commerce_product_load($product_id);
-      //$qty_ordered = commerce_stock_check_cart_product_level($product_id);
+  if(isset($form_state['input']['edit_quantity'])) {
+    foreach ($form_state['values']['edit_quantity'] as $index => $qty) {
+      $line_item = $form_state['line_items'][$line_item_index[$index]];
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+      if(in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
+        $product_id = $line_item_wrapper->commerce_product->product_id->value();
+        $product = commerce_product_load($product_id);
+        //$qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
-      // check using rules
-      commerce_stock_check_product_checkout_rule($product, $qty, $stock_state, $message);
-      // @todo: TEST and update error structure
-      if ($stock_state == 1) {
-        form_set_error("stock_error", $message);
-      }
-      else if ($stock_state == 2) {
-        drupal_set_message($message);
-        // @todo set aproved qty ????
+        // check using rules
+        commerce_stock_check_product_checkout_rule($product, $qty, $stock_state, $message);
+        // @todo: TEST and update error structure
+        if ($stock_state == 1) {
+          form_set_error("stock_error", $message);
+        }
+        else if ($stock_state == 2) {
+          drupal_set_message($message);
+          // @todo set aproved qty ????
+        }
       }
     }
   }
