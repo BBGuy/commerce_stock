@@ -208,7 +208,7 @@ function commerce_ss_batch_product_type_init_process($type, $init_stock_value, &
   }
 
   // We can safely process 10 at a time without a timeout.
-  $limit = 10;
+  $limit = 25;
   $current_count = 0;
 
   while ($current_count < $limit && count($context['sandbox']['product_data'])) {
@@ -225,8 +225,9 @@ function commerce_ss_batch_product_type_init_process($type, $init_stock_value, &
     $wrapper->commerce_stock = $init_stock_value; //@todo: the name of the stock field should probably be a variable for commerce_stock v2
     $wrapper->save();
 
-    $context['message'] = t('Processing %title.', array(
-      '%title' => $product->title,
+    $context['message'] = t('Processing product type %type %progress% complete.', array(
+      '%type' => $type,
+      '%progress' => intval( $context['sandbox']['progress'] / $context['sandbox']['max'] * 100 ),
     ));
   } // product processing loop
 
