@@ -51,7 +51,6 @@ function commerce_ss_admin_form($form, &$form_state) {
         '#title' => t('Allow stock override for @name (@machine_name)', array('@name' => $product_type['name'], '@machine_name' => $type)),
       );
     }
-
   }
 
   // Add a checkbox that requires them to say "I do", but don't show it

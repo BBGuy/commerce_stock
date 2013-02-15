@@ -12,8 +12,6 @@
  * by a certain quantity.
  */
 
-
-
 /**
  * Implements hook_rules_event_info().
  */
@@ -44,7 +42,6 @@ function commerce_stock_rules_event_info() {
   return $events;
 }
 
-
 /**
  * Returns a variables array for stock check event.
  */
@@ -70,7 +67,6 @@ function commerce_stock_rules_event_variables() {
   return $variables;
 }
 
-
 /**
  * Returns a variables array for stock enable cart check event.
  */
@@ -87,8 +83,6 @@ function commerce_stock_rules_cart_event_variables() {
   );
   return $variables;
 }
-
-
 
 /**
  * Implements hook_rules_condition_info().
@@ -113,7 +107,6 @@ function commerce_stock_rules_condition_info() {
 }
 
 /**
- *
  * Rules condition: checks to see if the given order is in a cart status.
  */
 function commerce_stock_rules_order_has_out_of_stock($order) {
@@ -121,7 +114,6 @@ function commerce_stock_rules_order_has_out_of_stock($order) {
 }
 
 /**
- *
  * Implementation of hook_rules_action_info().
  */
 function commerce_stock_rules_action_info() {
@@ -152,29 +144,22 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
-
-
   // The stock disable cart action
   $actions['commerce_stock_set_add_to_cart_form_state'] = array(
     'label' => t('Set the state of the add to cart form'),
     'parameter' => array(
-
       'disabled' => array(
         'type' => 'boolean',
         'label' => t('Disable the add to cart?'),
       ),
-
       'text' => array(
         'type' => 'text',
         'label' => t('The text to set the action to'),
       ),
-
       'class_name' => array(
         'type' => 'text',
         'label' => t('add a class to the add to cart form'),
       ),
-
-
     ),
     'group' => t('Commerce Stock'),
     'callbacks' => array(
@@ -182,84 +167,66 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
-  // The stock custom  cart action
+  // The stock custom cart action
   $actions['commerce_stock_custom_cart_form_state'] = array(
     'label' => t('Advanced configuration of the add to cart form'),
     'parameter' => array(
-
       'hide_qty' => array(
         'type' => 'boolean',
         'label' => t('Hide the Quantity field if it is visible'),
       ),
-
       'text' => array(
         'type' => 'text',
         'label' => t('The text to set the action to'),
       ),
-
       'class_name' => array(
         'type' => 'text',
         'label' => t('Add a class to the add to cart form'),
       ),
-
-
       'action_prefix' => array(
         'type' => 'text',
         'label' => t('Prefix'),
         'optional' => TRUE,
-
       ),
       'action_suffix' => array(
         'type' => 'text',
         'label' => t('Suffix'),
         'optional' => TRUE,
       ),
-
       'stock_action' => array(
         'type' => 'decimal',
         'label' => t('Stock Action'),
         'description' => t('The action to take.'),
         'options list' => 'commerce_stock_custom_cart_form_state_action_options_list',
         'default value' => 0,
-
       ),
-
-
       'disabled_cart' => array(
         'type' => 'boolean',
         'label' => t('Disable the add to cart?'),
         'description' => t('Only aplicable if Normal Submit was chosen as the Stock Action'),
       ),
-
-
       'custom_submit' => array(
         'type' => 'text',
         'label' => t('A new custom submit function'),
         'optional' => TRUE,
         'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
       ),
-
       'custom_submit_clear' => array(
         'type' => 'boolean',
         'label' => t('Clear the submit array first'),
         'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
       ),
-
       'custom_validate' => array(
         'type' => 'text',
         'label' => t('a new of a custom validation function'),
         'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
         'optional' => TRUE,
       ),
-
       'custom_validate_clear' => array(
         'type' => 'boolean',
         'label' => t('Clear the validation array first'),
         'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
       ),
-
-
-
       'custom_url' => array(
         'type' => 'text',
         'label' => t('Custom URL'),
@@ -267,23 +234,18 @@ function commerce_stock_rules_action_info() {
         'optional' => TRUE,
 
       ),
-
       'custom_html' => array(
         'type' => 'text',
         'label' => t('Custom HTML'),
         'description' => t('Only aplicable if Custom HTML was chosen as the Stock Action  (all submit and validation will be ignored). You can use the [product_id] token and [url] for a return path'),
         'optional' => TRUE,
-
       ),
-
     ),
     'group' => t('Commerce Stock'),
     'callbacks' => array(
       'execute' => 'commerce_stock_custom_cart_form_state',
     ),
   );
-
-
 
   // The Stock checkout check action
   $actions['commerce_stock_checkout_state'] = array(
@@ -313,11 +275,6 @@ function commerce_stock_rules_action_info() {
   return $actions;
 }
 
-
-
-
-
-
 /**
  * Rules integration access callback.
  */
@@ -326,13 +283,11 @@ function commerce_stock_rules_access() {
   return TRUE;
 }
 
-
 /**
  * Rules action: updates an order's status to the default status of the given
  *   order state.
  */
 function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $approved_quantity) {
-
   if ($approved_quantity < 0) {
     $approved_quantity = 0;
     // if zero transection must be blocked as it you are not allowed
@@ -344,13 +299,11 @@ function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $ap
   $stock_check_data['state'] = $stock_action;
   $stock_check_data['message'] = $message;
   $stock_check_data['qty'] = $approved_quantity;
-
 }
-
 
 /**
  * Rules action:
- *
+ * @todo: Define this function.
  */
 function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $class_name) {
   global $stock_cart_check_data;
@@ -359,7 +312,9 @@ function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $clas
   $stock_cart_check_data['form']['#attributes']['class']['stock'] = $class_name;
 }
 
-
+/**
+ * @todo: Define this function.
+ */
 function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
           $action_prefix, $action_suffix, $stock_action, $disabled_cart,
           $custom_submit, $custom_submit_clear, $custom_validate,
@@ -428,7 +383,6 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
       }
       break;
 
-
     // custom HTML
     case 3:
       if (!empty($custom_html)) {
@@ -440,18 +394,14 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
       }
       break;
 
-
-
     default:
       break;
   }
 }
 
-
-
 /**
  * Rules action:
- *
+ * @todo: Define this function.
  */
 function commerce_stock_rules_set_checkout_state($stock_action, $message, $approved_quantity) {
 if ($approved_quantity < 0) {
@@ -468,16 +418,18 @@ if ($approved_quantity < 0) {
   $stock_check_data['state'] = $stock_action;
   $stock_check_data['message'] = $message;
   $stock_check_data['qty'] = $approved_quantity;
-
 }
 
-
-
-
+/**
+ * @todo: Define this function.
+ */
 function commerce_stock_check_state_options_list() {
   return array( 0 => 'do nothing' , 1 => 'block transection', 2 => 'display message only');
 }
 
+/**
+ * @todo: Define this function.
+ */
 function commerce_stock_custom_cart_form_state_action_options_list() {
   return array( 0 => 'Normal Submit' , 1 => 'Custom Submit', 2 => 'URL Action', 3 => 'Custom HTML');
 

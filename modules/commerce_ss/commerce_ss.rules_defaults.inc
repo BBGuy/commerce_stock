@@ -5,13 +5,10 @@
  * Default rule configurations for Commerce Simple Stock.
  */
 
-
 /**
  * Implements hook_default_rules_configuration().
  */
 function commerce_ss_default_rules_configuration() {
-
-
   $rules = array();
 
   $rules_export = '{ "rules_stock_decrease_when_completing_the_order_process" : {
@@ -29,13 +26,9 @@ function commerce_ss_default_rules_configuration() {
         }
       }
     ]
-  }
-}';
-$rules['rules_decrement_stock_completing_order'] = rules_import($rules_export);
+  } }';
 
+  $rules['rules_decrement_stock_completing_order'] = rules_import($rules_export);
 
-
-
-
-return $rules;
+  return $rules;
 }

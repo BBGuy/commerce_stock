@@ -29,7 +29,6 @@ function commerce_ss_rules_condition_info() {
 
   $conditions['commerce_ss_stock_enabled_on_product'] = array(
     'label' => t('Product has simple stock enabled for its type'),
-
     'parameter' => array(
       'commerce_product' => array(
         'type' => 'commerce_product',
@@ -46,7 +45,6 @@ function commerce_ss_rules_condition_info() {
 
   $conditions['commerce_ss_stock_not_disabled'] = array(
     'label' => t('Product simple stock is not disabled by an override'),
-
     'parameter' => array(
       'commerce_product' => array(
         'type' => 'commerce_product',
@@ -64,10 +62,8 @@ function commerce_ss_rules_condition_info() {
   return $conditions;
 }
 
-
 /**
- *
- * Implementation of hook_rules_action_info().
+ * Implements hook_rules_action_info().
  */
 function commerce_ss_rules_action_info() {
   $actions = array();
@@ -94,14 +90,12 @@ function commerce_ss_rules_action_info() {
     ),
   );
 
-
   return $actions;
 }
 
 
 /**
- * If the line item is stock-enabled, subtract the sold amount in a line item
- * from stock.
+ * Substracts from stock the sold amount in a line item.
  *
  * @param $line_item
  *   A line item object.
@@ -125,9 +119,10 @@ function commerce_ss_decrease_by_line_item($line_item) {
 
 
 /**
- * If the line item is stock-enabled, add the sold amount in a line item
- * to stock. Typically used when a line item is removed from an order
- * (as when items are added to and removed from cart).
+ * Adds the sold amount in a line item to stock.
+ *
+ * Typically used when a line item is removed from an order (as when items are
+ * added to and removed from cart).
  *
  * @param $line_item
  *   A line item object.
@@ -151,6 +146,7 @@ function commerce_ss_increase_by_line_item($line_item) {
 
 /**
  * Adjusts a particular product SKU by a certain value.
+ *
  * A positive number will add to stock, a negative number will remove from
  * stock. Somewhat the equivalent of uc_stock_adjust().
  *

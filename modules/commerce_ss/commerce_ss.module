@@ -27,14 +27,12 @@ function commerce_ss_menu() {
   return $items;
 }
 
-
 /**
-* Implements hook_entity_property_info_alter()
-*
-*/
+ * Implements hook_entity_property_info_alter().
+ */
 function commerce_ss_entity_property_info_alter(&$info) {
   // Copy metadata about our stock field from the product bundle to the
-  // commerce_product entity
+  // commerce_product entity.
   if (!empty($info['commerce_product']['bundles'])) {
     $properties = array();
 
@@ -53,7 +51,6 @@ function commerce_ss_entity_property_info_alter(&$info) {
   }
 }
 
-
 /**
  * Implements hook_token_info().
  */
@@ -69,7 +66,6 @@ function commerce_ss_token_info() {
   );
   return $info;
 }
-
 
 /**
  * Implements hook_tokens().
@@ -93,18 +89,14 @@ function commerce_ss_tokens($type, $tokens, array $data = array(), array $option
   return $replacements;
 }
 
-
-
-
 /**
- * Given a product type, determine whether stock management is enabled on that
- * product type.
+ * Determines whether stock management is enabled on a product type.
  *
  * @param $type
  *   The product type.
  *
- * @return
- *   Boolean: TRUE if stock management is enabled.
+ * @return bool
+ *   TRUE if stock management is enabled.
  */
 function commerce_ss_product_type_enabled($type) {
   $instance = field_info_instance('commerce_product', 'commerce_stock', $type);
@@ -112,14 +104,13 @@ function commerce_ss_product_type_enabled($type) {
 }
 
 /**
- * Given a product type, determine whether stock management override is enabled
- * on that product type.
+ * Determines whether stock management override is enabled on a product type.
  *
  * @param $type
  *   The product type.
  *
- * @return
- *   Boolean: TRUE if stock management override is enabled.
+ * @return bool
+ *   TRUE if stock management override is enabled.
  */
 function commerce_ss_product_type_override_enabled($type) {
   $instance = field_info_instance('commerce_product', 'commerce_stock_override', $type);
@@ -127,14 +118,13 @@ function commerce_ss_product_type_override_enabled($type) {
 }
 
 /**
- * Given a product, determine whether stock management is enabled for that
- * product.
+ * Determines whether stock management is enabled for a product.
  *
  * @param $product
  *   The product to check.
  *
- * @return
- *   Boolean: TRUE if stock management is enabled on the product's product type.
+ * @return bool
+ *   TRUE if stock management is enabled on the product's product type.
  */
 function commerce_ss_product_enabled($product) {
   return commerce_ss_product_type_enabled($product->type);

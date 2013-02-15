@@ -5,17 +5,13 @@
  * Default rule configurations for Commerce Simple Stock.
  */
 
-
 /**
  * Implements hook_default_rules_configuration().
  */
 function commerce_ssr_default_rules_configuration() {
+  $rules = array();
 
-
-$rules = array();
-
-
-$rules_export = '{ "rules_stock_disable_add_to_cart" : {
+  $rules_export = '{ "rules_stock_disable_add_to_cart" : {
     "LABEL" : "Stock: disable add to cart ",
     "PLUGIN" : "reaction rule",
     "REQUIRES" : [ "commerce_ss", "rules", "commerce_stock" ],
@@ -33,13 +29,11 @@ $rules_export = '{ "rules_stock_disable_add_to_cart" : {
     "DO" : [
       { "commerce_stock_set_add_to_cart_form_state" : { "disabled" : 1, "text" : "Out of stock", "class_name" : "out-of-stock" } }
     ]
-  }
-}';
-$rules['rules_stock_disable_add_to_cart'] = rules_import($rules_export);
+  }}';
 
+  $rules['rules_stock_disable_add_to_cart'] = rules_import($rules_export);
 
-
-$rules_export = '{ "rules_stock_validate_add_to_cart" : {
+  $rules_export = '{ "rules_stock_validate_add_to_cart" : {
     "LABEL" : "Stock: validate add to cart",
     "PLUGIN" : "reaction rule",
     "REQUIRES" : [ "commerce_ss", "rules", "commerce_stock" ],
@@ -71,14 +65,11 @@ $rules_export = '{ "rules_stock_validate_add_to_cart" : {
         }
       }
     ]
-  }
-}';
-$rules['rules_stock_validate_add_to_cart'] = rules_import($rules_export);
+  }}';
 
+  $rules['rules_stock_validate_add_to_cart'] = rules_import($rules_export);
 
-
-
-$rules_export = '{ "rules_stock_validate_checkout" : {
+  $rules_export = '{ "rules_stock_validate_checkout" : {
     "LABEL" : "Stock: validate checkout",
     "PLUGIN" : "reaction rule",
     "REQUIRES" : [ "commerce_ss", "rules", "commerce_stock" ],
@@ -101,10 +92,9 @@ $rules_export = '{ "rules_stock_validate_checkout" : {
         }
       }
     ]
-  }
-}';
-$rules['rules_stock_validate_checkout'] = rules_import($rules_export);
+  }}';
 
+  $rules['rules_stock_validate_checkout'] = rules_import($rules_export);
 
-return $rules;
+  return $rules;
 }
