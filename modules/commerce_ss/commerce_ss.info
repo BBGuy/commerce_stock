@@ -5,5 +5,7 @@ dependencies[] = number
 dependencies[] = commerce_product
 dependencies[] = commerce_order
 dependencies[] = commerce_stock
+dependencies[] = commerce_checkout
+dependencies[] = rules
 core = 7.x
 configure = admin/commerce/config/stock/ss
