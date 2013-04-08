@@ -460,7 +460,7 @@ function commerce_stock_checkout_validate($order_wrapper) {
   }
   // if out of stock items send back to the cart form
   if ($found_errors) {
-    drupal_set_message(t('please adjust quantities before continuing to checkout') );
+    drupal_set_message(t('Please adjust quantities before continuing to checkout.') );
     $cart_url = url('cart', array('absolute' => TRUE));
     drupal_goto($cart_url);
   }
