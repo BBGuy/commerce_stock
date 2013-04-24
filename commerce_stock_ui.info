@@ -1,0 +1,8 @@
+name = Commerce stock UI
+description = Provides an interface for viewing and managing stock rules.
+package = Commerce (stock)
+dependencies[] = rules
+dependencies[] = commerce
+dependencies[] = commerce_stock
+core = 7.x
+configure = admin/commerce/config/stock
