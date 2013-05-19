@@ -21,10 +21,21 @@ function commerce_stock_menu() {
     'description' => 'Configure stock management.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_stock_admin_form'),
-    'access arguments' => array('administer commerce_product entities'),
+    'access arguments' => array('administer commerce_stock settings'),
     'file' => 'includes/commerce_stock.admin.inc',
   );
   return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function commerce_stock_permission() {
+  return array(
+    'administer commerce_stock settings' =>  array(
+      'title' => t('Administer commerce stock settings'),
+    ),
+  );
 }
 
 /**
