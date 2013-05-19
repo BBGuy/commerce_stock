@@ -19,7 +19,7 @@ function commerce_ss_menu() {
     'description' => 'Configure Simple stock.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_ss_admin_form'),
-    'access arguments' => array('administer commerce_product entities'),
+    'access arguments' => array('administer commerce_stock settings'),
     'file' => 'includes/commerce_ss.admin.inc',
     'type'  => MENU_LOCAL_TASK,
 
