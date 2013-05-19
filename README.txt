@@ -7,11 +7,12 @@ Commerce Stock 7.x-1.0-alpha3 is now compatible with Drupal Commerce 7.x-1.0-rc1
 To install and configure
 
    1. Install and enable the module.
-   2. Visit admin/commerce/config/stock to enable stock tracking on your product type(s).
-   3. Set the starting value of stock on each product.
+   2. Add the permission "Administer commerce stock settings" to all relevant roles.
+   3. Visit admin/commerce/config/stock to enable stock tracking on your product type(s).
+   4. Set the starting value of stock on each product.
 
 
-he stock module does two main things
+The stock module does two main things:
 
    1. Maintain stock levels
    2. Implement validation of stock to prevent users from ordering out of stock items
@@ -31,7 +32,7 @@ Management of stock
 
 Each product type that is to be stock controlled is to be enabled using the admin interface.
 Enabled product types will have a stock field added to them; this field will hold the current stock count.
-You can disable stock checking for specific products this is useful if an organisation has a “flagship” product that’s always in stock.
+You can disable stock checking for specific products this is useful if an organisation has a product that's always in stock.
 
 A rule is created by the module to decrease the stock level when an order is complete.
 
