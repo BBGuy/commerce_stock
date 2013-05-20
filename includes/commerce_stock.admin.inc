@@ -21,6 +21,14 @@ function commerce_stock_admin_form($form, &$form_state) {
  */
 function commerce_stock_admin_event_ruless() {
 
+  // Add a help section.
+  $content['help'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Stock validation'),
+  );
+  $content['help']['about']['#markup']
+    = t('Manage stock validation rules. Those are rules that manage availability of products to your online shoppers.');
+
   RulesPluginUI::$basePath = 'admin/commerce/config/stock/validation';
   $options = array('show plugin' => FALSE);
 
@@ -81,9 +89,18 @@ function commerce_stock_admin_event_ruless() {
  */
 function commerce_stock_admin_stock_control_ruless() {
 
+  // Add a help section.
+  $content['help'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Stock control'),
+  );
+  $content['help']['about']['#markup']
+    = t('<p>Manage Stock control / backend rules. Those are rules that effect and act on stock levels.</p>');
+  $content['help']['add_existing']['#markup']
+    = t('<p>To add existing rules to the stock control management screen, simply tag them with <strong>stock_control</strong>.</p>');
+
   RulesPluginUI::$basePath = 'admin/commerce/config/stock/control';
   $options = array('show plugin' => FALSE);
-
 
   $content['enabled'] = array(
     '#type' => 'fieldset',
@@ -107,14 +124,6 @@ function commerce_stock_admin_stock_control_ruless() {
   $conditions['active'] = FALSE;
   $content['disabled']['rules'] = RulesPluginUI::overviewTable($conditions, $options);
   $content['disabled']['rules']['#empty'] = t('There are no disabled rules.');
-
-  // Add a help section.
-  $content['help'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('help'),
-  );
-  $content['help']['add_existing']['#markup']
-    = t('To add existing rules to the stock control management screen, simply tag them with <strong>stock_control</strong>.');
 
   return $content;
 }
