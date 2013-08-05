@@ -48,7 +48,7 @@ function commerce_stock_permission() {
     'administer commerce_stock settings' => array(
       'title' => t('Administer commerce stock settings'),
     ),
-    'Make rule based changes to commerce stock' => array(
+    'make rule based changes to commerce_stock' => array(
       'title' => t('Make rule based changes to commerce stock'),
     ),
 
