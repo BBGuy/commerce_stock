@@ -279,8 +279,7 @@ function commerce_stock_rules_action_info() {
  * Rules integration access callback.
  */
 function commerce_stock_rules_access() {
-  // @todo
-  return TRUE;
+  return user_access('Make rule based changes to commerce stock');
 }
 
 /**
