@@ -168,3 +168,26 @@ function commerce_ss_product_not_disabled_by_override($product) {
   }
   return $stock_check_enabled;
 }
+
+/**
+ * Implements hook_inline_entity_form_table_fields_alter().
+ */
+function commerce_stock_inline_entity_form_table_fields_alter(&$fields, $context) {
+  if ($context['entity_type'] == 'commerce_product') {
+    // Make sure there's a stock field on each of the allowed product types.
+    $has_stock_field = TRUE;
+    foreach ($context['allowed_bundles'] as $bundle) {
+      if (!commerce_ss_product_type_enabled($bundle)) {
+        $has_stock_field = FALSE;
+      }
+    }
+
+    if ($has_stock_field) {
+      $fields['commerce_stock'] = array(
+        'type' => 'field',
+        'label' => t('Stock'),
+        'weight' => 101,
+      );
+    }
+  }
+}
