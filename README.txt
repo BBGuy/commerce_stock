@@ -11,7 +11,7 @@ This module includes three modules:
   created:
   - Disabling add to cart
   - Validate add to cart
-  - Validate checkout 
+  - Validate checkout
 
 
 To install and get working
@@ -19,11 +19,14 @@ To install and get working
 1. Download commerce_stock.
 2. Enable the Commerce Stock API, Commerce Simple Stock, and Commerce Simple
    Stock Rules modules.
-3. Go to Home > Administration > Store > Configuration > Stock management.
-4. Select the "simple stock management" tab.
-5. Check the product types you want simple stock to manage and hit submit.
+3. Go to people > permissions  and make sure that that you and other relevent
+   roles have the "Administer commerce stock settings".
+4. Go to Home > Administration > Store > Configuration > Stock management.
+5. Select the "simple stock management" tab.
+6. Check the product types you want simple stock to manage and hit submit.
 
-Important: 
+
+Important:
   You may need to clear caches after installing and enabling stock for your
   products. Rules will show errors for the stock rules until you enable stock on
   at least one product.
@@ -31,3 +34,8 @@ Important:
 If you want to be able to disable stock checking for individual products check
 the "Allow stock override for Product <product>".
 
+
+rules configuration
+===================
+If you need to make changes to rules you also need the permission
+"Make rule based changes to commerce stock".
