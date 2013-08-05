@@ -41,10 +41,10 @@ function commerce_ss_entity_property_info_alter(&$info) {
       $properties += $bundle_info['properties'];
     }
 
-    if ( isset($properties['commerce_stock'])) {
+    if (isset($properties['commerce_stock'])) {
       $info['commerce_product']['properties']['commerce_stock'] = $properties['commerce_stock'];
     }
-    if ( isset($properties['commerce_stock_override'])) {
+    if (isset($properties['commerce_stock_override'])) {
       $info['commerce_product']['properties']['commerce_stock_override'] = $properties['commerce_stock_override'];
     }
 
@@ -77,8 +77,9 @@ function commerce_ss_tokens($type, $tokens, array $data = array(), array $option
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'commerce-stock-int':
-          $replacements[$original] = (int)$product->commerce_stock->value();
+          $replacements[$original] = (int) $product->commerce_stock->value();
           break;
+
         case 'commerce-stock-user':
           $replacements[$original] = $product->commerce_stock->value() -
                 commerce_stock_check_cart_product_level($product->product_id->value());
@@ -131,8 +132,7 @@ function commerce_ss_product_enabled($product) {
 }
 
 /**
- * Given a line item, determine whether stock management is enabled for that
- * line item.
+ * For a given a line item, determine whether stock management is enabled.
  *
  * @param $line_item
  *   The line item to check.
@@ -146,7 +146,6 @@ function commerce_ss_line_item_product_enabled($line_item) {
 
 
 /**
- *
  * This function makes sure stock is enabled for product.
  * if true is return stock checking is enabled
  * if false stock checking is disabled
@@ -159,12 +158,12 @@ function commerce_ss_line_item_product_enabled($line_item) {
  */
 function commerce_ss_product_not_disabled_by_override($product) {
   $stock_check_enabled = TRUE;
-  // if product overide enabled for the product type
+  // If product overide enabled for the product type.
   if (commerce_ss_product_type_override_enabled($product->type)) {
-     // if the product has its override set and is turned on
-     if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
-       $stock_check_enabled = FALSE;
-     }
+    // If the product has its override set and is turned on.
+    if ((isset($product->commerce_stock_override['und']) && $product->commerce_stock_override['und'][0]['value'] == 1)) {
+      $stock_check_enabled = FALSE;
+    }
   }
   return $stock_check_enabled;
 }

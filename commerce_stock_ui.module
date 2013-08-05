@@ -187,4 +187,3 @@ function commerce_stock_ui_form_commerce_stock_ui_stock_control_rule_form_alter(
   $form['settings']['tags']['#value'] = 'stock_control';
   $form['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/stock/control');
 }
-

@@ -11,22 +11,6 @@
 function commerce_ss_rules_condition_info() {
   $conditions = array();
 
-// i dont think we need both this and the product enabled conditions
-// if anyone finds a good reason for it ill put it back
-//  $conditions['commerce_ss_stock_enabled_on_line_item'] = array(
-//    'label' => t('Line item has a product with simple stock enabled'),
-//    'parameter' => array(
-//      'commerce_line_item' => array(
-//        'type' => 'commerce_line_item',
-//        'label' => t('Line Item'),
-//      ),
-//    ),
-//    'group' => t('Commerce Stock (ss)'),
-//    'callbacks' => array(
-//      'execute' => 'commerce_ss_line_item_product_enabled',
-//    ),
-//  );
-
   $conditions['commerce_ss_stock_enabled_on_product'] = array(
     'label' => t('Product has simple stock enabled for its type'),
     'parameter' => array(
@@ -37,8 +21,8 @@ function commerce_ss_rules_condition_info() {
     ),
     'group' => t('Commerce Stock (ss)'),
     'callbacks' => array(
-      // @todo add a function that also checked that the "Disable stock for this product" is not on
-      // or maybe add another condision forœœ
+      // @todo add a function that also checked that the "Disable stock
+      // for this product" is not on or maybe add another condision form.
       'execute' => 'commerce_ss_product_enabled',
     ),
   );
@@ -53,8 +37,8 @@ function commerce_ss_rules_condition_info() {
     ),
     'group' => t('Commerce Stock (ss)'),
     'callbacks' => array(
-      // @todo add a function that also checked that the "Disable stock for this product" is not on
-      // or maybe add another condision forœœ
+      // @todo add a function that also checked that the "Disable stock for
+      // this product" is not on or maybe add another condision form.
       'execute' => 'commerce_ss_product_not_disabled_by_override',
     ),
   );
@@ -74,7 +58,7 @@ function commerce_ss_rules_action_info() {
     'parameter' => array(
       'commerce_line_item' => array(
         'type' => 'commerce_line_item',
-        'label' => t('Line item')
+        'label' => t('Line item'),
       ),
     ),
   );
@@ -85,7 +69,7 @@ function commerce_ss_rules_action_info() {
     'parameter' => array(
       'commerce_line_item' => array(
         'type' => 'commerce_line_item',
-        'label' => t('Line item')
+        'label' => t('Line item'),
       ),
     ),
   );
@@ -101,7 +85,7 @@ function commerce_ss_rules_action_info() {
  *   A line item object.
  */
 function commerce_ss_decrease_by_line_item($line_item) {
-  if(in_array($line_item->type, commerce_product_line_item_types())) {
+  if (in_array($line_item->type, commerce_product_line_item_types())) {
     // The product SKU that will have its stock level adjusted.
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
@@ -128,7 +112,7 @@ function commerce_ss_decrease_by_line_item($line_item) {
  *   A line item object.
  */
 function commerce_ss_increase_by_line_item($line_item) {
-  if(in_array($line_item->type, commerce_product_line_item_types())) {
+  if (in_array($line_item->type, commerce_product_line_item_types())) {
     // The product SKU that will have its stock level adjusted.
     $sku = $line_item->line_item_label;
     $product = commerce_product_load_by_sku($sku);
@@ -169,7 +153,8 @@ function commerce_ss_stock_adjust($product, $qty) {
   // @todo should this be moved to the
   if ($result) {
     watchdog('commerce_stock', 'Modified stock level of product %sku by %amount', array('%sku' => $product->sku, '%amount' => $qty));
-  } else {
+  }
+  else {
     watchdog('commerce_stock', 'Failed attempt to modify stock level of product %sku by %amount', array('%sku' => $product->sku, '%amount' => $qty), WATCHDOG_ERROR);
   }
 }

@@ -119,7 +119,7 @@ function commerce_stock_rules_order_has_out_of_stock($order) {
 function commerce_stock_rules_action_info() {
   $actions = array();
 
-  // The Stock cart state action
+  // The Stock cart state action.
   $actions['commerce_stock_add_to_cart_set_state'] = array(
     'label' => t('Set the result of an add to cart stock check'),
     'parameter' => array(
@@ -144,7 +144,7 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
-  // The stock disable cart action
+  // The stock disable cart action.
   $actions['commerce_stock_set_add_to_cart_form_state'] = array(
     'label' => t('Set the state of the add to cart form'),
     'parameter' => array(
@@ -167,7 +167,7 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
-  // The stock custom cart action
+  // The stock custom cart action.
   $actions['commerce_stock_custom_cart_form_state'] = array(
     'label' => t('Advanced configuration of the add to cart form'),
     'parameter' => array(
@@ -247,7 +247,7 @@ function commerce_stock_rules_action_info() {
     ),
   );
 
-  // The Stock checkout check action
+  // The Stock checkout check action.
   $actions['commerce_stock_checkout_state'] = array(
     'label' => t('Set the state of the checkout process (called one per an item)'),
     'parameter' => array(
@@ -283,17 +283,18 @@ function commerce_stock_rules_access() {
 }
 
 /**
- * Rules action: updates an order's status to the default status of the given
- *   order state.
+ * Rules action: updates an order's status.
+ *
+ * updates an order's status to the default status of the given order state.
  */
 function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $approved_quantity) {
   if ($approved_quantity < 0) {
     $approved_quantity = 0;
-    // if zero transection must be blocked as it you are not allowed
-    // to add zero quantity to the cart
+    // If zero transection must be blocked as it you are not allowed
+    // to add zero quantity to the cart.
     $stock_action = 1;
   }
-  // set the global stock check array
+  // Set the global stock check array.
   global $stock_check_data;
   $stock_check_data['state'] = $stock_action;
   $stock_check_data['message'] = $message;
@@ -320,8 +321,8 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
           $custom_validate_clear, $custom_url, $custom_html) {
   global $stock_cart_check_data;
 
-  // read form values
-  $form_action =  $stock_cart_check_data['form']['#action'];
+  // Read form values.
+  $form_action = $stock_cart_check_data['form']['#action'];
   if (isset ($stock_cart_check_data['form']['product_id']['#value'])) {
     $prod_id = $stock_cart_check_data['form']['product_id']['#value'];
   }
@@ -329,51 +330,51 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
     $prod_id = $stock_cart_check_data['form']['product_id']['#default_value'];
   }
 
-  // class
+  // Class.
   $stock_cart_check_data['form']['#attributes']['class']['stock'] = $class_name;
 
-  // Quantity field
+  // Quantity field.
   if ($hide_qty) {
     $stock_cart_check_data['form']['quantity']['#access'] = FALSE;
   }
 
-  // prefix & sufix
+  // Prefix & sufix.
   $stock_cart_check_data['form']['submit']['#prefix'] = $action_prefix;
   $stock_cart_check_data['form']['submit']['#suffix'] = $action_suffix;
 
   switch ($stock_action) {
 
-    //Normal Submit
+    // Normal Submit.
     case 0:
       $stock_cart_check_data['form']['submit']['#value'] = $text;
       $stock_cart_check_data['form']['submit']['#disabled'] = $disabled_cart;
       break;
 
-    // Custom Submit
+    // Custom Submit.
     case 1:
       $stock_cart_check_data['form']['submit']['#value'] = $text;
-      // should we clear the submit array
+      // Should we clear the submit array.
       if ($custom_submit_clear) {
         $stock_cart_check_data['form']['#submit'] = array();
       }
-      // should we clear the validate array
+      // Should we clear the validate array.
       if ($custom_validate_clear) {
         $stock_cart_check_data['form']['#validate'] = array();
       }
-      // add custom submit function
+      // Add custom submit function.
       if (!empty($custom_submit)) {
         $stock_cart_check_data['form']['#submit'][] = $custom_submit;
       }
-      // add custom validation function
+      // Sdd custom validation function.
       if (!empty($custom_validate)) {
         $stock_cart_check_data['form']['#validate'][] = $custom_validate;
       }
       break;
 
-    // URL Action
+    // URL Action.
     case 2:
       if (!empty($custom_url)) {
-        // custom url
+        // Custom url.
         $custom_url = str_replace('[product_id]', $prod_id, $custom_url);
         $custom_url = str_replace('[url]', $form_action, $custom_url);
         $stock_cart_check_data['form']['submit']['#type'] = 'link';
@@ -382,10 +383,10 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
       }
       break;
 
-    // custom HTML
+    // Custom HTML.
     case 3:
       if (!empty($custom_html)) {
-        // custom url
+        // Custom url.
         $custom_html = str_replace('[product_id]', $prod_id, $custom_html);
         $custom_html = str_replace('[url]', $form_action, $custom_html);
         $stock_cart_check_data['form']['submit']['#type'] = 'markup';
@@ -399,20 +400,16 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
 }
 
 /**
- * Rules action:
- * @todo: Define this function.
+ * Rules action: Set the state of the checkout process (called one per an item).
  */
 function commerce_stock_rules_set_checkout_state($stock_action, $message, $approved_quantity) {
-if ($approved_quantity < 0) {
+  if ($approved_quantity < 0) {
     $approved_quantity = 0;
-    // if zero transection must be blocked as it you are not allowed
-    // to add zero quantity to the cart
+    // If zero transection must be blocked as it you are not allowed
+    // to add zero quantity to the cart.
     $stock_action = 1;
   }
-//  if ($stock_action > $stock_check_data['state']) {
-//    $stock_check_data['state'] = $stock_action;
-//  }
-  // set the global stock check array
+  // Set the global stock check array.
   global $stock_check_data;
   $stock_check_data['state'] = $stock_action;
   $stock_check_data['message'] = $message;
@@ -420,16 +417,23 @@ if ($approved_quantity < 0) {
 }
 
 /**
- * @todo: Define this function.
+ * Options for stock actions.
  */
 function commerce_stock_check_state_options_list() {
-  return array( 0 => 'do nothing' , 1 => 'block transection', 2 => 'display message only');
+  return array(
+    0 => 'do nothing' ,
+    1 => 'block transection',
+    2 => 'display message only');
 }
 
 /**
- * @todo: Define this function.
+ * Options for Advanced configuration of the add to cart form actions.
  */
 function commerce_stock_custom_cart_form_state_action_options_list() {
-  return array( 0 => 'Normal Submit' , 1 => 'Custom Submit', 2 => 'URL Action', 3 => 'Custom HTML');
+  return array(
+    0 => 'Normal Submit' ,
+    1 => 'Custom Submit',
+    2 => 'URL Action',
+    3 => 'Custom HTML');
 
 }
