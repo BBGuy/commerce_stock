@@ -50,7 +50,7 @@ function commerce_stock_ui_menu() {
     'title' => 'Add a Validate cart / checkout rule',
     'description' => 'Validate products in the the cart before checkout.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_stock_check_product_checkout', 'admin/commerce/config/stock/validation'),
+    'page arguments' => array('commerce_stock_ui_add_checkout_rule_form', 'admin/commerce/config/stock/validation'),
     'access arguments' => array('administer rules'),
     'file path' => drupal_get_path('module', 'rules_admin'),
     'file' => 'rules_admin.inc',
