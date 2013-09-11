@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for commerce_ss.
+ */
+
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_ss_uninstall() {
+  // We may have a number of variables one for each type enabled so safer to use
+  // a db_delete() with a like then a variable_del().
+  db_delete('variable')
+    ->condition('name', "commerce_stock_decimal_backend_%", "LIKE")
+    ->execute();
+  // Clear the variables cache.
+  cache_clear_all('variables', 'cache_bootstrap');
+}
