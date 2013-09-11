@@ -37,7 +37,7 @@ function commerce_stock_ui_menu() {
   );
 
   $items['admin/commerce/config/stock/validation/add_cart_action'] = array(
-    'title' => 'Add a Cart state rule',
+    'title' => 'Add a Cart action rule',
     'description' => 'Act on the add to cart action.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('commerce_stock_ui_add_cart_action_rule_form', 'admin/commerce/config/stock/validation'),
