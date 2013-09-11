@@ -39,3 +39,15 @@ rules configuration
 ===================
 If you need to make changes to rules you also need the permission
 "Make rule based changes to commerce stock".
+to view and edit the rules see:
+admin/commerce/config/stock/validation
+and
+admin/commerce/config/stock/control
+
+Decimal Stock
+=============
+The editing of stock levels support decimal quantities, to enable this feature
+edit a product type (admin/commerce/products/types) and check the box
+"Allow decimal quantities for stock administration"
+to support decimal quantities on the add to basket use the module
+https://drupal.org/project/commerce_decimal_quantities
