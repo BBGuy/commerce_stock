@@ -147,13 +147,11 @@ function commerce_stock_cart_state_validate_options($form_id, &$form, &$form_sta
   // Integration with rules_form_alter().
   if (module_exists('rules_form_alter')) {
     // make sure rules_form_alter actions work from the stock event.
-    global $rules_form_alter_data;
-    $rules_form_alter_data = array(
-      'id'  => $form_id,
-      'form' => &$form,
-      'state' => &$form_state,
-    );
-
+    $rules_form_alter_data = &drupal_static('rules_form_alter_data', array());
+    // Set the form data that will be used by rules.
+    $rules_form_alter_data['id'] = $form_id;
+    $rules_form_alter_data['form'] = &$form;
+    $rules_form_alter_data['state'] = &$form_state;
   }
   // Invoke the stock check event.
   rules_invoke_event('commerce_stock_check_add_to_cart_form_state', $product, $qty_ordered, $form);
@@ -266,13 +264,12 @@ function commerce_stock_cart_state_validate($form_id, &$form, &$form_state) {
 
   // Integration with rules_form_alter().
   if (module_exists('rules_form_alter')) {
-    // Make sure rules_form_alter actions work from the stock event.
-    global $rules_form_alter_data;
-    $rules_form_alter_data = array(
-      'id'  => $form_id,
-      'form' => &$form,
-      'state' => &$form_state,
-    );
+    // make sure rules_form_alter actions work from the stock event.
+    $rules_form_alter_data = &drupal_static('rules_form_alter_data', array());
+    // Set the form data that will be used by rules.
+    $rules_form_alter_data['id'] = $form_id;
+    $rules_form_alter_data['form'] = &$form;
+    $rules_form_alter_data['state'] = &$form_state;
   }
 
   // Invoke the stock check event.
