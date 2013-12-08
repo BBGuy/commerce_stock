@@ -231,7 +231,7 @@ function commerce_ss_product_not_disabled_by_override($product) {
 /**
  * Implements hook_inline_entity_form_table_fields_alter().
  */
-function commerce_stock_inline_entity_form_table_fields_alter(&$fields, $context) {
+function commerce_ss_inline_entity_form_table_fields_alter(&$fields, $context) {
   if ($context['entity_type'] == 'commerce_product') {
     // Make sure there's a stock field on each of the allowed product types.
     $has_stock_field = TRUE;
