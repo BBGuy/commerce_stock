@@ -34,6 +34,23 @@ Important:
 If you want to be able to disable stock checking for individual products check
 the "Allow stock override for Product <product>".
 
+To Uninstall
+=============
+1. Go to Home > Administration > Store > Configuration > Stock management.
+2. Select the "simple stock management" tab.
+3. Un-Check all product types hit submit and confirm the "I understand that all
+   stock data will be permanently removed".
+4. go to the modules page & disable all stock modules.
+5. Go to the uninstall tab and uninstall all stock modules.
+
+Notes on Uninstall:
+* If you are planing on using a different version of stock or replace the stock
+  module with another / a custom system, you can keep the stock field and skip
+  steps 1 to 3. the stock field will be preserved and you will be able to use it
+  as any other drupal field.
+* If you forgot to follow steps 1 to 3 before uninstalling you can visit each of
+  the product bundles and delete the stock field from each of those.
+
 
 rules configuration
 ===================
