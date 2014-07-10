@@ -85,7 +85,8 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id) {
   }
   elseif ($form_id == 'views_form_commerce_cart_form_default') {
     // Add validate function to the cart form.
-    $form['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+    $form['actions']['submit']['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+    $form['actions']['checkout']['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
   }
   elseif ($form_id == 'commerce_checkout_form_checkout') {
     // Add validate function to the checkout form.
@@ -193,10 +194,7 @@ function commerce_stock_add_to_cart_validate($form, &$form_state) {
  * than are in stock.
  */
 function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
-  // If a user choses to remove an item, then ts valid.
-  if ($form_state['triggering_element']['#value'] == t('Remove')) {
-    return;
-  }
+
   $line_item_index = array_keys($form_state['line_items']);
   if (isset($form_state['input']['edit_quantity'])) {
     foreach ($form_state['values']['edit_quantity'] as $index => $qty) {
