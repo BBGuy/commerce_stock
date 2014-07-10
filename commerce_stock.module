@@ -134,7 +134,7 @@ function commerce_stock_cart_state_validate_options($form_id, &$form, &$form_sta
   $qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
   // Initialize the form.
-  $form['submit']['#value'] = t('Add to cart');
+  $form['submit']['#value'] = $form['submit']['#value'];
   $form['submit']['#disabled'] = FALSE;
   $form['#attributes']['class']['stock'] = 'in-stock';
 
@@ -253,7 +253,7 @@ function commerce_stock_cart_state_validate($form_id, &$form, &$form_state) {
   $qty_ordered = commerce_stock_check_cart_product_level($product_id);
 
   // Initialize the form.
-  $form['submit']['#value'] = t('Add to cart');
+  $form['submit']['#value'] = $form['submit']['#value'];
   $form['submit']['#disabled'] = FALSE;
   $form['#attributes']['class']['stock'] = 'in-stock';
 
