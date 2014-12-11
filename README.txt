@@ -61,6 +61,17 @@ admin/commerce/config/stock/validation
 and
 admin/commerce/config/stock/control
 
+Increase stock level when canceling an order
+============================================
+If you want stock to be automatically returned when an order is canceled you can
+enable the "Stock: Increase when canceling the order process" rule on the "stock
+control" configuration page.
+This will handle orders with a state change
+from: Pending, Processing or Completed
+to: Canceled
+you can easily update this to include other states that are relevant to your
+site.
+
 Decimal Stock
 =============
 The editing of stock levels support decimal quantities, to enable this feature
