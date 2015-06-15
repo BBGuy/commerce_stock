@@ -87,7 +87,7 @@ function commerce_ss_rules_action_info() {
 function commerce_ss_decrease_by_line_item($line_item) {
   if (in_array($line_item->type, commerce_product_line_item_types())) {
     // The product SKU that will have its stock level adjusted.
-    $sku = $line_item->line_item_label;
+    $sku = commerce_ss_line_item_sku($line_item);
     $product = commerce_product_load_by_sku($sku);
     if (commerce_ss_product_type_enabled($product->type)) {
       if (!(commerce_ss_product_type_override_enabled($product->type)
@@ -114,7 +114,7 @@ function commerce_ss_decrease_by_line_item($line_item) {
 function commerce_ss_increase_by_line_item($line_item) {
   if (in_array($line_item->type, commerce_product_line_item_types())) {
     // The product SKU that will have its stock level adjusted.
-    $sku = $line_item->line_item_label;
+    $sku = commerce_ss_line_item_sku($line_item);
     $product = commerce_product_load_by_sku($sku);
     if (commerce_ss_product_type_enabled($product->type)) {
       if (!(commerce_ss_product_type_override_enabled($product->type)
@@ -157,4 +157,15 @@ function commerce_ss_stock_adjust($product, $qty) {
   else {
     watchdog('commerce_stock', 'Failed attempt to modify stock level of product %sku by %amount', array('%sku' => $product->sku, '%amount' => $qty), WATCHDOG_ERROR);
   }
+}
+
+/**
+ * Helper function to get product SKU from line item.
+ *
+ * @param $line_item
+ *   The cart line item for which to return a product SKU.
+ */
+function commerce_ss_line_item_sku($line_item) {
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  return($line_item_wrapper->commerce_product->sku->value());
 }
