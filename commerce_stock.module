@@ -83,10 +83,25 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id) {
       commerce_stock_cart_state_validate($form_id, $form, $form_state);
     }
   }
-  elseif ($form_id == 'views_form_commerce_cart_form_default') {
-    // Add validate function to the cart form.
-    $form['actions']['submit']['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
-    $form['actions']['checkout']['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+  elseif (strpos($form_id, 'views_form_commerce_cart_form_') === 0) {
+    $view = reset($form_state['build_info']['args']);
+
+    // Only alter buttons if the cart form View shows line items.
+    if (!empty($view->result)) {
+      // Add validate function to the cart form.
+      if (empty($form['actions']['submit']['#validate'])) {
+        $form['actions']['submit']['#validate'] = array_merge($form['#validate'], array('commerce_stock_form_commerce_cart_validate'));
+      }
+      else {
+        $form['actions']['submit']['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+      }
+      if (empty($form['actions']['checkout']['#validate'])) {
+        $form['actions']['checkout']['#validate'] = array_merge($form['#validate'], array('commerce_stock_form_commerce_cart_validate'));
+      }
+      else {
+        $form['actions']['checkout']['#validate'][] = 'commerce_stock_form_commerce_cart_validate';
+      }
+    }
   }
   elseif ($form_id == 'commerce_checkout_form_checkout') {
     // Add validate function to the checkout form.
