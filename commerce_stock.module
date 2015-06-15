@@ -222,7 +222,7 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
         commerce_stock_check_product_checkout_rule($product, $qty, $stock_state, $message);
         // @todo: TEST and update error structure.
         if ($stock_state == 1) {
-          form_set_error("stock_error", $message);
+          form_set_error('edit_quantity][' . $index, $message);
         }
         elseif ($stock_state == 2) {
           drupal_set_message($message);
