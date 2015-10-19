@@ -46,6 +46,7 @@ function commerce_ss_entity_property_info_alter(&$info) {
     }
     if (isset($properties['commerce_stock_override'])) {
       $info['commerce_product']['properties']['commerce_stock_override'] = $properties['commerce_stock_override'];
+      unset($info['commerce_product']['properties']['commerce_stock_override']['options list']);
     }
 
   }
