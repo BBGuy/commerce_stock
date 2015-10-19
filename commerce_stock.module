@@ -62,6 +62,11 @@ function commerce_stock_permission() {
  * Alters the add-to-cart form to show out-of-stock items and add a validator.
  */
 function commerce_stock_form_alter(&$form, &$form_state, $form_id) {
+  $commerce_cart_form = 'commerce_cart_form';
+  if (module_exists('commerce_cart_view_override')) {
+    $commerce_cart_form = variable_get('commerce_cart_view_override_page_view', 'commerce_cart_form');
+  }
+
   if (strpos($form_id, "commerce_cart_add_to_cart_form") === 0) {
     // Check if product is disabled.
     if (isset($form['submit']['#attributes']['disabled']) && ($form['submit']['#attributes']['disabled'] == 'disabled')) {
@@ -83,7 +88,7 @@ function commerce_stock_form_alter(&$form, &$form_state, $form_id) {
       commerce_stock_cart_state_validate($form_id, $form, $form_state);
     }
   }
-  elseif (strpos($form_id, 'views_form_commerce_cart_form_') === 0) {
+  elseif (strpos($form_id, "views_form_{$commerce_cart_form}_") === 0) {
     $view = reset($form_state['build_info']['args']);
 
     // Only alter buttons if the cart form View shows line items.
