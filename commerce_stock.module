@@ -218,23 +218,23 @@ function commerce_stock_form_commerce_cart_validate($form, &$form_state) {
   $line_item_index = array_keys($form_state['line_items']);
   if (isset($form_state['input']['edit_quantity'])) {
     $products = array();
-
     foreach ($form_state['values']['edit_quantity'] as $index => $qty) {
       $line_item = $form_state['line_items'][$line_item_index[$index]];
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
       if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
         $product_id = $line_item_wrapper->commerce_product->product_id->value();
-        $products[$product_id] = isset($products[$product_id]) ? $products[$product_id] + $qty : $qty;
+        $products[$product_id]['qty'] = isset($products[$product_id]) ? $products[$product_id] + $qty : $qty;
+        $products[$product_id]['line'] = $index;
       }
     }
 
-    foreach ($products as $product_id => $qty) {
-      $product = commerce_product_load($product_id);
+    foreach ($products as $product_id => $product) {
+      $prod = commerce_product_load($product_id);
       // Check using rules.
-      commerce_stock_check_product_checkout_rule($product, $qty, $stock_state, $message);
+      commerce_stock_check_product_checkout_rule($prod, $product['qty'], $stock_state, $message);
       // @todo: TEST and update error structure.
       if ($stock_state == 1) {
-        form_set_error('edit_quantity][' . $index, $message);
+        form_set_error('edit_quantity][' . $product['line'], $message);
       }
       elseif ($stock_state == 2) {
         drupal_set_message($message);
@@ -410,12 +410,9 @@ function commerce_stock_check_product_checkout_rule($product, $qty_ordered, &$st
   // Invoke the stock check event.
   rules_invoke_event('commerce_stock_check_product_checkout', $product, $qty_ordered);
 
-  // If state not ok, do nothing then return the value set by the action.
-  if ($stock_check_data['state'] <> 0) {
-    $stock_state = $stock_check_data['state'];
-    $message = $stock_check_data['message'];
-    $qty = $stock_check_data['qty'];
-  }
+  // Set return values.
+  $stock_state = $stock_check_data['state'];
+  $message = $stock_check_data['message'];
 }
 
 /**
