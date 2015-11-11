@@ -1,5 +1,0 @@
-name = Commerce Stock Decimal formatter
-description = Provide a Decimal formater for converting stock levels into text messages.
-package = Commerce (stock)
-dependencies[] = number
-core = 7.x
