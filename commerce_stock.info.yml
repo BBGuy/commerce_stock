@@ -2,7 +2,6 @@ name: 'Commerce Stock API'
 description: 'Provides a stock management framework based on rules to manage stock levels of commerce products.'
 package: 'Commerce (stock)'
 dependencies:
-  - number
   - commerce_product
   - commerce_order
   - rules
