@@ -31,5 +31,54 @@ function commerce_stock_s_schema() {
     'primary key' => array('locid'),
   );
 
+
+  $schema['cs_inventory_transaction'] = array(
+    'description' => 'Stores inventory transactions form commerce stock.',
+    'fields' => array(
+      'trid' => array(
+        'description' => 'Primary Key: unique transactions ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'product_id' => array(
+        'description' => 'The referenced product',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'qty' => array(
+        'description' => 'The quentity',
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+      ),
+      'location_id' => array(
+        'description' => 'The location ID (locid).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'location_zone' => array(
+        'description' => 'the zone in: aisle.bay.shelf.bin format',
+        'type' => 'varchar_ascii',
+        'length' => 28,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+
+    ),
+    'primary key' => array('trid'),
+
+    'foreign keys' => array(
+      'location' => array(
+        'table' => 'cs_inventory_location',
+        'columns' => array(
+          'location_id' => 'locid',
+        ),
+      ),
+    ),
+  );
+
   return $schema;
 }
