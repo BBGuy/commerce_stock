@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Commerce Stock Storage module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_stock_s_schema() {
+
+
+  $schema['cs_inventory_location'] = array(
+    'description' => 'List of locations/warehouse form commerce stock.',
+    'fields' => array(
+      'locid' => array(
+        'description' => 'Primary Key: Location ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The name of the locations/warehous',
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'default' => '',
+        'length' => 128,
+      ),
+    ),
+    'primary key' => array('locid'),
+  );
+
+  return $schema;
+}
