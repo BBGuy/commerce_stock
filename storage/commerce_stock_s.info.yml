@@ -1,0 +1,8 @@
+name: 'Commerce Stock Storage'
+description: 'Provides a DB storage and low level API for commerce stock.'
+package: 'Commerce (stock)'
+dependencies:
+  - commerce_product
+  - commerce_order
+core: 8.x
+type: module
