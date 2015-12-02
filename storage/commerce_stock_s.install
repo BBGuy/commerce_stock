@@ -69,6 +69,14 @@ function commerce_stock_s_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'unit_cost' => array(
+        'description' => 'The amount paid per unit',
+        'type' => 'numeric',
+        'size' => 'normal',
+        'precision' => 19,
+        'scale' => 6,
+      ),
+
     ),
     'primary key' => array('trid'),
     'foreign keys' => array(
@@ -80,6 +88,6 @@ function commerce_stock_s_schema() {
       ),
     ),
   );
-
+  
   return $schema;
 }
