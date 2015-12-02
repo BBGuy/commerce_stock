@@ -89,5 +89,48 @@ function commerce_stock_s_schema() {
     ),
   );
   
+  $schema['cs_inventory_location_level'] = array(
+    'description' => 'Stock Level at a location.',
+    'fields' => array(
+      'location_id' => array(
+        'description' => 'The location ID (locid).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'product_id' => array(
+        'description' => 'The referenced product',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'qty' => array(
+        'description' => 'The quentity',
+        'type' => 'numeric',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+        'precision' => 10,
+        'scale' => 2,
+      ),
+      'last_transaction_id' => array(
+        'description' => 'The last transaction that was used to calculate the total quentity to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+
+    ),
+    'primary key' => array('location_id', 'product_id'),
+    'foreign keys' => array(
+      'location' => array(
+        'table' => 'cs_inventory_location',
+        'columns' => array(
+          'location_id' => 'locid',
+        ),
+      ),
+    ),
+  );
+
   return $schema;
 }
