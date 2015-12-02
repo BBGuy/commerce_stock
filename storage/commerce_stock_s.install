@@ -49,9 +49,12 @@ function commerce_stock_s_schema() {
       ),
       'qty' => array(
         'description' => 'The quentity',
-        'type' => 'int',
-        'unsigned' => FALSE,
+        'type' => 'numeric',
+        'size' => 'normal',
         'not null' => TRUE,
+        'default' => 0,
+        'precision' => 10,
+        'scale' => 2,
       ),
       'location_id' => array(
         'description' => 'The location ID (locid).',
@@ -66,10 +69,8 @@ function commerce_stock_s_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-
     ),
     'primary key' => array('trid'),
-
     'foreign keys' => array(
       'location' => array(
         'table' => 'cs_inventory_location',
