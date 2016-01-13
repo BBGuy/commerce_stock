@@ -331,41 +331,59 @@ function commerce_stock_tokens($type, $tokens, array $data = array(), array $opt
 }
 
 /**
- * Checks and returns quanity of the product and returns the value.
+ * Checks and returns quantity of the product and returns the value.
  *
  * The value is cached as is called more then once (including tokens)
  */
 function commerce_stock_check_cart_product_level($product_id) {
+  // Cart product levels will be cached keyed by $product_id.
+  $cart_product_levels = &drupal_static(__FUNCTION__);
 
-  static $cart_product_level = array();
+  if (isset($cart_product_levels[$product_id])) {
+    return $cart_product_levels[$product_id];
+  }
 
-  if (isset($cart_product_level[$product_id])) {
-    return $cart_product_level[$product_id];
+  // First let other modules attempt to provide a valid quantity for the given
+  // product id. Instead of invoking hook_commerce_stock_check_cart_product_level()
+  // directly, we invoke it in each module implementing the hook and return the
+  // first valid quantity returned (if any).
+  foreach (module_implements('commerce_stock_check_cart_product_level') as $module) {
+    $cart_qty = module_invoke($module, 'commerce_stock_check_cart_product_level', $product_id);
+
+    // If a hook said the product should not have a cart product level, that
+    // overrides any other potentially valid cart quantity. Return 0 now.
+    if ($cart_qty === FALSE) {
+      $cart_product_levels[$product_id] = 0;
+      return 0;
+    }
+
+    // Otherwise only return a valid cart quantity.
+    if (!empty($cart_qty) && is_numeric($cart_qty)) {
+      $cart_product_levels[$product_id] = $cart_qty;
+      return $cart_qty;
+    }
+  }
+
+  $cart_qty = 0;
+  global $user;
+  // Load the current cart if it exists.
+  $order = commerce_cart_order_load($user->uid);
+  if (!$order) {
+    $cart_qty = 0;
   }
   else {
-    $cart_qty = 0;
-    global $user;
-    // Load the current cart if it exists.
-    $order = commerce_cart_order_load($user->uid);
-    if (!$order) {
-      $cart_qty = 0;
-    }
-    else {
-      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-      if ($order_wrapper) {
-        // Cycle throw each line item ID.
-        foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
-          if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
-            if ($line_item_wrapper->commerce_product->product_id->value() == $product_id){
-              $cart_qty += $line_item_wrapper->quantity->value();
-            }
-          }
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    // Cycle throw each line item ID.
+    foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
+      if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
+        if ($line_item_wrapper->commerce_product->product_id->value() == $product_id){
+          $cart_qty += $line_item_wrapper->quantity->value();
         }
       }
     }
-    $cart_product_level[$product_id] = $cart_qty;
-    return $cart_qty;
   }
+  $cart_product_levels[$product_id] = $cart_qty;
+  return $cart_qty;
 }
 
 /**
