@@ -152,6 +152,30 @@ function commerce_ss_form_commerce_product_ui_product_form_alter(&$form, &$form_
 }
 
 /**
+ * Implements hook_inline_entity_form_alter().
+ *
+ * Controll the decimal quantities option when editing products.
+ */
+function commerce_ss_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+  if ($entity_form['#entity_type'] == 'commerce_product') {
+    // Get the product bundle type.
+    $type = $entity_form['#bundle'];
+    // Check if stock enabled for the type.
+    if (commerce_ss_product_type_enabled($type)) {
+      $decimal = variable_get('commerce_stock_decimal_backend_'.$type, FALSE);
+      if (!$decimal) {
+        // Get the fields language.
+        $language = $entity_form['commerce_stock']['#language'];
+        // Set the number format to decimal.
+        $entity_form['commerce_stock'][$language][0]['value']['#number_type'] = 'integer';
+        $entity_form['commerce_stock'][$language][0]['value']['#default_value']
+          = intval($entity_form['commerce_stock'][$language][0]['value']['#default_value']);
+      }
+    }
+  }
+}
+
+/**
  * Determines whether stock management is enabled on a product type.
  *
  * @param $type
@@ -236,9 +260,13 @@ function commerce_ss_inline_entity_form_table_fields_alter(&$fields, $context) {
   if ($context['entity_type'] == 'commerce_product') {
     // Make sure there's a stock field on each of the allowed product types.
     $has_stock_field = TRUE;
+    $decimal = FALSE;
     foreach ($context['allowed_bundles'] as $bundle) {
       if (!commerce_ss_product_type_enabled($bundle)) {
         $has_stock_field = FALSE;
+      }
+      if (variable_get('commerce_stock_decimal_backend_' . $bundle, FALSE)) {
+        $decimal = TRUE;
       }
     }
 
@@ -246,6 +274,7 @@ function commerce_ss_inline_entity_form_table_fields_alter(&$fields, $context) {
       $fields['commerce_stock'] = array(
         'type' => 'field',
         'label' => t('Stock'),
+        'formatter' => $decimal ? 'number_decimal' : 'number_integer',
         'weight' => 101,
       );
     }
