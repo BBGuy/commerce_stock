@@ -27,6 +27,12 @@ function commerce_stock_s_schema() {
         'default' => '',
         'length' => 128,
       ),
+      'status' => array(
+        'description' => 'Boolean indicating whether the location is active.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'primary key' => array('locid'),
   );
@@ -88,7 +94,7 @@ function commerce_stock_s_schema() {
       ),
     ),
   );
-  
+
   $schema['cs_inventory_location_level'] = array(
     'description' => 'Stock Level at a location.',
     'fields' => array(
