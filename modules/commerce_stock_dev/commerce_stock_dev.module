@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Contains commerce_stock_dev.module..
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function commerce_stock_dev_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the commerce_stock_dev module.
+    case 'help.page.commerce_stock_dev':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Development tools for Commerce Stock') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_stock_dev_theme() {
+  $theme = [];
+
+  return $theme;
+}

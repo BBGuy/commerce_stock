@@ -1,0 +1,10 @@
+commerce_stock_dev.stock_dev_form:
+  path: '/admin/commerce/config/stock/dev/stock_dev_form'
+  defaults:
+    _form: '\Drupal\commerce_stock_dev\Form\stock_dev_form'
+    _title: 'stock_dev_form'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+
