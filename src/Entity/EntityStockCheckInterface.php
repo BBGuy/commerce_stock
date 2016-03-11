@@ -54,6 +54,6 @@ interface EntityStockCheckInterface {
    * @return array
    *   List of locations keyd by ID.
    */
-  public function getLocationList();
+  public function getLocationList($return_active_only = TRUE);
 
 }
