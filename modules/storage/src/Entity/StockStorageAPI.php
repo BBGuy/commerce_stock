@@ -152,17 +152,6 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
       if ($result) {
         $location_info[$location_id]['transactions_qty'] = $result->transactions_qty;
       }
-
-      // The below complains about not having a Group By although not needed
-      // for sum(). needs looking into.
-      // query transactions total stock where id > last_transaction_id
-//      $select = $db->select('cs_inventory_transaction', 'it')
-//        ->fields('it', array('location_id'))
-//        ->condition('location_id', $location_id, '=')
-//        ->condition('product_id', $product_id);
-//        $select->addExpression('sum(it.qty)', 'qty_total');
-//        //$select->addGroupBy
-
     }
     return $location_info;
   }
