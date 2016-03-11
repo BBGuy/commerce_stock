@@ -1,5 +1,5 @@
-name: Commerce Stock Dev
+name: Commerce Stock Dev tools
 type: module
-description: Commerce Stock developer tools
+description: Commerce Stock developer tools - For development only and will be removed at a later stage!!!!!
 core: 8.x
 package: 'Commerce (stock)'
