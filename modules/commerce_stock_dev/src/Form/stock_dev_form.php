@@ -9,6 +9,8 @@ namespace Drupal\commerce_stock_dev\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\commerce_stock\Entity\StockAvailabilityChecker;
+use Drupal\commerce_stock\Entity\CoreStockConfiguration;
 
 use Drupal\commerce_stock_s\Entity\StockStorageAPI;
 
@@ -136,6 +138,34 @@ class stock_dev_form extends ConfigFormBase {
 
 
 
+    $form['s_am'] = [
+      '#type' => 'fieldset',
+      '#title' => t('Availability Manager'),
+    ];
+    $form['s_am']['check_stock'] = [
+      '#type' => 'fieldset',
+      '#title' => t('Stock Availability'),
+    ];
+    $form['s_am']['check_stock']['prod_to_check_id'] = array(
+      '#type' => 'number',
+      '#title' => t('Product ID'),
+      '#step' => '1',
+      '#default_value' => '1',
+      '#required' => TRUE,
+    );
+    $form['s_am']['check_stock']['prod_to_check_qty'] = array(
+      '#type' => 'number',
+      '#title' => t('Qty.'),
+      '#step' => '1',
+      '#default_value' => '1',
+      '#required' => TRUE,
+    );
+
+    $form['s_am']['check_stock']['check'] = array(
+      '#type' => 'submit',
+      '#value' => t('Check Stock'),
+      '#submit' => ['::submitAvailabilityManagerCheck'],
+    );
 
 
 
@@ -226,6 +256,35 @@ class stock_dev_form extends ConfigFormBase {
     $stock_api->updateProductInventoryLocationLevel($location_id, $product_id);
   }
 
+  public function submitAvailabilityManagerCheck(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    // Get values.
+    $variation_id = $form_state->getValue('prod_to_check_id');
+    $prod_qty = $form_state->getValue('prod_to_check_qty');
+
+    // Create needed enities
+    $stock_api = new StockStorageAPI;
+    $configuration = new CoreStockConfiguration($stock_api);
+    // Load the product variation.
+    $variation_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $product_variation = $variation_storage->load($variation_id);
+
+    if (!isset($product_variation)) {
+      drupal_set_message('Can not load product!');
+      return;
+    }
+
+    // Create the checker
+    $availability_checker = new StockAvailabilityChecker($stock_api, $configuration);
+    /// Check
+    if ($availability_checker->check($product_variation, $prod_qty)) {
+      drupal_set_message('Available');
+    }
+    else {
+      drupal_set_message('Not Available');
+    }
+  }
 
 
 }
