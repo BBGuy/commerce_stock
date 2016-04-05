@@ -19,12 +19,12 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
   /**
    * Create a stock transaction.
    */
-  public function createTransaction($product_id, $location_id, $zone, $quantity, $unit_cost) {
+  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
     // Create a record.
     // @todo - Deprecated replace with https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Database%21Connection.php/function/Connection%3A%3Ainsert/8
     $io = db_insert('cs_inventory_transaction');
-    $io->fields( array('product_id', 'qty', 'location_id', 'location_zone', 'unit_cost') ) ;
-    $io->values( array($product_id, $quantity, $location_id, $zone,  $unit_cost) );
+    $io->fields( array('variation_id', 'qty', 'location_id', 'location_zone', 'unit_cost') ) ;
+    $io->values( array($variation_id, $quantity, $location_id, $zone,  $unit_cost) );
     $io->execute();
   }
 
@@ -32,14 +32,14 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
    * Update the stock level by adding up the transaction that got created since
    * the last time this was run.
    */
-  public function updateProductInventoryLocationLevel($location_id, $product_id) {
+  public function updateProductInventoryLocationLevel($location_id, $variation_id) {
     // Get the location level & last transaction.
     $db = \Drupal::database();
     $result = $db->select('cs_inventory_location_level', 'ill')
       ->fields('ill')
       //->condition('location_id', 1)
       ->condition('location_id', $location_id, '=')
-      ->condition('product_id', $product_id)
+      ->condition('variation_id', $variation_id)
       ->execute()
       ->fetch();
       if ($result) {
@@ -52,8 +52,8 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
         // Create a record.
         // @todo - Deprecated replace with https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Database%21Connection.php/function/Connection%3A%3Ainsert/8
         $io = db_insert('cs_inventory_location_level');
-        $io->fields( array('location_id', 'product_id', 'qty', 'last_transaction_id') ) ;
-        $io->values( array($location_id, $product_id, 0, 0) );
+        $io->fields( array('location_id', 'variation_id', 'qty', 'last_transaction_id') ) ;
+        $io->values( array($location_id, $variation_id, 0, 0) );
         $io->execute();
       }
 
@@ -61,7 +61,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
       // @todo - need to use a higher level method.
       $query = "select max(trid) as max_id from `{cs_inventory_transaction}`
       WHERE (`location_id` = '" . $location_id . "')
-      AND (`product_id` =" . $product_id . ")
+      AND (`variation_id` =" . $variation_id . ")
       GROUP BY location_id";
       $result = $db->query($query)->fetch();
       if (!$result) {
@@ -74,7 +74,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
       // @todo - need to use a higher level method.
       $query = "SELECT location_id, sum(qty) as transactions_qty FROM `{cs_inventory_transaction}`
       WHERE (`location_id` = '" . $location_id . "')
-      AND (`product_id` =" . $product_id . ")
+      AND (`variation_id` =" . $variation_id . ")
       AND (`trid` > " . $last_transaction .")
       AND (`trid` <= " . $max_transaction .")
       GROUP BY location_id";
@@ -86,7 +86,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
         $io = db_update('cs_inventory_location_level');
         $io->fields(array('qty' => $stock_level, 'last_transaction_id' => $max_transaction ));
         $io->condition('location_id', $location_id, '=');
-        $io->condition('product_id', $product_id, '=');
+        $io->condition('variation_id', $variation_id, '=');
         $io->execute();
       }
   }
@@ -97,8 +97,8 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
    * @return int
    *   Stock Level.
    */
-  public function getStockLevel($product_id, $locations) {
-    $location_info = $this->getStockLocationLevel($product_id, $locations);
+  public function getStockLevel($variation_id, $locations) {
+    $location_info = $this->getStockLocationLevel($variation_id, $locations);
     // Add the quentities together and return.
     $qty = 0;
     foreach ($location_info as $location) {
@@ -110,7 +110,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
   /**
    * Returns array containing stock level across all locations.
    */
-  public function getStockLocationLevel($product_id, $locations) {
+  public function getStockLocationLevel($variation_id, $locations) {
     // An array to hold stock data for the listed locations.
     $location_info = array();
     foreach ($locations as $location_id) {
@@ -127,7 +127,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
       ->fields('ill')
       //->condition('location_id', 1)
       ->condition('location_id', $locations, 'IN')
-      ->condition('product_id', $product_id)
+      ->condition('variation_id', $variation_id)
       ->execute()
       ->fetchAll();
       //->fetch();
@@ -145,7 +145,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
       // @todo - need to use a higher level method, the select below for details
       $query = "SELECT location_id, sum(qty) as transactions_qty FROM `{cs_inventory_transaction}`
       WHERE (`location_id` = '" . $location_id . "')
-      AND (`product_id` =" . $product_id . ")
+      AND (`variation_id` =" . $variation_id . ")
       AND (`trid` > " . $location['last_transaction'] .")
       GROUP BY location_id";
       $result = $db->query($query)->fetch();
@@ -163,8 +163,8 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
    */
-  public function getIsInStock($product_id, $locations) {
-    return ($this->getStockLevel($product_id, $locations) > 0);
+  public function getIsInStock($variation_id, $locations) {
+    return ($this->getStockLevel($variation_id, $locations) > 0);
   }
 
 
@@ -174,7 +174,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
    */
-  public function getIsAlwaysInStock($product_id) {
+  public function getIsAlwaysInStock($variation_id) {
     // @todo - not yet implamanted.
     return FALSE;
   }
@@ -185,7 +185,7 @@ class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInt
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
    */
-  public function getIsStockManaged($product_id) {
+  public function getIsStockManaged($variation_id) {
     // @todo - not yet implamanted, so for now all products are managed.
     return TRUE;
   }

@@ -19,7 +19,7 @@ interface EntityStockCheckInterface {
    * @return int
    *   Stock Level.
    */
-  public function getStockLevel($product_id, $locations);
+  public function getStockLevel($variation_id, $locations);
 
 
   /**
@@ -28,7 +28,7 @@ interface EntityStockCheckInterface {
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
    */
-  public function getIsInStock($product_id, $locations);
+  public function getIsInStock($variation_id, $locations);
 
 
   /**
@@ -37,7 +37,7 @@ interface EntityStockCheckInterface {
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
    */
-  public function getIsAlwaysInStock($product_id);
+  public function getIsAlwaysInStock($variation_id);
 
   /**
    * Check if product is managed by stock.
@@ -45,7 +45,7 @@ interface EntityStockCheckInterface {
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
    */
-  public function getIsStockManaged($product_id);
+  public function getIsStockManaged($variation_id);
 
 
   /**

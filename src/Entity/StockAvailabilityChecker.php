@@ -53,9 +53,9 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
   public function applies(PurchasableEntityInterface $entity) {
     // @todo - validation of $entity type.
     // Get product id.
-    $product_id  = $entity->getProductId();
+    $variation_id  = $entity->id();
     // Check if stock enabled for the product
-    return $StockChecker->getIsStockManaged($product_id);
+    return $StockChecker->getIsStockManaged($variation_id);
   }
 
   /**
@@ -73,14 +73,14 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
   public function check(PurchasableEntityInterface $entity, $quantity = 1) {
     // @todo - validation of $entity type.
     // Get product id.
-    $product_id  = $entity->getProductId();
+    $variation_id  = $entity->id();
     // Get locations.
-    //$locations = array_keys($this->StockConfiguration->getLocationList($product_id));
-    $locations = $this->StockConfiguration->getLocationList($product_id);
+    //$locations = array_keys($this->StockConfiguration->getLocationList($variation_id));
+    $locations = $this->StockConfiguration->getLocationList($variation_id);
     // Check if always in stock.
-    if (!$this->StockChecker->getIsAlwaysInStock($product_id)) {
+    if (!$this->StockChecker->getIsAlwaysInStock($variation_id)) {
       // Check quantity is available
-      $stock_level = $this->StockChecker->getStockLevel($product_id, $locations);
+      $stock_level = $this->StockChecker->getStockLevel($variation_id, $locations);
       return ($stock_level >= $quantity);
     }
 

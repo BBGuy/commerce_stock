@@ -18,7 +18,7 @@ use Drupal\commerce_stock\Entity\EntityStockCheckInterface;
 class CoreStockConfiguration implements EntityStockConfigurationInterface {
 
 
-  public function getLocationList($product_id) {
+  public function getLocationList($variation_id) {
     return $this->StockLocations;
 
   }

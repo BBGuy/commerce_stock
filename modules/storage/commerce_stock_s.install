@@ -47,8 +47,8 @@ function commerce_stock_s_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'product_id' => array(
-        'description' => 'The referenced product',
+      'variation_id' => array(
+        'description' => 'The referenced product variation',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -104,8 +104,8 @@ function commerce_stock_s_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'product_id' => array(
-        'description' => 'The referenced product',
+      'variation_id' => array(
+        'description' => 'The referenced product variation',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -127,7 +127,7 @@ function commerce_stock_s_schema() {
       ),
 
     ),
-    'primary key' => array('location_id', 'product_id'),
+    'primary key' => array('location_id', 'variation_id'),
     'foreign keys' => array(
       'location' => array(
         'table' => 'cs_inventory_location',

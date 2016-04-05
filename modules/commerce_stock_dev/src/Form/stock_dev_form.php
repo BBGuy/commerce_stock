@@ -233,8 +233,8 @@ class stock_dev_form extends ConfigFormBase {
   public function submitCreateTransaction(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    //$product_id, $location_id, $zone, $quantity,
-    $product_id = $form_state->getValue('prod_id');
+    //$variation_id, $location_id, $zone, $quantity,
+    $variation_id = $form_state->getValue('prod_id');
     $location_id = $form_state->getValue('location');
     $zone = $form_state->getValue('zone');
     $quantity = $form_state->getValue('quentity');
@@ -243,17 +243,17 @@ class stock_dev_form extends ConfigFormBase {
 
 
     $stock_api = new StockStorageAPI;
-    $stock_api->createTransaction($product_id, $location_id, $zone, $quantity, $unit_cost);
+    $stock_api->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost);
   }
 
   public function submitupdateProductInventoryLocationLevel(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $product_id = $form_state->getValue('prod_id');
+    $variation_id = $form_state->getValue('prod_id');
     $location_id = $form_state->getValue('location');
 
     $stock_api = new StockStorageAPI;
-    $stock_api->updateProductInventoryLocationLevel($location_id, $product_id);
+    $stock_api->updateProductInventoryLocationLevel($location_id, $variation_id);
   }
 
   public function submitAvailabilityManagerCheck(array &$form, FormStateInterface $form_state) {

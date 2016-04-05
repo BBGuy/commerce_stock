@@ -19,6 +19,6 @@ interface EntityStockUpdateInterface {
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
    */
-  public function createTransaction($product_id, $location_id, $zone, $quantity, $unit_cost);
+  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost);
 
 }

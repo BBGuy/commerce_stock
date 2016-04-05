@@ -22,6 +22,6 @@ interface EntityStockConfigurationInterface {
    * @return array
    *   Of location IDs.
    */
-  public function getLocationList($product_id);
+  public function getLocationList($variation_id);
 
 }
