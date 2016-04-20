@@ -53,7 +53,7 @@ class stock_dev_form extends ConfigFormBase {
       '#type' => 'fieldset',
       '#title' => t('Stock Availability'),
     ];
-    $form['s_api']['availability']['prod_id'] = array(
+    $form['s_api']['availability']['prod_vid'] = array(
       '#type' => 'number',
       '#title' => t('Product ID'),
       '#step' => '1',
@@ -71,7 +71,7 @@ class stock_dev_form extends ConfigFormBase {
     );
     $form['s_api']['availability']['check_stock'] = array(
       '#type' => 'submit',
-      '#value' => t('Check Stock'),
+      '#value' => t('Check Stock using Stock API'),
       '#submit' => ['::submitCheckStockForm'],
     );
 
@@ -142,18 +142,18 @@ class stock_dev_form extends ConfigFormBase {
       '#type' => 'fieldset',
       '#title' => t('Availability Manager'),
     ];
-    $form['s_am']['check_stock'] = [
+    $form['s_am']['check'] = [
       '#type' => 'fieldset',
       '#title' => t('Stock Availability'),
     ];
-    $form['s_am']['check_stock']['prod_to_check_id'] = array(
+    $form['s_am']['check']['prod_to_check_id'] = array(
       '#type' => 'number',
       '#title' => t('Product ID'),
       '#step' => '1',
       '#default_value' => '1',
       '#required' => TRUE,
     );
-    $form['s_am']['check_stock']['prod_to_check_qty'] = array(
+    $form['s_am']['check']['prod_to_check_qty'] = array(
       '#type' => 'number',
       '#title' => t('Qty.'),
       '#step' => '1',
@@ -161,9 +161,9 @@ class stock_dev_form extends ConfigFormBase {
       '#required' => TRUE,
     );
 
-    $form['s_am']['check_stock']['check'] = array(
+    $form['s_am']['check']['check'] = array(
       '#type' => 'submit',
-      '#value' => t('Check Stock'),
+      '#value' => t('Check Stock using Availability Manager'),
       '#submit' => ['::submitAvailabilityManagerCheck'],
     );
 
@@ -207,7 +207,7 @@ class stock_dev_form extends ConfigFormBase {
     parent::submitForm($form, $form_state);
 
     // Get values.
-    $prod_id = $form_state->getValue('prod_id');
+    $prod_id = $form_state->getValue('prod_vid');
     $location_ids = explode(',', $form_state->getValue('location_ids'));
     // Call the API
     $stock_api = new StockStorageAPI;
