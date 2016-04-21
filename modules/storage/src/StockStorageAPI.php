@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_stock_s\Entity\StockStorageAPI.
+ * Contains \Drupal\commerce_stock_s\StockStorageAPI.
  */
 
 
-namespace Drupal\commerce_stock_s\Entity;
+namespace Drupal\commerce_stock_s;
 
 
-use Drupal\commerce_stock\Entity\EntityStockCheckInterface;
-use Drupal\commerce_stock\Entity\EntityStockUpdateInterface;
+use Drupal\commerce_stock\StockCheckInterface;
+use Drupal\commerce_stock\StockUpdateInterface;
 
 
 
-class StockStorageAPI implements EntityStockCheckInterface, EntityStockUpdateInterface {
+class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
 
   /**
    * Create a stock transaction.

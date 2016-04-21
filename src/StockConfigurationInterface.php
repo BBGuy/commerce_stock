@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_stock\Entity\EntityStockConfigurationInterface.
+ * Contains \Drupal\commerce_stock\StockConfigurationInterface.
  */
 
-namespace Drupal\commerce_stock\Entity;
+namespace Drupal\commerce_stock;
 
 /**
  * Defines a common interface for configuration.
  */
-interface EntityStockConfigurationInterface {
+interface StockConfigurationInterface {
 
 
   /**

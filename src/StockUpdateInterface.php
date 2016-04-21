@@ -2,15 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_stock\Entity\EntityStockUpdateInterface.
+ * Contains \Drupal\commerce_stock\StockUpdateInterface.
  */
 
-namespace Drupal\commerce_stock\Entity;
+namespace Drupal\commerce_stock;
 
 /**
  * Defines a common interface for writing stock.
  */
-interface EntityStockUpdateInterface {
+interface StockUpdateInterface {
 
 
   /**

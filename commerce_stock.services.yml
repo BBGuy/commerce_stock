@@ -1,0 +1,15 @@
+services:
+  commerce.availability_checker.stock_availability_checker:
+    class: Drupal\commerce_stock\StockAvailabilityChecker
+    tags:
+    - { name: commerce.availability_checker, priority: 0 }      
+
+  commerce.stock_manager:
+    class: Drupal\commerce_stock\StockManager
+    tags:
+      - { name: service_collector, tag: commerce.stock_service, call: addService }
+      
+  commerce.stock_manager.always_in_stock_service:
+    class: Drupal\commerce_stock\AlwaysInStockService
+    tags:
+    - { name: commerce.stock_service, priority: 0 }          

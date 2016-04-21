@@ -2,16 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_stock\Entity\StockAvailabilityChecker.
+ * Contains \Drupal\commerce_stock\StockAvailabilityChecker.
  */
 
 
-namespace Drupal\commerce_stock\Entity;
+namespace Drupal\commerce_stock;
 
 
 use Drupal\commerce\AvailabilityCheckerInterface;
-use Drupal\commerce_stock\Entity\EntityStockCheckInterface;
+use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_stock\StockManager;
 
 
 
@@ -33,12 +34,12 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
    * Constructor.
    *
    */
-  public function __construct(EntityStockCheckInterface $StockChecker, EntityStockConfigurationInterface $configuration) {
-    // @todo - we need another object that holds information about the locations
-    // that we need to check.
-    $this->StockChecker = $StockChecker;
-    $this->StockConfiguration = $configuration;
-  }
+//  public function __construct(StockCheckInterface $StockChecker, StockConfigurationInterface $configuration) {
+//    // @todo - we need another object that holds information about the locations
+//    // that we need to check.
+//    $this->StockChecker = $StockChecker;
+//    $this->StockConfiguration = $configuration;
+//  }
 
   /**
    * Determines whether the checker applies to the given purchasable entity.
@@ -51,6 +52,7 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
    *   otherwise.
    */
   public function applies(PurchasableEntityInterface $entity) {
+    return TRUE;
     // @todo - validation of $entity type.
     // Get product id.
     $variation_id  = $entity->id();
@@ -71,12 +73,32 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
    *   or NULL if it has no opinion.
    */
   public function check(PurchasableEntityInterface $entity, $quantity = 1) {
+    $stock_manager = \Drupal::service('commerce.stock_manager');
+    $stock_service = $stock_manager->getService($entity);
+    $stock_checker = $stock_service->getStockChecker();
+    $stock_config = $stock_service->getConfiguration();
+
+    // Get product variation id.
     // @todo - validation of $entity type.
-    // Get product id.
     $variation_id  = $entity->id();
+
     // Get locations.
     //$locations = array_keys($this->StockConfiguration->getLocationList($variation_id));
-    $locations = $this->StockConfiguration->getLocationList($variation_id);
+    $locations = $stock_config->getLocationList($variation_id);
+
+
+    // Check if always in stock.
+    if (!$stock_checker->getIsAlwaysInStock($variation_id)) {
+      // Check quantity is available
+      $stock_level = $stock_checker->getStockLevel($variation_id, $locations);
+      return ($stock_level >= $quantity);
+    }
+
+    return TRUE;
+
+
+    return $stock_checker->getIsInStock($variation_id, $locations);
+
     // Check if always in stock.
     if (!$this->StockChecker->getIsAlwaysInStock($variation_id)) {
       // Check quantity is available

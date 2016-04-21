@@ -9,10 +9,11 @@ namespace Drupal\commerce_stock_dev\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_stock\Entity\StockAvailabilityChecker;
-use Drupal\commerce_stock\Entity\CoreStockConfiguration;
+use Drupal\commerce_stock\StockAvailabilityChecker;
+use Drupal\commerce_stock\CoreStockConfiguration;
+use Drupal\commerce\AvailabilityManager;
 
-use Drupal\commerce_stock_s\Entity\StockStorageAPI;
+use Drupal\commerce_stock_s\StockStorageAPI;
 
 /**
  * Class stock_dev_form.
@@ -161,13 +162,27 @@ class stock_dev_form extends ConfigFormBase {
       '#required' => TRUE,
     );
 
-    $form['s_am']['check']['check'] = array(
+    $form['s_am']['check']['check1'] = array(
+      '#type' => 'submit',
+      '#value' => t('Check Stock using Stock Availability Checker'),
+      '#submit' => ['::submitStockAvailabilityCheck'],
+    );
+
+    $form['s_am']['check']['check2'] = array(
       '#type' => 'submit',
       '#value' => t('Check Stock using Availability Manager'),
       '#submit' => ['::submitAvailabilityManagerCheck'],
     );
 
-
+    $form['s_sm'] = [
+      '#type' => 'fieldset',
+      '#title' => t('Stock Manager'),
+    ];
+    $form['s_sm']['list'] = array(
+      '#type' => 'submit',
+      '#value' => t('List all services'),
+      '#submit' => ['::submitStockManagerList'],
+    );
 
 
 //    $options = [
@@ -256,7 +271,7 @@ class stock_dev_form extends ConfigFormBase {
     $stock_api->updateProductInventoryLocationLevel($location_id, $variation_id);
   }
 
-  public function submitAvailabilityManagerCheck(array &$form, FormStateInterface $form_state) {
+  public function submitStockAvailabilityCheck(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     // Get values.
@@ -287,4 +302,50 @@ class stock_dev_form extends ConfigFormBase {
   }
 
 
+  public function submitAvailabilityManagerCheck(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    // Test.
+    $availabilityManager = \Drupal::service('commerce.availability_manager');
+
+
+    // Get values.
+    $variation_id = $form_state->getValue('prod_to_check_id');
+    $prod_qty = $form_state->getValue('prod_to_check_qty');
+
+    // Load the product variation.
+    $variation_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $product_variation = $variation_storage->load($variation_id);
+
+    if (!isset($product_variation)) {
+      drupal_set_message('Can not load product!');
+      return;
+    }
+
+
+
+    $availabilityManager = \Drupal::service('commerce.availability_manager');
+
+    $availabe = $availabilityManager->check($product_variation, $prod_qty);
+
+    /// Check
+    if ($availabe) {
+      drupal_set_message('Available');
+    }
+    else {
+      drupal_set_message('Not Available');
+    }
+  }
+
+  public function submitStockManagerList(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+      $availabilityManager = \Drupal::service('commerce.stock_manager');
+      $services = $availabilityManager->listServices();
+      drupal_set_message(print_r($services, TRUE));
+
+  }
+
 }
+
+

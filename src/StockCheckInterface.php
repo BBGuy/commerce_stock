@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Contains \Drupal\commerce_stock\Entity\EntityStockCheckInterface.
+ * Contains \Drupal\commerce_stock\StockCheckInterface.
  */
 
-namespace Drupal\commerce_stock\Entity;
+namespace Drupal\commerce_stock;
 
 
 /**
  * Defines a common interface for stock checking.
  */
-interface EntityStockCheckInterface {
+interface StockCheckInterface {
 
   /**
    * Gets the Stock level.
@@ -41,6 +41,8 @@ interface EntityStockCheckInterface {
 
   /**
    * Check if product is managed by stock.
+   *
+   * @todo - not sure if this is needed - not used at this point!!!
    *
    * @return bool
    *   TRUE if the product is in stock, FALSE otherwise.
