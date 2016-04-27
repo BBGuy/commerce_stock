@@ -19,27 +19,6 @@ use Drupal\commerce_stock\StockManager;
 
 class StockAvailabilityChecker implements AvailabilityCheckerInterface {
 
-  /**
-   * The Stock checker object.
-   *
-   */
-  protected $StockChecker;
-
-  protected $StockConfiguration;
-
-
-
-
-  /**
-   * Constructor.
-   *
-   */
-//  public function __construct(StockCheckInterface $StockChecker, StockConfigurationInterface $configuration) {
-//    // @todo - we need another object that holds information about the locations
-//    // that we need to check.
-//    $this->StockChecker = $StockChecker;
-//    $this->StockConfiguration = $configuration;
-//  }
 
   /**
    * Determines whether the checker applies to the given purchasable entity.
@@ -56,8 +35,13 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     // @todo - validation of $entity type.
     // Get product id.
     $variation_id  = $entity->id();
+
+    $stock_manager = \Drupal::service('commerce.stock_manager');
+    $stock_service = $stock_manager->getService($entity);
+    $stock_checker = $stock_service->getStockChecker();
+
     // Check if stock enabled for the product
-    return $StockChecker->getIsStockManaged($variation_id);
+    return $stock_checker->getIsStockManaged($variation_id);
   }
 
   /**
@@ -83,7 +67,6 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     $variation_id  = $entity->id();
 
     // Get locations.
-    //$locations = array_keys($this->StockConfiguration->getLocationList($variation_id));
     $locations = $stock_config->getLocationList($variation_id);
 
 
@@ -93,20 +76,6 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
       $stock_level = $stock_checker->getStockLevel($variation_id, $locations);
       return ($stock_level >= $quantity);
     }
-
     return TRUE;
-
-
-    return $stock_checker->getIsInStock($variation_id, $locations);
-
-    // Check if always in stock.
-    if (!$this->StockChecker->getIsAlwaysInStock($variation_id)) {
-      // Check quantity is available
-      $stock_level = $this->StockChecker->getStockLevel($variation_id, $locations);
-      return ($stock_level >= $quantity);
-    }
-
-    return TRUE;
-
   }
 }
