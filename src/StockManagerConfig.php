@@ -45,9 +45,6 @@ class StockManagerConfig implements StockManagerConfigInterface {
 
     // If not found return the first service in the list.
     return $services[0];
-
-// @todo - replace testing code:
-    $type =  $entity->getLineItemTypeId();
   }
 
 
