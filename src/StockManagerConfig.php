@@ -19,13 +19,15 @@ class StockManagerConfig implements StockManagerConfigInterface {
 
   protected $stockManager;
 
+  /**
+   * {@inheritdoc}
+   */
   function __construct(StockManagerInterface $stock_manager) {
     $this->stockManager = $stock_manager;
   }
 
   /**
-   * Get a serice relevent for the entity.
-   *
+   * {@inheritdoc}
    */
   public function getService(PurchasableEntityInterface $entity) {
     // Get the list of services.

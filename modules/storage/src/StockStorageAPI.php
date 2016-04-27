@@ -17,9 +17,8 @@ use Drupal\commerce_stock\StockUpdateInterface;
 class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
 
   /**
-   * Create a stock transaction.
-   */
-  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
+   * {@inheritdoc}
+   */  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
     // Create a record.
     // @todo - Deprecated replace with https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Database%21Connection.php/function/Connection%3A%3Ainsert/8
     $io = db_insert('cs_inventory_transaction');
@@ -29,8 +28,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * Update the stock level by adding up the transaction that got created since
-   * the last time this was run.
+   * {@inheritdoc}
    */
   public function updateProductInventoryLocationLevel($location_id, $variation_id) {
     // Get the location level & last transaction.
@@ -92,10 +90,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * Gets the Stock level.
-   *
-   * @return int
-   *   Stock Level.
+   * {@inheritdoc}
    */
   public function getStockLevel($variation_id, $locations) {
     $location_info = $this->getStockLocationLevel($variation_id, $locations);
@@ -108,7 +103,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * Returns array containing stock level across all locations.
+   * {@inheritdoc}
    */
   public function getStockLocationLevel($variation_id, $locations) {
     // An array to hold stock data for the listed locations.
@@ -158,10 +153,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
 
 
   /**
-   * Check if product is in stock.
-   *
-   * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function getIsInStock($variation_id, $locations) {
     return ($this->getStockLevel($variation_id, $locations) > 0);
@@ -169,10 +161,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
 
 
   /**
-   * Check if product is always in stock.
-   *
-   * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function getIsAlwaysInStock($variation_id) {
     // @todo - not yet implamanted.
@@ -180,10 +169,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * Check if product is managed by stock.
-   *
-   * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function getIsStockManaged($variation_id) {
     // @todo - not yet implamanted, so for now all products are managed.
@@ -191,10 +177,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * Get list of locations.
-   *
-   * @return array
-   *   List of locations keyd by ID.
+   * {@inheritdoc}
    */
   public function getLocationList($return_active_only = TRUE) {
     // Build he query.

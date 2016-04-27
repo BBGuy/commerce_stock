@@ -17,7 +17,7 @@ use Drupal\commerce_stock\StockUpdateInterface;
 class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
   /**
-   * Create a stock transaction.
+   * {@inheritdoc}
    */
   public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
     // Do nothing.
@@ -25,10 +25,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
 
   /**
-   * Gets the Stock level.
-   *
-   * @return int
-   *   Stock Level.
+   * {@inheritdoc}
    */
   public function getStockLevel($variation_id, $locations) {
     // @todo this can be configurable?
@@ -37,10 +34,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
 
   /**
-   * Check if product is in stock.
-   *
-   * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function getIsInStock($variation_id, $locations) {
     return TRUE;
@@ -48,20 +42,14 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
 
   /**
-   * Check if product is always in stock.
-   *
-   * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function getIsAlwaysInStock($variation_id) {
     return TRUE;
   }
 
   /**
-   * Check if product is managed by stock.
-   *
-   * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function getIsStockManaged($variation_id) {
     // @todo - Not sure about this one. The result will be the same for:
@@ -71,10 +59,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * Get list of locations.
-   *
-   * @return array
-   *   List of locations keyd by ID.
+   * {@inheritdoc}
    */
   public function getLocationList($return_active_only = TRUE) {
     // We dont have locations so return an empty array.

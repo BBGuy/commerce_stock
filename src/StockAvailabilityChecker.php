@@ -19,20 +19,14 @@ use Drupal\commerce_stock\StockManager;
 
 class StockAvailabilityChecker implements AvailabilityCheckerInterface {
 
-
   /**
-   * Determines whether the checker applies to the given purchasable entity.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity.
-   *
-   * @return bool
-   *   TRUE if the checker applies to the given purchasable entity, FALSE
-   *   otherwise.
+   * {@inheritdoc}
    */
   public function applies(PurchasableEntityInterface $entity) {
     return TRUE;
     // @todo - validation of $entity type.
+    $type =  $entity->getLineItemTypeId();
+
     // Get product id.
     $variation_id  = $entity->id();
 
@@ -45,16 +39,7 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
   }
 
   /**
-   * Checks the availability of the given purchasable entity.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity.
-   * @param int $quantity
-   *   The quantity.
-   *
-   * @return bool|null
-   *   TRUE if the entity is available, FALSE if it's unavailable,
-   *   or NULL if it has no opinion.
+   * {@inheritdoc}
    */
   public function check(PurchasableEntityInterface $entity, $quantity = 1) {
     $stock_manager = \Drupal::service('commerce.stock_manager');
