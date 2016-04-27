@@ -23,6 +23,12 @@ class StockManager implements StockManagerInterface {
    * @var \Drupal\commerce_stock\StockServiceInterface[]
    */
   protected $stockServices = [];
+  protected $stockManagerConfig;
+
+
+  function __construct() {
+    $this->stockManagerConfig = new StockManagerConfig($this);
+  }
 
   /**
    * {@inheritdoc}
@@ -35,8 +41,8 @@ class StockManager implements StockManagerInterface {
    * {@inheritdoc}
    */
   public function getService(PurchasableEntityInterface $entity) {
-    // @todo - testing only return the first one
-    return $this->stockServices[0];
+    $service = $this->stockManagerConfig->getService($entity);
+    return $service;
   }
 
   /**

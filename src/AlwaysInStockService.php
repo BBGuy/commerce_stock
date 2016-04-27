@@ -56,6 +56,9 @@ class AlwaysInStockService implements StockServiceInterface {
     return 'Always In Stock';
   }
 
+  public function getID() {
+    return 'always_in_stock';
+  }
   /**
    * Gets the stock checker.
    *

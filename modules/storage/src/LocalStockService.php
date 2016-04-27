@@ -56,6 +56,10 @@ class LocalStockService implements StockServiceInterface {
     return 'Local Stock';
   }
 
+  public function getID() {
+    return 'local_stock';
+  }
+
   /**
    * Gets the stock checker.
    *

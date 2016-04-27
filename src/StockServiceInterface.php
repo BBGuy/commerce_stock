@@ -23,6 +23,10 @@ interface StockServiceInterface {
   public function getName();
 
   /**
+   * Get the id of the service
+   */
+  public function getID();
+  /**
    * Gets the stock checker.
    *
    * @return \Drupal\commerce_stock\StockCheckInterface
