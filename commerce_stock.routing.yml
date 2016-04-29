@@ -1,0 +1,9 @@
+commerce_stock.admin_settings:
+  path: '/admin/commerce/config/Stock'  
+  defaults:
+    _form: '\Drupal\commerce_stock\Form\StockConfigForm'
+    _title: 'StockConfigForm'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
