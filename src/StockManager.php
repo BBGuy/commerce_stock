@@ -46,13 +46,21 @@ class StockManager implements StockManagerInterface {
   }
 
   /**
-   * Returns an array of all services.
-   *
+   * {@inheritdoc}
    */
   public function listServices() {
     return $this->stockServices;
   }
 
-
+  /**
+   * {@inheritdoc}
+   */
+  public function listServiceIds() {
+    $ids = array();
+    foreach ($this->stockServices as $service) {
+      $ids[$service->getID()] = $service->getName();
+    }
+    return $ids;
+  }
 
 }

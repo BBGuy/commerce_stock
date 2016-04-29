@@ -38,4 +38,12 @@ interface StockManagerInterface {
   public function listServices();
 
 
+  /**
+   * Returns an array of all services.
+   *
+   * Format is: array('service key' => 'service name')
+   *
+   */
+  public function listServiceIds();
+
 }
