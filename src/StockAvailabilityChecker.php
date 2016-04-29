@@ -23,18 +23,18 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
    * {@inheritdoc}
    */
   public function applies(PurchasableEntityInterface $entity) {
-    return TRUE;
+    $stock_manager = \Drupal::service('commerce.stock_manager');
+    $stock_service = $stock_manager->getService($entity);
+    $stock_checker = $stock_service->getStockChecker();
+
+    // Get product variation id.
     // @todo - validation of $entity type.
     $type =  $entity->getLineItemTypeId();
 
     // Get product id.
     $variation_id  = $entity->id();
 
-    $stock_manager = \Drupal::service('commerce.stock_manager');
-    $stock_service = $stock_manager->getService($entity);
-    $stock_checker = $stock_service->getStockChecker();
-
-    // Check if stock enabled for the product
+    // Check if stock managed for the product.
     return $stock_checker->getIsStockManaged($variation_id);
   }
 
