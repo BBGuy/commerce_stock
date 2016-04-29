@@ -18,7 +18,8 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
 
   /**
    * {@inheritdoc}
-   */  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
+   */
+  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
     // Create a record.
     // @todo - Deprecated replace with https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Database%21Connection.php/function/Connection%3A%3Ainsert/8
     $io = db_insert('cs_inventory_transaction');
@@ -172,7 +173,9 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
    * {@inheritdoc}
    */
   public function getIsStockManaged($variation_id) {
-    // @todo - not yet implamanted, so for now all products are managed.
+    // @todo - not yet implemented, so for now all products are managed.
+    // Also we have the "always in stock" function so unless we have cascading s
+    // ervice functionality this is not needed and can just return TRUE.
     return TRUE;
   }
 
