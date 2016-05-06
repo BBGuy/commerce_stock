@@ -258,7 +258,12 @@ class stock_dev_form extends ConfigFormBase {
 
 
     $stock_api = new StockStorageAPI;
-    $stock_api->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost);
+    $options = array(
+//      'related_tid' => '1',
+//      'related_oid' => '1',
+//      'related_uid' => '1',
+    );
+    $stock_api->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, 1, $options);
   }
 
   public function submitupdateProductInventoryLocationLevel(array &$form, FormStateInterface $form_state) {
