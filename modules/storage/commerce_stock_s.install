@@ -260,7 +260,7 @@ function commerce_stock_s_install() {
   db_insert('cs_inventory_transaction_type')
     ->fields(array(
       'ttid' => 3,
-      'name' => 'Stock Movment',
+      'name' => 'Stock Movement',
       'parent_ttid' => 3,
     ))
     ->execute();
