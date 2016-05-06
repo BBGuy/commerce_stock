@@ -16,9 +16,13 @@ interface StockUpdateInterface {
   /**
    * check if product is in stock.
    *
-   * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   * $metadata holds all the optional values those are:
+   * related_tid - related transaction.
+   * related_oid - related order.
+   * related_uid - related user.
+   * data - Serialized data array.
+   *
    */
-  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost);
+  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
 
 }

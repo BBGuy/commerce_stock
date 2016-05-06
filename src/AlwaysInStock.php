@@ -19,7 +19,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
+  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata) {
     // Do nothing.
   }
 

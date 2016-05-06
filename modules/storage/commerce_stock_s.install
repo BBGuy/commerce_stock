@@ -37,6 +37,40 @@ function commerce_stock_s_schema() {
     'primary key' => array('locid'),
   );
 
+  $schema['cs_inventory_transaction_type'] = array(
+    'description' => 'The Type of  transaction.',
+    'fields' => array(
+      'ttid' => array(
+        'description' => 'Primary Key: transaction type ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The name of the transaction type',
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'default' => '',
+        'length' => 128,
+      ),
+      'parent_ttid' => array(
+        'description' => 'The parent transaction (no more then one level nesting)',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('ttid'),
+    'foreign keys' => array(
+      'parent_type' => array(
+        'table' => 'cs_inventory_transaction_type',
+        'columns' => array(
+          'parent_ttid' => 'ttid',
+        ),
+      ),
+    ),
+
+  );
 
   $schema['cs_inventory_transaction'] = array(
     'description' => 'Stores inventory transactions form commerce stock.',
@@ -82,6 +116,37 @@ function commerce_stock_s_schema() {
         'precision' => 19,
         'scale' => 6,
       ),
+      'transaction_type_id' => array(
+        'description' => 'transaction type ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      // Metadata.
+      'related_tid' => array(
+        'description' => 'related transaction.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'related_oid' => array(
+        'description' => 'related order.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'related_uid' => array(
+        'description' => 'related user.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'description' => 'Serialized data array.',
+      ),
 
     ),
     'primary key' => array('trid'),
@@ -90,6 +155,30 @@ function commerce_stock_s_schema() {
         'table' => 'cs_inventory_location',
         'columns' => array(
           'location_id' => 'locid',
+        ),
+      ),
+      'transaction_type' => array(
+        'table' => 'cs_inventory_transaction_type',
+        'columns' => array(
+          'transaction_type_id' => 'ttid',
+        ),
+      ),
+      'related_transaction' => array(
+        'table' => 'cs_inventory_transaction',
+        'columns' => array(
+          'related_tid' => 'trid',
+        ),
+      ),
+      'related_order' => array(
+        'table' => 'commerce_order',
+        'columns' => array(
+          'related_oid' => 'order_id',
+        ),
+      ),
+      'related_user' => array(
+        'table' => 'users',
+        'columns' => array(
+          'related_uid' => 'uid',
         ),
       ),
     ),
@@ -139,4 +228,65 @@ function commerce_stock_s_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function commerce_stock_s_install() {
+  // Add primery stock location.
+  db_insert('cs_inventory_location')
+    ->fields(array(
+      'name' => 'Main',
+      'status' => 1,
+    ))
+    ->execute();
+
+  // Add core transaction types.
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 1,
+      'name' => 'Stock in',
+      'parent_ttid' => 1,
+    ))
+    ->execute();
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 2,
+      'name' => 'Stock Out',
+      'parent_ttid' => 2,
+    ))
+    ->execute();
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 3,
+      'name' => 'Stock Movment',
+      'parent_ttid' => 3,
+    ))
+    ->execute();
+
+  // Add sub transaction types.
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 4,
+      'name' => 'Sale',
+      'parent_ttid' => 2,
+    ))
+    ->execute();
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 5,
+      'name' => 'Return',
+      'parent_ttid' => 1,
+    ))
+    ->execute();
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 6,
+      'name' => 'New Stock',
+      'parent_ttid' => 1,
+    ))
+    ->execute();
+
+
 }

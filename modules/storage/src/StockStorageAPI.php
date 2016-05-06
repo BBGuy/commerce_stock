@@ -19,12 +19,37 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost) {
+  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata) {
+    // Get optional fields.
+    if (isset($metadata['related_tid'])) {
+      $related_tid = $metadata['related_tid'];
+    }
+    else {
+      $related_tid = NULL;
+    }
+    if (isset($metadata['related_oid'])) {
+      $related_oid = $metadata['related_oid'];
+    }
+    else {
+      $related_oid = NULL;
+    }
+    if (isset($metadata['related_uid'])) {
+      $related_uid = $metadata['related_uid'];
+    }
+    else {
+      $related_uid = NULL;
+    }
+    if (isset($metadata['data'])) {
+      $data = $metadata['data'];
+    }
+    else {
+      $data = NULL;
+    }
     // Create a record.
     // @todo - Deprecated replace with https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Database%21Connection.php/function/Connection%3A%3Ainsert/8
     $io = db_insert('cs_inventory_transaction');
-    $io->fields( array('variation_id', 'qty', 'location_id', 'location_zone', 'unit_cost') ) ;
-    $io->values( array($variation_id, $quantity, $location_id, $zone,  $unit_cost) );
+    $io->fields( array('variation_id', 'qty', 'location_id', 'location_zone', 'unit_cost', 'transaction_type_id', 'related_tid', 'related_oid', 'related_uid', 'data') ) ;
+    $io->values( array($variation_id, $quantity, $location_id, $zone,  $unit_cost, $transaction_type_id, $related_tid, $related_oid, $related_uid, $data) );
     $io->execute();
   }
 
