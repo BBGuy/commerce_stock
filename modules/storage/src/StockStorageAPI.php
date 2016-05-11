@@ -48,8 +48,8 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
     // Create a record.
     // @todo - Deprecated replace with https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Database%21Connection.php/function/Connection%3A%3Ainsert/8
     $io = db_insert('cs_inventory_transaction');
-    $io->fields( array('variation_id', 'qty', 'location_id', 'location_zone', 'unit_cost', 'transaction_type_id', 'related_tid', 'related_oid', 'related_uid', 'data') ) ;
-    $io->values( array($variation_id, $quantity, $location_id, $zone,  $unit_cost, $transaction_type_id, $related_tid, $related_oid, $related_uid, $data) );
+    $io->fields( array('variation_id', 'qty', 'location_id', 'location_zone', 'unit_cost', 'transaction_time', 'transaction_type_id', 'related_tid', 'related_oid', 'related_uid', 'data') ) ;
+    $io->values( array($variation_id, $quantity, $location_id, $zone,  $unit_cost, time(), $transaction_type_id, $related_tid, $related_oid, $related_uid, $data) );
     $io->execute();
   }
 

@@ -116,6 +116,11 @@ function commerce_stock_s_schema() {
         'precision' => 19,
         'scale' => 6,
       ),
+      'transaction_time' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'The date & time of the transaction',
+      ),
       'transaction_type_id' => array(
         'description' => 'transaction type ID.',
         'type' => 'int',
