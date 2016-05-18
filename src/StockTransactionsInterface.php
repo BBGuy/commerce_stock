@@ -4,6 +4,7 @@
  * @file
  * Contains \Drupal\commerce_stock\StockTransactionsInterface.
  */
+namespace Drupal\commerce_stock;
 
 define('TRANSACTION_TYPE_STOCK_IN', 1);
 define('TRANSACTION_TYPE_STOCK_OUT', 2);
@@ -12,7 +13,7 @@ define('TRANSACTION_TYPE_SALE', 4);
 define('TRANSACTION_TYPE_RETURN', 5);
 define('TRANSACTION_TYPE_NEW_STOCK', 6);
 
-namespace Drupal\commerce_stock;
+
 
 /**
  * Defines a common interface for creating stock transactions.
