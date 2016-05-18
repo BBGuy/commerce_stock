@@ -292,6 +292,18 @@ function commerce_stock_s_install() {
       'parent_ttid' => 1,
     ))
     ->execute();
-
-
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 7,
+      'name' => 'Move From',
+      'parent_ttid' => 1,
+    ))
+    ->execute();
+  db_insert('cs_inventory_transaction_type')
+    ->fields(array(
+      'ttid' => 8,
+      'name' => 'Move To',
+      'parent_ttid' => 1,
+    ))
+    ->execute();
 }

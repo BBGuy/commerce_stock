@@ -6,12 +6,16 @@
  */
 namespace Drupal\commerce_stock;
 
+// Core transaction types.
 define('TRANSACTION_TYPE_STOCK_IN', 1);
 define('TRANSACTION_TYPE_STOCK_OUT', 2);
 define('TRANSACTION_TYPE_STOCK_MOVMENT', 3);
+// Use case transaction types.
 define('TRANSACTION_TYPE_SALE', 4);
 define('TRANSACTION_TYPE_RETURN', 5);
 define('TRANSACTION_TYPE_NEW_STOCK', 6);
+define('TRANSACTION_TYPE_STOCK_MOVMENT_FROM', 7);
+define('TRANSACTION_TYPE_STOCK_MOVMENT_TO', 8);
 
 
 

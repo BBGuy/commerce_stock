@@ -134,7 +134,6 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
     if ($purchasable_entity->getEntityTypeId() == 'commerce_product_variation') {
       // Set values.
       $variation_id = $purchasable_entity->id();
-      $transaction_type_id = TRANSACTION_TYPE_STOCK_MOVMENT;
       if (is_null($message)) {
         $metadata = array();
       }
@@ -153,10 +152,10 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
       // Get the stock updater.
       $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
       // Create the transactions.
-      $tid = $stock_updater->createTransaction($variation_id, $from_location_id, $from_zone, $quantity_from, $unit_cost, $transaction_type_id, $metadata);
+      $tid = $stock_updater->createTransaction($variation_id, $from_location_id, $from_zone, $quantity_from, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_FROM, $metadata);
       // The second transaction will point to the first one.
       $metadata['related_tid'] = $tid;
-      $tid = $stock_updater->createTransaction($variation_id, $to_location_id, $to_zone, $quantity_to, $unit_cost, $transaction_type_id, $metadata);
+      $tid = $stock_updater->createTransaction($variation_id, $to_location_id, $to_zone, $quantity_to, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_TO, $metadata);
     }
     else {
       // @todo - raise exception.
