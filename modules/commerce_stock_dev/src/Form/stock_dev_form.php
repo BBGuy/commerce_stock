@@ -13,6 +13,7 @@ use Drupal\commerce_stock\StockAvailabilityChecker;
 use Drupal\commerce_stock\CoreStockConfiguration;
 use Drupal\commerce\AvailabilityManager;
 
+use Drupal\commerce_stock\StockManager;
 use Drupal\commerce_stock_s\StockStorageAPI;
 
 /**
@@ -135,6 +136,72 @@ class stock_dev_form extends ConfigFormBase {
     '#type' => 'submit',
     '#value' => t('Update Product location level'),
       '#submit' => ['::submitupdateProductInventoryLocationLevel'],
+  );
+
+
+  // Typed Transactions
+  $form['s_api']['typed_transactions'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Typed Transactions'),
+  ];
+
+  $form['s_api']['typed_transactions']['transaction_notes'] = array(
+    '#type' => 'textfield',
+    '#title' => t('note'),
+    '#description' => t('The location zone (bins)'),
+    '#size' => 60,
+    '#maxlength' => 50,
+  );
+
+
+  $form['s_api']['typed_transactions']['receiveStock'] = array(
+    '#type' => 'submit',
+    '#value' => t('receiveStock'),
+      '#submit' => ['::submitReceiveStock'],
+  );
+  $form['s_api']['typed_transactions']['order_id'] = array(
+    '#type' => 'number',
+    '#title' => t('Order ID'),
+    '#default_value' => '1',
+    '#step' => '1',
+    '#required' => TRUE,
+  );
+  $form['s_api']['typed_transactions']['user_id'] = array(
+    '#type' => 'number',
+    '#title' => t('User ID'),
+    '#default_value' => '1',
+    '#step' => '1',
+    '#required' => TRUE,
+  );
+  $form['s_api']['typed_transactions']['sellStock'] = array(
+    '#type' => 'submit',
+    '#value' => t('sellStock'),
+      '#submit' => ['::submitSellStock'],
+  );
+  $form['s_api']['typed_transactions']['returnStock'] = array(
+    '#type' => 'submit',
+    '#value' => t('returnStock'),
+      '#submit' => ['::submitReturnStock'],
+  );
+  $form['s_api']['typed_transactions']['to_location'] = array(
+    '#type' => 'number',
+    '#title' => t('Move to Location'),
+    '#default_value' => '2',
+    '#step' => '1',
+    '#required' => TRUE,
+  );
+  $form['s_api']['typed_transactions']['to_zone'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Zone/Bins'),
+    '#description' => t('The location zone (bins)'),
+    '#size' => 60,
+    '#maxlength' => 50,
+    '#title' => t('Move to Zone'),
+  );
+  $form['s_api']['typed_transactions']['moveStock'] = array(
+    '#type' => 'submit',
+    '#value' => t('moveStock'),
+      '#submit' => ['::submitMoveStock'],
   );
 
 
@@ -351,6 +418,89 @@ class stock_dev_form extends ConfigFormBase {
 
   }
 
+  public function submitReceiveStock(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    $variation_id = $form_state->getValue('prod_id');
+    $location_id = $form_state->getValue('location');
+    $zone = $form_state->getValue('zone');
+    $quantity = $form_state->getValue('quentity');
+    $message = $form_state->getValue('transaction_notes');
+    $unit_cost = NULL;
+
+    // Load the product variation.
+    $variation_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $product_variation = $variation_storage->load($variation_id);
+
+    // Create the transaction.
+    $stockManager = \Drupal::service('commerce.stock_manager');
+    $stockManager->receiveStock($product_variation, $location_id, $zone, $quantity, $unit_cost, $message);
+  }
+
+  public function submitSellStock(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    $variation_id = $form_state->getValue('prod_id');
+    $location_id = $form_state->getValue('location');
+    $zone = $form_state->getValue('zone');
+    $quantity = $form_state->getValue('quentity');
+    $order_id = $form_state->getValue('order_id');
+    $user_id = $form_state->getValue('user_id');
+    $message = $form_state->getValue('transaction_notes');
+    $unit_cost = NULL;
+
+    // Load the product variation.
+    $variation_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $product_variation = $variation_storage->load($variation_id);
+
+    // Create the transaction.
+    $stockManager = \Drupal::service('commerce.stock_manager');
+    $stockManager->sellStock($product_variation, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message);
+  }
+
+  public function submitReturnStock(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    $variation_id = $form_state->getValue('prod_id');
+    $location_id = $form_state->getValue('location');
+    $zone = $form_state->getValue('zone');
+    $quantity = $form_state->getValue('quentity');
+    $order_id = $form_state->getValue('order_id');
+    $user_id = $form_state->getValue('user_id');
+    $message = $form_state->getValue('transaction_notes');
+    $unit_cost = NULL;
+
+    // Load the product variation.
+    $variation_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $product_variation = $variation_storage->load($variation_id);
+
+    // Create the transaction.
+    $stockManager = \Drupal::service('commerce.stock_manager');
+    $stockManager->returnStock($product_variation, $location_id,  $zone, $quantity, $unit_cost, $order_id, $user_id, $message);
+  }
+
+  public function submitMoveStock(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    $variation_id = $form_state->getValue('prod_id');
+    $from_location_id = $form_state->getValue('location');
+    $to_location_id = $form_state->getValue('to_location');
+    $from_zone = $form_state->getValue('zone');
+    $to_zone = $form_state->getValue('to_zone');
+    $quantity = $form_state->getValue('quentity');
+    $order_id = $form_state->getValue('order_id');
+    $user_id = $form_state->getValue('user_id');
+    $message = $form_state->getValue('transaction_notes');
+    $unit_cost = NULL;
+
+    // Load the product variation.
+    $variation_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $product_variation = $variation_storage->load($variation_id);
+
+    // Create the transaction.
+    $stockManager = \Drupal::service('commerce.stock_manager');
+    $stockManager->moveStock($product_variation, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $message);
+  }
+
+
 }
-
-
