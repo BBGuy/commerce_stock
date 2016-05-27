@@ -1,5 +1,5 @@
 commerce_stock.admin_settings:
-  path: '/admin/commerce/config/Stock'  
+  path: '/admin/commerce/config/stock'
   defaults:
     _form: '\Drupal\commerce_stock\Form\StockConfigForm'
     _title: 'StockConfigForm'
