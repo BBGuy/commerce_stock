@@ -10,84 +10,83 @@
  */
 function commerce_stock_s_schema() {
 
-
-  $schema['cs_inventory_location'] = array(
+  $schema['cs_inventory_location'] = [
     'description' => 'List of locations/warehouse form commerce stock.',
-    'fields' => array(
-      'locid' => array(
+    'fields' => [
+      'locid' => [
         'description' => 'Primary Key: Location ID.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'name' => array(
+      ],
+      'name' => [
         'description' => 'The name of the locations/warehous',
         'type' => 'varchar_ascii',
         'not null' => TRUE,
         'default' => '',
         'length' => 128,
-      ),
-      'status' => array(
+      ],
+      'status' => [
         'description' => 'Boolean indicating whether the location is active.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
-      ),
-    ),
-    'primary key' => array('locid'),
-  );
+      ],
+    ],
+    'primary key' => ['locid'],
+  ];
 
-  $schema['cs_inventory_transaction_type'] = array(
+  $schema['cs_inventory_transaction_type'] = [
     'description' => 'The Type of  transaction.',
-    'fields' => array(
-      'ttid' => array(
+    'fields' => [
+      'ttid' => [
         'description' => 'Primary Key: transaction type ID.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'name' => array(
+      ],
+      'name' => [
         'description' => 'The name of the transaction type',
         'type' => 'varchar_ascii',
         'not null' => TRUE,
         'default' => '',
         'length' => 128,
-      ),
-      'parent_ttid' => array(
+      ],
+      'parent_ttid' => [
         'description' => 'The parent transaction (no more then one level nesting)',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-    ),
-    'primary key' => array('ttid'),
-    'foreign keys' => array(
-      'parent_type' => array(
+      ],
+    ],
+    'primary key' => ['ttid'],
+    'foreign keys' => [
+      'parent_type' => [
         'table' => 'cs_inventory_transaction_type',
-        'columns' => array(
+        'columns' => [
           'parent_ttid' => 'ttid',
-        ),
-      ),
-    ),
+        ],
+      ],
+    ],
 
-  );
+  ];
 
-  $schema['cs_inventory_transaction'] = array(
+  $schema['cs_inventory_transaction'] = [
     'description' => 'Stores inventory transactions form commerce stock.',
-    'fields' => array(
-      'trid' => array(
+    'fields' => [
+      'trid' => [
         'description' => 'Primary Key: unique transactions ID.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'variation_id' => array(
+      ],
+      'variation_id' => [
         'description' => 'The referenced product variation',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'qty' => array(
+      ],
+      'qty' => [
         'description' => 'The quentity',
         'type' => 'numeric',
         'size' => 'normal',
@@ -95,116 +94,116 @@ function commerce_stock_s_schema() {
         'default' => 0,
         'precision' => 10,
         'scale' => 2,
-      ),
-      'location_id' => array(
+      ],
+      'location_id' => [
         'description' => 'The location ID (locid).',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'location_zone' => array(
+      ],
+      'location_zone' => [
         'description' => 'the zone in: aisle.bay.shelf.bin format',
         'type' => 'varchar_ascii',
         'length' => 28,
         'not null' => TRUE,
         'default' => '',
-      ),
-      'unit_cost' => array(
+      ],
+      'unit_cost' => [
         'description' => 'The amount paid per unit',
         'type' => 'numeric',
         'size' => 'normal',
         'precision' => 19,
         'scale' => 6,
-      ),
-      'transaction_time' => array(
+      ],
+      'transaction_time' => [
         'type' => 'int',
         'not null' => TRUE,
         'description' => 'The date & time of the transaction',
-      ),
-      'transaction_type_id' => array(
+      ],
+      'transaction_type_id' => [
         'description' => 'transaction type ID.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
+      ],
       // Metadata.
-      'related_tid' => array(
+      'related_tid' => [
         'description' => 'related transaction.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
-      ),
-      'related_oid' => array(
+      ],
+      'related_oid' => [
         'description' => 'related order.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
-      ),
-      'related_uid' => array(
+      ],
+      'related_uid' => [
         'description' => 'related user.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => FALSE,
-      ),
-      'data' => array(
+      ],
+      'data' => [
         'type' => 'blob',
         'not null' => FALSE,
         'size' => 'big',
         'description' => 'Serialized data array.',
-      ),
+      ],
 
-    ),
-    'primary key' => array('trid'),
-    'foreign keys' => array(
-      'location' => array(
+    ],
+    'primary key' => ['trid'],
+    'foreign keys' => [
+      'location' => [
         'table' => 'cs_inventory_location',
-        'columns' => array(
+        'columns' => [
           'location_id' => 'locid',
-        ),
-      ),
-      'transaction_type' => array(
+        ],
+      ],
+      'transaction_type' => [
         'table' => 'cs_inventory_transaction_type',
-        'columns' => array(
+        'columns' => [
           'transaction_type_id' => 'ttid',
-        ),
-      ),
-      'related_transaction' => array(
+        ],
+      ],
+      'related_transaction' => [
         'table' => 'cs_inventory_transaction',
-        'columns' => array(
+        'columns' => [
           'related_tid' => 'trid',
-        ),
-      ),
-      'related_order' => array(
+        ],
+      ],
+      'related_order' => [
         'table' => 'commerce_order',
-        'columns' => array(
+        'columns' => [
           'related_oid' => 'order_id',
-        ),
-      ),
-      'related_user' => array(
+        ],
+      ],
+      'related_user' => [
         'table' => 'users',
-        'columns' => array(
+        'columns' => [
           'related_uid' => 'uid',
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
-  $schema['cs_inventory_location_level'] = array(
+  $schema['cs_inventory_location_level'] = [
     'description' => 'Stock Level at a location.',
-    'fields' => array(
-      'location_id' => array(
+    'fields' => [
+      'location_id' => [
         'description' => 'The location ID (locid).',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'variation_id' => array(
+      ],
+      'variation_id' => [
         'description' => 'The referenced product variation',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'qty' => array(
+      ],
+      'qty' => [
         'description' => 'The quentity',
         'type' => 'numeric',
         'size' => 'normal',
@@ -212,25 +211,25 @@ function commerce_stock_s_schema() {
         'default' => 0,
         'precision' => 10,
         'scale' => 2,
-      ),
-      'last_transaction_id' => array(
+      ],
+      'last_transaction_id' => [
         'description' => 'The last transaction that was used to calculate the total quentity to.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
+      ],
 
-    ),
-    'primary key' => array('location_id', 'variation_id'),
-    'foreign keys' => array(
-      'location' => array(
+    ],
+    'primary key' => ['location_id', 'variation_id'],
+    'foreign keys' => [
+      'location' => [
         'table' => 'cs_inventory_location',
-        'columns' => array(
+        'columns' => [
           'location_id' => 'locid',
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $schema;
 }
@@ -241,69 +240,69 @@ function commerce_stock_s_schema() {
 function commerce_stock_s_install() {
   // Add primery stock location.
   db_insert('cs_inventory_location')
-    ->fields(array(
+    ->fields([
       'name' => 'Main',
       'status' => 1,
-    ))
+    ])
     ->execute();
 
   // Add core transaction types.
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 1,
       'name' => 'Stock in',
       'parent_ttid' => 1,
-    ))
+    ])
     ->execute();
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 2,
       'name' => 'Stock Out',
       'parent_ttid' => 2,
-    ))
+    ])
     ->execute();
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 3,
       'name' => 'Stock Movement',
       'parent_ttid' => 3,
-    ))
+    ])
     ->execute();
 
   // Add sub transaction types.
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 4,
       'name' => 'Sale',
       'parent_ttid' => 2,
-    ))
+    ])
     ->execute();
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 5,
       'name' => 'Return',
       'parent_ttid' => 1,
-    ))
+    ])
     ->execute();
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 6,
       'name' => 'New Stock',
       'parent_ttid' => 1,
-    ))
+    ])
     ->execute();
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 7,
       'name' => 'Move From',
       'parent_ttid' => 1,
-    ))
+    ])
     ->execute();
   db_insert('cs_inventory_transaction_type')
-    ->fields(array(
+    ->fields([
       'ttid' => 8,
       'name' => 'Move To',
       'parent_ttid' => 1,
-    ))
+    ])
     ->execute();
 }

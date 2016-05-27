@@ -7,23 +7,18 @@
 
 namespace Drupal\commerce_stock;
 
-use Drupal\commerce_stock\StockCheckInterface;
-use Drupal\commerce_stock\StockUpdateInterface;
-
-
-
 /**
  * Defines a common interface for stock checking.
  */
 interface StockServiceInterface {
 
   /**
-   * Get the name of the service
+   * Gets the name of the service
    */
   public function getName();
 
   /**
-   * Get the id of the service
+   * Gets the id of the service
    */
   public function getID();
   /**

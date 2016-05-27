@@ -7,10 +7,7 @@
 
 namespace Drupal\commerce_stock;
 
-
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_stock\StockServiceInterface;
-
 
 /**
  * Defines a common interface for stock checking.
@@ -18,31 +15,37 @@ use Drupal\commerce_stock\StockServiceInterface;
 interface StockManagerInterface {
 
   /**
-   * Adds a Stock serice..
+   * Adds a Stock service.
    *
+   * @param \Drupal\commerce_stock\StockServiceInterface $stock_service
+   *   The stock service.
    */
   public function addService(StockServiceInterface $stock_service);
 
-
   /**
-   * Get a serice relevent for the entity.
+   * Get a service relevant for the entity.
    *
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity (most likely a product variation entity).
+   * @return \Drupal\commerce_stock\StockServiceInterface
+   *   The appropriate stock service for the given purchasable entity.
    */
   public function getService(PurchasableEntityInterface $entity);
 
-
   /**
-   * Returns an array of all services.
+   * Returns an array of all registered stock services.
    *
+   * @return \Drupal\commerce_stock\StockServiceInterface[]
+   *   All registered stock services.
    */
   public function listServices();
 
-
   /**
-   * Returns an array of all services.
+   * Returns an array of the IDs of all registered stock services.
    *
-   * Format is: array('service key' => 'service name')
-   *
+   * @return array
+   *   Array of the IDs of all registered stock services.
+   *   Format is: array('service key' => 'service name')
    */
   public function listServiceIds();
 

@@ -1,6 +1,7 @@
 services:
   commerce.availability_checker.stock_availability_checker:
     class: Drupal\commerce_stock\StockAvailabilityChecker
+    arguments: ['@commerce.stock_manager']
     tags:
     - { name: commerce.availability_checker, priority: 0 }      
 

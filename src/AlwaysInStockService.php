@@ -5,19 +5,9 @@
  * Contains \Drupal\commerce_stock\AlwaysInStockService.
  */
 
-
 namespace Drupal\commerce_stock;
 
-
-use Drupal\commerce_stock\StockCheckInterface;
-use Drupal\commerce_stock\StockUpdateInterface;
-use Drupal\commerce_stock\StockConfigurationInterface;
-use Drupal\commerce_stock\AlwaysInStock;
-use Drupal\commerce_stock\CoreStockConfiguration;
-
-
 class AlwaysInStockService implements StockServiceInterface {
-
 
   /**
    * The stock Checker.
@@ -40,51 +30,46 @@ class AlwaysInStockService implements StockServiceInterface {
    */
   protected $stockConfiguration;
 
-
-
-   function __construct() {
-     // Create the objects needed.
-     $this->stockChecker = new AlwaysInStock;
-     $this->stockUpdater =  $this->stockChecker;
-     $this->stockConfiguration = new CoreStockConfiguration($this->stockChecker);
-   }
+  /**
+   * Constructs a new AlwaysInStockService object.
+   */
+  function __construct() {
+    // Create the objects needed.
+    $this->stockChecker = new AlwaysInStock;
+    $this->stockUpdater = $this->stockChecker;
+    $this->stockConfiguration = new CoreStockConfiguration($this->stockChecker);
+  }
 
   /**
-   * Get the name of the service
+   * {@inheritdoc}
    */
   public function getName() {
     return 'Always In Stock';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getID() {
     return 'always_in_stock';
   }
+
   /**
-   * Gets the stock checker.
-   *
-   * @return \Drupal\commerce_stock\StockCheckInterface
-   *   The stock checkers.
+   * {@inheritdoc}
    */
   public function getStockChecker() {
     return $this->stockChecker;
   }
 
   /**
-   * Gets the stock updater.
-   *
-   * @return \Drupal\commerce_stock\StockUpdateInterface
-   *   The stock updater.
+   * {@inheritdoc}
    */
   public function getStockUpdater() {
     return $this->stockUpdater;
   }
 
-
   /**
-   * Gets the stock Configuration.
-   *
-   * @return \Drupal\commerce_stock\StockConfigurationInterface
-   *   The stock Configuration.
+   * {@inheritdoc}
    */
   public function getConfiguration() {
     return $this->stockConfiguration;

@@ -5,53 +5,47 @@
  * Contains \Drupal\commerce_stock\CoreStockConfiguration.
  */
 
-
 namespace Drupal\commerce_stock;
-
-
-use Drupal\commerce_stock\StockConfigurationInterface;
-use Drupal\commerce_stock\StockCheckInterface;
-
-
 
 // Core functionality can be overridden or extended by contrib modules.
 class CoreStockConfiguration implements StockConfigurationInterface {
 
-
-  public function getLocationList($variation_id) {
-    return $this->StockLocations;
-
-  }
-
   /**
-   * The Stock checker object.
+   * @var \Drupal\commerce_stock\StockCheckInterface $stock_checker
+   *   The stock checker
    */
-  protected $StockChecker;
+  protected $stockChecker;
 
   /**
-   * Array of location IDs.
+   * @yar array
+   *   Array of location IDs.
    */
-  protected $StockLocations;
-
+  protected $stockLocations;
 
   /**
-   * Constructor.
+   * Constructs a new CoreStockConfiguration object.
    *
+   * @param \Drupal\commerce_stock\StockCheckInterface $stock_checker
+   *   The stock checker
    */
-  public function __construct(StockCheckInterface $StockChecker) {
+  public function __construct(StockCheckInterface $stock_checker) {
     // @todo - we need another object that holds information about the locations
     // that we need to check.
-    $this->StockChecker = $StockChecker;
+    $this->stockChecker = $stock_checker;
     // Load the configuration
     $this->loadConfiguration();
   }
 
+  public function getLocationList($variation_id) {
+    return $this->stockLocations;
+  }
+
   public function loadConfiguration() {
     // For now we will use all active locations for all products.
-    $locations = $this->StockChecker->getLocationList(TRUE);
-    $this->StockLocations = array();
+    $locations = $this->stockChecker->getLocationList(TRUE);
+    $this->stockLocations = [];
     foreach ($locations as $key => $value) {
-      $this->StockLocations[$key] = $key;
+      $this->stockLocations[$key] = $key;
     }
   }
 

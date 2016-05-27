@@ -5,33 +5,24 @@
  * Contains \Drupal\commerce_stock\AlwaysInStock.
  */
 
-
 namespace Drupal\commerce_stock;
-
-
-use Drupal\commerce_stock\StockCheckInterface;
-use Drupal\commerce_stock\StockUpdateInterface;
-
-
 
 class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata) {
+  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
     // Do nothing.
   }
-
 
   /**
    * {@inheritdoc}
    */
-  public function getStockLevel($variation_id, $locations) {
+  public function getStockLevel($variation_id, array $locations) {
     // @todo this can be configurable?
     return 999;
   }
-
 
   /**
    * {@inheritdoc}
@@ -39,7 +30,6 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   public function getIsInStock($variation_id, $locations) {
     return TRUE;
   }
-
 
   /**
    * {@inheritdoc}
@@ -53,7 +43,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
    */
   public function getIsStockManaged($variation_id) {
     // @todo - Not sure about this one. The result will be the same for:
-    // TRUE - managed by this and will always be availalbe.
+    // TRUE - managed by this and will always be available.
     // FALSE - not managed so will be available.
     return TRUE;
   }
@@ -62,8 +52,8 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
    * {@inheritdoc}
    */
   public function getLocationList($return_active_only = TRUE) {
-    // We dont have locations so return an empty array.
-    return array();
+    // We don't have locations, so return an empty array.
+    return [];
   }
 
 }

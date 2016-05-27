@@ -5,19 +5,12 @@
  * Contains \Drupal\commerce_stock_s\LocalStockService.
  */
 
-
 namespace Drupal\commerce_stock_s;
 
 use Drupal\commerce_stock\StockServiceInterface;
-use Drupal\commerce_stock\StockCheckInterface;
-use Drupal\commerce_stock\StockUpdateInterface;
-use Drupal\commerce_stock\StockConfigurationInterface;
-use Drupal\commerce_stock_s\StockStorageAPI;
 use Drupal\commerce_stock\CoreStockConfiguration;
 
-
 class LocalStockService implements StockServiceInterface {
-
 
   /**
    * The stock Checker.
@@ -40,14 +33,12 @@ class LocalStockService implements StockServiceInterface {
    */
   protected $stockConfiguration;
 
-
-
-   function __construct() {
-     // Create the objects needed.
-     $this->stockChecker = new StockStorageAPI;
-     $this->stockUpdater =  $this->stockChecker;
-     $this->stockConfiguration = new CoreStockConfiguration($this->stockChecker);
-   }
+  function __construct() {
+    // Create the objects needed.
+    $this->stockChecker = new StockStorageAPI;
+    $this->stockUpdater = $this->stockChecker;
+    $this->stockConfiguration = new CoreStockConfiguration($this->stockChecker);
+  }
 
   /**
    * Get the name of the service
@@ -79,7 +70,6 @@ class LocalStockService implements StockServiceInterface {
   public function getStockUpdater() {
     return $this->stockUpdater;
   }
-
 
   /**
    * Gets the stock Configuration.

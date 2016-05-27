@@ -5,18 +5,16 @@
  * Contains \Drupal\commerce_stock\StockManagerConfig.
  */
 
-
 namespace Drupal\commerce_stock;
 
-
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_stock\StockServiceInterface;
-use Drupal\commerce_stock\StockManagerConfigInterface;
-
 
 class StockManagerConfig implements StockManagerConfigInterface {
 
-
+  /**
+   * @var \Drupal\commerce_stock\StockManagerInterface
+   *   The stock manager.
+   */
   protected $stockManager;
 
   /**
@@ -37,7 +35,6 @@ class StockManagerConfig implements StockManagerConfigInterface {
     $config = \Drupal::config('commerce_stock.manager');
     $default_service_id = $config->get('default_service_id');
 
-
     // Cycle all services to see if we got the default service.
     foreach ($services as $service) {
       if ($service->getID() == $default_service_id) {
@@ -48,7 +45,5 @@ class StockManagerConfig implements StockManagerConfigInterface {
     // If not found return the first service in the list.
     return $services[0];
   }
-
-
 
 }

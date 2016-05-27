@@ -9,13 +9,6 @@ namespace Drupal\commerce_stock\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_stock\StockManager;
-
-use Drupal\commerce_stock\StockAvailabilityChecker;
-use Drupal\commerce_stock\CoreStockConfiguration;
-use Drupal\commerce\AvailabilityManager;
-
-use Drupal\commerce_stock_s\StockStorageAPI;
 
 /**
  * Class StockConfigForm.
@@ -29,7 +22,7 @@ class StockConfigForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'commerce_stock.manager'
+      'commerce_stock.manager',
     ];
   }
 
@@ -39,7 +32,6 @@ class StockConfigForm extends ConfigFormBase {
   public function getFormId() {
     return 'stock_config_form';
   }
-
 
   /**
    * {@inheritdoc}
@@ -53,19 +45,17 @@ class StockConfigForm extends ConfigFormBase {
     $stock_manager = \Drupal::service('commerce.stock_manager');
     $stock_services = $stock_manager->listServiceIds();
 
-
     $form['stock_manager'] = [
       '#type' => 'fieldset',
       '#title' => t('Stock Manager'),
     ];
 
-
-  $form['stock_manager']['default_service_id'] = [
-    '#type' => 'select',
-    '#title' => $this->t('Default service'),
-    '#options' => $stock_services,
-    '#default_value' => $default_service_id,
-  ];
+    $form['stock_manager']['default_service_id'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Default service'),
+      '#options' => $stock_services,
+      '#default_value' => $default_service_id,
+    ];
 
     return parent::buildForm($form, $form_state);
   }
@@ -86,7 +76,6 @@ class StockConfigForm extends ConfigFormBase {
     $this->config('commerce_stock.manager')
       ->set('default_service_id', $values['default_service_id'])
       ->save();
-
 
     //drupal_set_message('Saved configurations');
   }

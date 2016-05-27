@@ -4,16 +4,15 @@
  * Implementation of hook_views_data()
  */
 function commerce_stock_s_views_data() {
- // Define the return array.
-  $data = array();
+  // Define the return array.
+  $data = [];
 
   // Stock Location
   // The outermost keys of $data are Views table names, which should usually
   // be the same as the hook_schema() table names.
-  $data['cs_inventory_location'] = array();
+  $data['cs_inventory_location'] = [];
 
-  $data['cs_inventory_location']['table'] = array();
-
+  $data['cs_inventory_location']['table'] = [];
 
   // Within 'table', the value of 'group' (translated string) is used as a
   // prefix in Views UI for this table's fields, filters, etc. When adding
@@ -30,7 +29,7 @@ function commerce_stock_s_views_data() {
   // for views. Non-base tables can only be brought in via relationships in
   // views based on other tables. To define a table to be a base table, add
   // key 'base' to the 'table' array:
-  $data['cs_inventory_location']['table']['base'] = array(
+  $data['cs_inventory_location']['table']['base'] = [
     // Identifier (primary) field in this table for Views.
     'field' => 'locid',
     // Label in the UI.
@@ -38,362 +37,352 @@ function commerce_stock_s_views_data() {
     // Longer description in the UI. Required.
     'help' => t('Table holding the stock locations.'),
     'weight' => -10,
-  );
-
+  ];
 
   // Fields.
-  $data['cs_inventory_location']['locid'] = array(
+  $data['cs_inventory_location']['locid'] = [
     'title' => t('Location ID'),
     'help' => t('Unique Stock Location ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_location']['name'] = array(
+    ],
+  ];
+  $data['cs_inventory_location']['name'] = [
     'title' => t('Name'),
     'help' => t('The location name.'),
-    'field' => array(
+    'field' => [
       'id' => 'standard',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'string',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'string',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
+    ],
+  ];
 
-  $data['cs_inventory_location']['status'] = array(
+  $data['cs_inventory_location']['status'] = [
     'title' => t('Status'),
     'help' => t('Is the location active.'),
 
-    'field' => array(
+    'field' => [
       'id' => 'boolean',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'boolean',
       'label' => t('Active'),
       'type' => 'yes-no',
       'use_equal' => TRUE,
-    ),
-  );
-
-
+    ],
+  ];
 
   // Stock transactions
-  $data['cs_inventory_transaction'] = array();
-  $data['cs_inventory_transaction']['table'] = array();
+  $data['cs_inventory_transaction'] = [];
+  $data['cs_inventory_transaction']['table'] = [];
   $data['cs_inventory_transaction']['table']['group'] = t('Stock Transactions');
   $data['cs_inventory_transaction']['table']['provider'] = 'commerce_stock_s';
-  $data['cs_inventory_transaction']['table']['base'] = array(
+  $data['cs_inventory_transaction']['table']['base'] = [
     'field' => 'trid',
     'title' => t('Stock transaction'),
     'help' => t('Table holding the stock transactions.'),
     'weight' => -10,
-  );
+  ];
   // Fields.
-  $data['cs_inventory_transaction']['trid'] = array(
+  $data['cs_inventory_transaction']['trid'] = [
     'title' => t('Transactions ID'),
     'help' => t('Unique Stock Transactions ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction']['variation_id'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['variation_id'] = [
     'title' => t('Variation ID'),
     'help' => t('The product variation ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-    'relationship' => array(
+    ],
+    'relationship' => [
       'base' => 'commerce_product_variation_field_data',
       'base field' => 'variation_id',
       'id' => 'standard',
       'label' => t('Product variation relating the transaction'),
-    ),
-  );
-  $data['cs_inventory_transaction']['qty'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['qty'] = [
     'title' => t('Qty'),
     'help' => t('The Quantity.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction']['location_id'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['location_id'] = [
     'title' => t('Location ID'),
     'help' => t('The Location ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-    'relationship' => array(
+    ],
+    'relationship' => [
       'base' => 'cs_inventory_location',
       'base field' => 'locid',
       'id' => 'standard',
       'label' => t('Stock Location'),
-    ),
-  );
-  $data['cs_inventory_transaction']['location_zone'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['location_zone'] = [
     'title' => t('Zone'),
     'help' => t('The location zone.'),
-    'field' => array(
+    'field' => [
       'id' => 'standard',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'string',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'string',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction']['unit_cost'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['unit_cost'] = [
     'title' => t('Unit cost'),
     'help' => t('The cost of a single unit.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction']['transaction_time'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['transaction_time'] = [
     'title' => t('Time'),
     'help' => t('The date & time of the transaction.'),
-    'field' => array(
+    'field' => [
       'id' => 'date',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'date',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'date',
-    ),
-  );
+    ],
+  ];
 
-  $data['cs_inventory_transaction']['transaction_type_id'] = array(
+  $data['cs_inventory_transaction']['transaction_type_id'] = [
     'title' => t('Type ID'),
     'help' => t('Transaction type id.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction']['related_tid'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['related_tid'] = [
     'title' => t('Related transaction ID'),
     'help' => t('The Related transaction id.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction']['related_oid'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['related_oid'] = [
     'title' => t('Related Order ID'),
     'help' => t('The Related Order ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-    'relationship' => array(
+    ],
+    'relationship' => [
       'base' => 'commerce_order',
       'base field' => 'order_id',
       'id' => 'standard',
       'label' => t('Related Order'),
-    ),
-  );
-  $data['cs_inventory_transaction']['related_uid'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['related_uid'] = [
     'title' => t('Related User ID'),
     'help' => t('The Related User ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-    'relationship' => array(
+    ],
+    'relationship' => [
       'base' => 'users_field_data',
       'base field' => 'uid',
       'id' => 'standard',
       'label' => t('User for the transaction'),
-    ),
-  );
-  $data['cs_inventory_transaction']['data'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction']['data'] = [
     'title' => t('data'),
     'help' => t('Serialized Data.'),
-    'field' => array(
+    'field' => [
       'id' => 'serialized',
       'click sortable' => FALSE,
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'Standard',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'Standard',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-
-
-
-
+    ],
+  ];
 
   // Stock transaction types
-  $data['cs_inventory_transaction_type'] = array();
-  $data['cs_inventory_transaction_type']['table'] = array();
+  $data['cs_inventory_transaction_type'] = [];
+  $data['cs_inventory_transaction_type']['table'] = [];
   $data['cs_inventory_transaction_type']['table']['group'] = t('Stock Transaction Types');
   $data['cs_inventory_transaction_type']['table']['provider'] = 'commerce_stock_s';
-  $data['cs_inventory_transaction_type']['table']['base'] = array(
+  $data['cs_inventory_transaction_type']['table']['base'] = [
     'field' => 'ttid',
     'title' => t('Stock transaction Type'),
     'help' => t('Table holding the stock transaction types.'),
     'weight' => -10,
-  );
-
-
+  ];
 
   $data['cs_inventory_transaction_type']['table']['join']['cs_inventory_transaction']['left_field'] = 'transaction_type_id';
   $data['cs_inventory_transaction_type']['table']['join']['cs_inventory_transaction']['field'] = 'ttid';
 
   // Fields.
-  $data['cs_inventory_transaction_type']['ttid'] = array(
+  $data['cs_inventory_transaction_type']['ttid'] = [
     'title' => t('Transactions Type ID'),
     'help' => t('Unique Stock Transactions Type ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction_type']['name'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction_type']['name'] = [
     'title' => t('Transaction Type Name'),
     'help' => t('The transaction type name.'),
-    'field' => array(
+    'field' => [
       'id' => 'standard',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'string',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'string',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-  $data['cs_inventory_transaction_type']['parent_ttid'] = array(
+    ],
+  ];
+  $data['cs_inventory_transaction_type']['parent_ttid'] = [
     'title' => t('Parent Transactions Type ID'),
     'help' => t('The parent stock transactions type ID.'),
-    'field' => array(
+    'field' => [
       'id' => 'numeric',
-    ),
-    'filter' => array(
+    ],
+    'filter' => [
       'id' => 'numeric',
-    ),
-    'argument' => array(
+    ],
+    'argument' => [
       'id' => 'numeric',
-    ),
-    'sort' => array(
+    ],
+    'sort' => [
       'id' => 'standard',
-    ),
-  );
-
+    ],
+  ];
 
   return $data;
 }
