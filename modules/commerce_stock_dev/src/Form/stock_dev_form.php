@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock_dev\Form\stock_dev_form.
- */
-
 namespace Drupal\commerce_stock_dev\Form;
 
 use Drupal\commerce_product\ProductVariationStorage;

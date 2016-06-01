@@ -1,26 +1,26 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\StockManagerConfig.
- */
 
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 
+/**
+ * Configuration class for the stock manager.
+ */
 class StockManagerConfig implements StockManagerConfigInterface {
 
   /**
+   * The stock manager.
+   *
    * @var \Drupal\commerce_stock\StockManagerInterface
-   *   The stock manager.
    */
   protected $stockManager;
 
   /**
    * {@inheritdoc}
    */
-  function __construct(StockManagerInterface $stock_manager) {
+  public function __construct(StockManagerInterface $stock_manager) {
     $this->stockManager = $stock_manager;
   }
 
@@ -37,7 +37,7 @@ class StockManagerConfig implements StockManagerConfigInterface {
 
     // Cycle all services to see if we got the default service.
     foreach ($services as $service) {
-      if ($service->getID() == $default_service_id) {
+      if ($service->getId() == $default_service_id) {
         return $service;
       }
     }

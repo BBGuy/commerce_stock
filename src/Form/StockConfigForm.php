@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\Form\StockConfigForm.
- */
-
 namespace Drupal\commerce_stock\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
@@ -71,15 +66,10 @@ class StockConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    //parent::submitForm($form, $form_state);
     $values = $form_state->getValues();
     $this->config('commerce_stock.manager')
       ->set('default_service_id', $values['default_service_id'])
       ->save();
-
-    //drupal_set_message('Saved configurations');
   }
 
 }
-
-

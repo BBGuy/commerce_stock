@@ -1,15 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock_s\StockStorageAPI.
- */
-
 namespace Drupal\commerce_stock_s;
 
 use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
 
+/**
+ * The API used by the commerce local storage service.
+ */
 class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
 
   /**
@@ -62,7 +60,6 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
     $db = \Drupal::database();
     $result = $db->select('cs_inventory_location_level', 'ill')
       ->fields('ill')
-      //->condition('location_id', 1)
       ->condition('location_id', $location_id, '=')
       ->condition('variation_id', $variation_id)
       ->execute()
@@ -145,6 +142,7 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
    *   The product variation ID.
    * @param array $locations
    *   Array of locations.
+   *
    * @return array The stock location level.
    *   The stock location level.
    */
@@ -163,12 +161,10 @@ class StockStorageAPI implements StockCheckInterface, StockUpdateInterface {
     $db = \Drupal::database();
     $result = $db->select('cs_inventory_location_level', 'ill')
       ->fields('ill')
-      //->condition('location_id', 1)
       ->condition('location_id', $locations, 'IN')
       ->condition('variation_id', $variation_id)
       ->execute()
       ->fetchAll();
-    //->fetch();
     if ($result) {
       foreach ($result as $record) {
         // Location info for retriving transactions.

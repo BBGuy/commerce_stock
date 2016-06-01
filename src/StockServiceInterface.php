@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\StockServiceInterface.
- */
-
 namespace Drupal\commerce_stock;
 
 /**
@@ -13,14 +8,15 @@ namespace Drupal\commerce_stock;
 interface StockServiceInterface {
 
   /**
-   * Gets the name of the service
+   * Gets the name of the service.
    */
   public function getName();
 
   /**
-   * Gets the id of the service
+   * Gets the id of the service.
    */
-  public function getID();
+  public function getId();
+
   /**
    * Gets the stock checker.
    *
@@ -36,7 +32,6 @@ interface StockServiceInterface {
    *   The stock updater.
    */
   public function getStockUpdater();
-
 
   /**
    * Gets the stock Configuration.

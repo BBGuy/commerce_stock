@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\StockManagerInterface.
- */
-
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
@@ -27,6 +22,7 @@ interface StockManagerInterface {
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
+   *
    * @return \Drupal\commerce_stock\StockServiceInterface
    *   The appropriate stock service for the given purchasable entity.
    */

@@ -1,19 +1,19 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\AlwaysInStock.
- */
 
 namespace Drupal\commerce_stock;
 
+/**
+ * The API class used by the always in stock service.
+ */
 class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
   /**
    * {@inheritdoc}
    */
   public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
-    // Do nothing.
+    // Do nothing and return a NULL value as its N/A.
+    return NULL;
   }
 
   /**

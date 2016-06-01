@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\StockTransactionsInterface.
- */
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
@@ -30,13 +26,13 @@ interface StockTransactionsInterface {
    * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $location_id
-   *   The location ID
+   *   The location ID.
    * @param string $zone
-   *   The zone
+   *   The zone.
    * @param float $quantity
-   *   The quantity
+   *   The quantity.
    * @param float $unit_cost
-   *   The unit cost
+   *   The unit cost.
    * @param string $message
    *   The message.
    */
@@ -48,17 +44,17 @@ interface StockTransactionsInterface {
    * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $location_id
-   *   The location ID
+   *   The location ID.
    * @param string $zone
-   *   The zone
+   *   The zone.
    * @param float $quantity
-   *   The quantity
+   *   The quantity.
    * @param float $unit_cost
-   *   The unit cost
-   * @param $order_id
-   *   The order ID
-   * @param $user_id
-   *   The user ID
+   *   The unit cost.
+   * @param int $order_id
+   *   The order ID.
+   * @param int $user_id
+   *   The user ID.
    * @param string $message
    *   The message.
    */
@@ -70,42 +66,41 @@ interface StockTransactionsInterface {
    * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $from_location_id
-   *   The source location ID
+   *   The source location ID.
    * @param int $to_location_id
-   *   The target location ID
+   *   The target location ID.
    * @param string $from_zone
-   *   The source zone
+   *   The source zone.
    * @param string $to_zone
-   *   The target zone
+   *   The target zone.
    * @param float $quantity
-   *   The quantity
+   *   The quantity.
    * @param float $unit_cost
-   *   The unit cost
+   *   The unit cost.
    * @param string $message
    *   The message.
    */
   public function moveStock(PurchasableEntityInterface $purchasable_entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $message = NULL);
 
   /**
-   * Stock returns
+   * Stock returns.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $location_id
-   *   The location ID
+   *   The location ID.
    * @param string $zone
-   *   The zone
+   *   The zone.
    * @param float $quantity
-   *   The quantity
+   *   The quantity.
    * @param float $unit_cost
-   *   The unit cost
-   * @param $order_id
-   *   The order ID
-   * @param $user_id
-   *   The user ID
+   *   The unit cost.
+   * @param int $order_id
+   *   The order ID.
+   * @param int $user_id
+   *   The user ID.
    * @param string $message
    *   The message.
-   * @return
    */
   public function returnStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL);
 

@@ -1,15 +1,14 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\StockManager.
- */
 
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 
+/**
+ * The Stock Manager service collector used by the Stock availability checker.
+ */
 class StockManager implements StockManagerInterface, StockTransactionsInterface {
 
   /**
@@ -29,7 +28,7 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
   /**
    * Constructs a new StockManager object.
    */
-  function __construct() {
+  public function __construct() {
     $this->stockManagerConfig = new StockManagerConfig($this);
   }
 
@@ -60,7 +59,7 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
   public function listServiceIds() {
     $ids = [];
     foreach ($this->stockServices as $service) {
-      $ids[$service->getID()] = $service->getName();
+      $ids[$service->getId()] = $service->getName();
     }
     return $ids;
   }
@@ -89,6 +88,7 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
       // Get the stock updater.
       $stock_updater = $this->getService($purchasable_entity)
         ->getStockUpdater();
+
       // Create the transaction.
       $stock_updater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
     }

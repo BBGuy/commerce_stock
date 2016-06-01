@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\StockUpdateInterface.
- */
-
 namespace Drupal\commerce_stock;
 
 /**
@@ -13,28 +8,29 @@ namespace Drupal\commerce_stock;
 interface StockUpdateInterface {
 
   /**
-   * Check if product is in stock. @todo Really? Is this the correct description?
+   * Create a stock transaction.
    *
    * @param int $variation_id
-   *   The variation ID
+   *   The variation ID.
    * @param int $location_id
-   *   The location ID
+   *   The location ID.
    * @param string $zone
-   *   The zone
+   *   The zone.
    * @param float $quantity
-   *   Tbe quantity
+   *   Tbe quantity.
    * @param float $unit_cost
-   *   The unit cost
+   *   The unit cost.
    * @param int $transaction_type_id
-   *   The transaction type ID
+   *   The transaction type ID.
    * @param array $metadata
    *   Holds all the optional values those are:
    *     - related_tid: related transaction.
    *     - related_oid: related order.
    *     - related_uid: related user.
    *     - data: Serialized data array.
-   * @return mixed
-   *   @todo document the return type
+   *
+   * @return int
+   *   Return the ID of the transaction.
    */
   public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata);
 

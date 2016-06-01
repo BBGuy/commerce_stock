@@ -1,12 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\commerce_stock\AlwaysInStockService.
- */
 
 namespace Drupal\commerce_stock;
 
+/**
+ * A stock service for always in stock products.
+ */
 class AlwaysInStockService implements StockServiceInterface {
 
   /**
@@ -33,9 +32,9 @@ class AlwaysInStockService implements StockServiceInterface {
   /**
    * Constructs a new AlwaysInStockService object.
    */
-  function __construct() {
+  public function __construct() {
     // Create the objects needed.
-    $this->stockChecker = new AlwaysInStock;
+    $this->stockChecker = new AlwaysInStock();
     $this->stockUpdater = $this->stockChecker;
     $this->stockConfiguration = new CoreStockConfiguration($this->stockChecker);
   }
@@ -50,7 +49,7 @@ class AlwaysInStockService implements StockServiceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getID() {
+  public function getId() {
     return 'always_in_stock';
   }
 
@@ -74,4 +73,5 @@ class AlwaysInStockService implements StockServiceInterface {
   public function getConfiguration() {
     return $this->stockConfiguration;
   }
+
 }

@@ -1,7 +1,12 @@
 <?php
 
 /**
- * Implementation of hook_views_data()
+ * @file
+ * Views integration for the stock storage module.
+ */
+
+/**
+ * Implements hook_views_data().
  */
 function commerce_stock_s_views_data() {
   // Define the return array.
@@ -91,7 +96,7 @@ function commerce_stock_s_views_data() {
     ],
   ];
 
-  // Stock transactions
+  // Stock transactions.
   $data['cs_inventory_transaction'] = [];
   $data['cs_inventory_transaction']['table'] = [];
   $data['cs_inventory_transaction']['table']['group'] = t('Stock Transactions');
@@ -319,7 +324,7 @@ function commerce_stock_s_views_data() {
     ],
   ];
 
-  // Stock transaction types
+  // Stock transaction types.
   $data['cs_inventory_transaction_type'] = [];
   $data['cs_inventory_transaction_type']['table'] = [];
   $data['cs_inventory_transaction_type']['table']['group'] = t('Stock Transaction Types');
