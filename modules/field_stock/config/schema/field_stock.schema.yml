@@ -1,0 +1,12 @@
+# @see Configuration schema/metadata at https://drupal.org/node/1905070
+#
+field.field_stock.value:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        value:
+          type: numeric
+          label: 'Value'
