@@ -64,7 +64,7 @@ class StockWidget extends WidgetBase {
       '#type' => 'checkbox',
       '#title' => t('Provide note'),
       '#default_value' => $this->getSetting('transaction_note'),
-      '#description' => t('Provid an input box for a transaction note.'),
+      '#description' => t('Provide an input box for a transaction note.'),
     ];
 
     return $element;
