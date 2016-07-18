@@ -261,14 +261,6 @@ function commerce_stock_s_install() {
       'parent_ttid' => 2,
     ])
     ->execute();
-  db_insert('cs_inventory_transaction_type')
-    ->fields([
-      'ttid' => 3,
-      'name' => 'Stock Movement',
-      'parent_ttid' => 3,
-    ])
-    ->execute();
-
   // Add sub transaction types.
   db_insert('cs_inventory_transaction_type')
     ->fields([
@@ -295,7 +287,7 @@ function commerce_stock_s_install() {
     ->fields([
       'ttid' => 7,
       'name' => 'Move From',
-      'parent_ttid' => 1,
+      'parent_ttid' => 2,
     ])
     ->execute();
   db_insert('cs_inventory_transaction_type')
