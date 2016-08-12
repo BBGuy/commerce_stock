@@ -43,6 +43,15 @@ class CoreStockConfiguration implements StockConfigurationInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getPrimaryTransactionLocation($variation_id, $quantity) {
+    $locations = $this->getLocationList($variation_id);
+    // @todo - we need a better way of managing this.
+    return array_shift($locations);
+  }
+
+  /**
    * Load the configuration.
    */
   public function loadConfiguration() {

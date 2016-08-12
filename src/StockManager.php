@@ -67,6 +67,34 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
   /**
    * {@inheritdoc}
    */
+  public function getPrimaryTransactionLocation(PurchasableEntityInterface $purchasable_entity, $quantity) {
+      $stock_config = $this->getService($purchasable_entity)
+        ->getConfiguration();
+      return $stock_config->getPrimaryTransactionLocation($purchasable_entity, $quantity);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createTransaction(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata = []) {
+    if ($purchasable_entity instanceof ProductVariationInterface) {
+      // Set values.
+      $variation_id = $purchasable_entity->id();
+      // Get the stock updater.
+      $stock_updater = $this->getService($purchasable_entity)
+        ->getStockUpdater();
+      // Create the transaction.
+      $stock_updater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
+    }
+    else {
+      // @todo - raise exception.
+    }
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function receiveStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $message = NULL) {
     // Make sure entity is a product variation.
     if ($purchasable_entity instanceof ProductVariationInterface) {
@@ -191,6 +219,29 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
         ->getStockUpdater();
       // Create the transactions.
       $stock_updater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
+    }
+    else {
+      // @todo - raise exception.
+    }
+
+  }
+
+ public function getStockLevel(PurchasableEntityInterface $purchasable_entity) {
+    // Make sure entity is a product variation.
+    if ($purchasable_entity instanceof ProductVariationInterface) {
+      // Get the  ID.
+      $variation_id = $purchasable_entity->id();
+      // If no ID no stock.
+      if (is_null($variation_id)) {
+        return 0;
+      }
+      // Get the stock checker.
+      $stock_checker = $this->getService($purchasable_entity)
+        ->getStockChecker();
+      // @todo - we need a better way to determin the locations.
+      $locations = array_keys($stock_checker->getLocationList());
+      return $stock_checker->getStockLevel($variation_id, $locations);
+
     }
     else {
       // @todo - raise exception.
