@@ -20,6 +20,43 @@ define('TRANSACTION_TYPE_STOCK_MOVMENT_TO', 8);
  */
 interface StockTransactionsInterface {
 
+
+  /**
+   * Get the primary location for automatic stock allocation.
+   *
+   * This is normally a designated location to act as the main warehouse.
+   * However this can also be code working out in realtime the location relevant
+   * at that time. To help support this we are including the quantity related to
+   * the transaction.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity (most likely a product variation entity).
+   *
+   * @return int
+   *   The location ID.
+   */
+  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity);
+
+  /**
+   * Create a transaction.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
+   *   The purchasable entity (most likely a product variation entity).
+   * @param int $location_id
+   *   The location ID.
+   * @param string $zone
+   *   The zone.
+   * @param float $quantity
+   *   The quantity.
+   * @param float $unit_cost
+   *   The unit cost.
+   * @param int $transaction_type_id
+   *  Transaction type ID.
+   * @param array $metadata
+   *   A metadata array.
+   */
+  public function createTransaction(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata = []);
+
   /**
    * Receive stock.
    *
