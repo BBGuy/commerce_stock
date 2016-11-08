@@ -97,7 +97,7 @@ function commerce_ss_tokens($type, $tokens, array $data = array(), array $option
  * Implements hook_form_ID_alter().
  *
  * Provides a checkbox on the Product type edit form to allow decimal
- * quantities for stock managment.
+ * quantities for stock management.
  */
 function commerce_ss_form_commerce_product_ui_product_type_form_alter(&$form, &$form_state) {
   // Get the product bundle type.
@@ -132,7 +132,7 @@ function commerce_ss_checkbox_validate($element, &$form_state, $form) {
 /**
  * Implements hook_form_ID_alter().
  *
- * Controll the decimal quantities option when editing products.
+ * Control the decimal quantities option when editing products.
  */
 function commerce_ss_form_commerce_product_ui_product_form_alter(&$form, &$form_state) {
   // Get the product bundle type.
@@ -154,7 +154,7 @@ function commerce_ss_form_commerce_product_ui_product_form_alter(&$form, &$form_
 /**
  * Implements hook_inline_entity_form_alter().
  *
- * Controll the decimal quantities option when editing products.
+ * Control the decimal quantities option when editing products.
  */
 function commerce_ss_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
   if ($entity_form['#entity_type'] == 'commerce_product') {
@@ -235,8 +235,8 @@ function commerce_ss_line_item_product_enabled($line_item) {
  * if true is return stock checking is enabled
  * if false stock checking is disabled
  *
- * @todo rename function  confusing name its not product thats not disabled
- *   its the stock check for the product thats disabled
+ * @todo rename function confusing name it's not product that's not disabled
+ * its the stock check for the product that's disabled.
  *
  * @param type $product
  * @return boolean

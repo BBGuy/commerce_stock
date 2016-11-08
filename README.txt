@@ -19,7 +19,7 @@ To install and get working
 1. Download commerce_stock.
 2. Enable the Commerce Stock API, Commerce Simple Stock, and Commerce Simple
    Stock Rules modules.
-3. Go to people > permissions  and make sure that that you and other relevent
+3. Go to people > permissions and make sure that you and other relevant
    roles have the "Administer commerce stock settings".
 4. Go to Home > Administration > Store > Configuration > Stock management.
 5. Select the "simple stock management" tab.

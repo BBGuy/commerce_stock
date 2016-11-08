@@ -19,7 +19,7 @@ function commerce_stock_admin_form($form, &$form_state) {
 /**
  * Builds the stock events page.
  */
-function commerce_stock_admin_event_ruless() {
+function commerce_stock_admin_event_rules() {
 
   // Add a help section.
   $content['help'] = array(
@@ -87,7 +87,7 @@ function commerce_stock_admin_event_ruless() {
 /**
  * Builds the stock control rules page.
  */
-function commerce_stock_admin_stock_control_ruless() {
+function commerce_stock_admin_stock_control_rules() {
 
   // Add a help section.
   $content['help'] = array(

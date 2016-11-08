@@ -22,7 +22,7 @@ function commerce_ss_rules_condition_info() {
     'group' => t('Commerce Stock (ss)'),
     'callbacks' => array(
       // @todo add a function that also checked that the "Disable stock
-      // for this product" is not on or maybe add another condision form.
+      // for this product" is not on or maybe add another condition form.
       'execute' => 'commerce_ss_product_enabled',
     ),
   );
@@ -38,7 +38,7 @@ function commerce_ss_rules_condition_info() {
     'group' => t('Commerce Stock (ss)'),
     'callbacks' => array(
       // @todo add a function that also checked that the "Disable stock for
-      // this product" is not on or maybe add another condision form.
+      // this product" is not on or maybe add another condition form.
       'execute' => 'commerce_ss_product_not_disabled_by_override',
     ),
   );
@@ -79,7 +79,7 @@ function commerce_ss_rules_action_info() {
 
 
 /**
- * Substracts from stock the sold amount in a line item.
+ * Subtracts from stock the sold amount in a line item.
  *
  * @param $line_item
  *   A line item object.

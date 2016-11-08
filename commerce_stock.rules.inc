@@ -203,41 +203,41 @@ function commerce_stock_rules_action_info() {
       'disabled_cart' => array(
         'type' => 'boolean',
         'label' => t('Disable the add to cart?'),
-        'description' => t('Only aplicable if Normal Submit was chosen as the Stock Action'),
+        'description' => t('Only applicable if Normal Submit was chosen as the Stock Action'),
       ),
       'custom_submit' => array(
         'type' => 'text',
         'label' => t('A new custom submit function'),
         'optional' => TRUE,
-        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+        'description' => t('Only applicable if Custom Submit was chosen as the Stock Action'),
       ),
       'custom_submit_clear' => array(
         'type' => 'boolean',
         'label' => t('Clear the submit array first'),
-        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+        'description' => t('Only applicable if Custom Submit was chosen as the Stock Action'),
       ),
       'custom_validate' => array(
         'type' => 'text',
         'label' => t('a new of a custom validation function'),
-        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+        'description' => t('Only applicable if Custom Submit was chosen as the Stock Action'),
         'optional' => TRUE,
       ),
       'custom_validate_clear' => array(
         'type' => 'boolean',
         'label' => t('Clear the validation array first'),
-        'description' => t('Only aplicable if Custom Submit was chosen as the Stock Action'),
+        'description' => t('Only applicable if Custom Submit was chosen as the Stock Action'),
       ),
       'custom_url' => array(
         'type' => 'text',
         'label' => t('Custom URL'),
-        'description' => t('Only aplicable if URL Action was chosen as the Stock Action  (all submit and validation will be ignored). You can use the [product_id] token and [url] for a return path'),
+        'description' => t('Only applicable if URL Action was chosen as the Stock Action  (all submit and validation will be ignored). You can use the [product_id] token and [url] for a return path'),
         'optional' => TRUE,
 
       ),
       'custom_html' => array(
         'type' => 'text',
         'label' => t('Custom HTML'),
-        'description' => t('Only aplicable if Custom HTML was chosen as the Stock Action  (all submit and validation will be ignored). You can use the [product_id] token and [url] for a return path'),
+        'description' => t('Only applicable if Custom HTML was chosen as the Stock Action  (all submit and validation will be ignored). You can use the [product_id] token and [url] for a return path'),
         'optional' => TRUE,
       ),
     ),
@@ -290,7 +290,7 @@ function commerce_stock_rules_access() {
 function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $approved_quantity) {
   if ($approved_quantity < 0) {
     $approved_quantity = 0;
-    // If zero transection must be blocked as it you are not allowed
+    // If zero transaction must be blocked as it you are not allowed
     // to add zero quantity to the cart.
     $stock_action = 1;
   }
@@ -338,7 +338,7 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
     $stock_cart_check_data['form']['quantity']['#access'] = FALSE;
   }
 
-  // Prefix & sufix.
+  // Prefix & suffix.
   $stock_cart_check_data['form']['submit']['#prefix'] = $action_prefix;
   $stock_cart_check_data['form']['submit']['#suffix'] = $action_suffix;
 
@@ -400,12 +400,12 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
 }
 
 /**
- * Rules action: Set the state of the checkout process (called one per an item).
+ * Rules action: Set the state of the checkout process (called once per an item).
  */
 function commerce_stock_rules_set_checkout_state($stock_action, $message, $approved_quantity) {
   if ($approved_quantity < 0) {
     $approved_quantity = 0;
-    // If zero transection must be blocked as it you are not allowed
+    // If zero transaction must be blocked as it you are not allowed
     // to add zero quantity to the cart.
     $stock_action = 1;
   }
@@ -422,7 +422,7 @@ function commerce_stock_rules_set_checkout_state($stock_action, $message, $appro
 function commerce_stock_check_state_options_list() {
   return array(
     0 => 'do nothing' ,
-    1 => 'block transection',
+    1 => 'block transaction',
     2 => 'display message only');
 }
 
@@ -435,5 +435,4 @@ function commerce_stock_custom_cart_form_state_action_options_list() {
     1 => 'Custom Submit',
     2 => 'URL Action',
     3 => 'Custom HTML');
-
 }

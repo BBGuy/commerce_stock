@@ -15,7 +15,7 @@ function commerce_stock_ui_menu() {
   $items['admin/commerce/config/stock/validation'] = array(
     'title' => 'Stock validation',
     'description' => 'Manage and configure stock validation events.',
-    'page callback' => 'commerce_stock_admin_event_ruless',
+    'page callback' => 'commerce_stock_admin_event_rules',
     'access arguments' => array('administer rules'),
     'weight' => 5,
     'type' => MENU_LOCAL_TASK,
@@ -60,7 +60,7 @@ function commerce_stock_ui_menu() {
   $items['admin/commerce/config/stock/control'] = array(
     'title' => 'Stock control',
     'description' => 'Manage and configure stock control rules.',
-    'page callback' => 'commerce_stock_admin_stock_control_ruless',
+    'page callback' => 'commerce_stock_admin_stock_control_rules',
     'access arguments' => array('administer rules'),
     'weight' => 6,
     'type' => MENU_LOCAL_TASK,
