@@ -282,7 +282,7 @@ class stock_dev_form extends ConfigFormBase {
     $location_ids = explode(',', $form_state->getValue('location_ids'));
     // Call the API
     $stock_api = new StockStorageAPI;
-    $stock_level = $stock_api->getStockLevel($prod_id, $location_ids);
+    $stock_level = $stock_api->getTotalStockLevel($prod_id, $location_ids);
     drupal_set_message(t('Stock level is: @stock_level', ['@stock_level' => $stock_level]));
 
     // $stock_api->createTransaction(1, 1, '', 1, 0.0);
@@ -326,7 +326,7 @@ class stock_dev_form extends ConfigFormBase {
     $location_id = $form_state->getValue('location');
 
     $stock_api = new StockStorageAPI;
-    $stock_api->updateProductInventoryLocationLevel($location_id, $variation_id);
+    $stock_api->updateLocationStockLevel($location_id, $variation_id);
   }
 
   public function submitStockAvailabilityCheck(array &$form, FormStateInterface $form_state) {

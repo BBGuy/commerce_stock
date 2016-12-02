@@ -18,7 +18,7 @@ interface StockCheckInterface {
    * @return int The stock level.
    *   The stock level.
    */
-  public function getStockLevel($variation_id, array $locations);
+  public function getTotalStockLevel($variation_id, array $locations);
 
   /**
    * Check if product is in stock.

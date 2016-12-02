@@ -238,8 +238,9 @@ function commerce_stock_s_schema() {
  * Implements hook_install().
  */
 function commerce_stock_s_install() {
-  // Add primery stock location.
-  db_insert('cs_inventory_location')
+  $db = \Drupal::database();
+  // Add primary stock location.
+  $db->insert('cs_inventory_location')
     ->fields([
       'name' => 'Main',
       'status' => 1,
@@ -247,14 +248,14 @@ function commerce_stock_s_install() {
     ->execute();
 
   // Add core transaction types.
-  db_insert('cs_inventory_transaction_type')
+  $db->insert('cs_inventory_transaction_type')
     ->fields([
       'ttid' => 1,
       'name' => 'Stock in',
       'parent_ttid' => 1,
     ])
     ->execute();
-  db_insert('cs_inventory_transaction_type')
+  $db->insert('cs_inventory_transaction_type')
     ->fields([
       'ttid' => 2,
       'name' => 'Stock Out',
@@ -262,35 +263,35 @@ function commerce_stock_s_install() {
     ])
     ->execute();
   // Add sub transaction types.
-  db_insert('cs_inventory_transaction_type')
+  $db->insert('cs_inventory_transaction_type')
     ->fields([
       'ttid' => 4,
       'name' => 'Sale',
       'parent_ttid' => 2,
     ])
     ->execute();
-  db_insert('cs_inventory_transaction_type')
+  $db->insert('cs_inventory_transaction_type')
     ->fields([
       'ttid' => 5,
       'name' => 'Return',
       'parent_ttid' => 1,
     ])
     ->execute();
-  db_insert('cs_inventory_transaction_type')
+  $db->insert('cs_inventory_transaction_type')
     ->fields([
       'ttid' => 6,
       'name' => 'New Stock',
       'parent_ttid' => 1,
     ])
     ->execute();
-  db_insert('cs_inventory_transaction_type')
+  $db->insert('cs_inventory_transaction_type')
     ->fields([
       'ttid' => 7,
       'name' => 'Move From',
       'parent_ttid' => 2,
     ])
     ->execute();
-  db_insert('cs_inventory_transaction_type')
+  $db->insert('cs_inventory_transaction_type')
     ->fields([
       'ttid' => 8,
       'name' => 'Move To',

@@ -27,7 +27,7 @@ class StockWorkerLocationLevel extends QueueWorkerBase {
     // Update.
     foreach ($locations as $location_id => $location) {
       // Update the stock level.
-      $stock_api->updateProductInventoryLocationLevel($location_id, $data);
+      $stock_api->updateLocationStockLevel($location_id, $data);
     }
   }
 

@@ -240,7 +240,7 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
         ->getStockChecker();
       // @todo - we need a better way to determin the locations.
       $locations = array_keys($stock_checker->getLocationList());
-      return $stock_checker->getStockLevel($variation_id, $locations);
+      return $stock_checker->getTotalStockLevel($variation_id, $locations);
 
     }
     else {

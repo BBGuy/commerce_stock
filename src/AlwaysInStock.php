@@ -19,7 +19,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getStockLevel($variation_id, array $locations) {
+  public function getTotalStockLevel($variation_id, array $locations) {
     // @todo this can be configurable?
     return 999;
   }
