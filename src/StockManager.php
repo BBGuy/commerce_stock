@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
@@ -68,9 +67,9 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
    * {@inheritdoc}
    */
   public function getPrimaryTransactionLocation(PurchasableEntityInterface $purchasable_entity, $quantity) {
-      $stock_config = $this->getService($purchasable_entity)
-        ->getConfiguration();
-      return $stock_config->getPrimaryTransactionLocation($purchasable_entity, $quantity);
+    $stock_config = $this->getService($purchasable_entity)
+      ->getConfiguration();
+    return $stock_config->getPrimaryTransactionLocation($purchasable_entity, $quantity);
   }
 
   /**
@@ -226,7 +225,10 @@ class StockManager implements StockManagerInterface, StockTransactionsInterface 
 
   }
 
- public function getStockLevel(PurchasableEntityInterface $purchasable_entity) {
+  /**
+   *
+   */
+  public function getStockLevel(PurchasableEntityInterface $purchasable_entity) {
     // Make sure entity is a product variation.
     if ($purchasable_entity instanceof ProductVariationInterface) {
       // Get the  ID.

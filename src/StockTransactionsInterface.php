@@ -20,7 +20,6 @@ define('TRANSACTION_TYPE_STOCK_MOVMENT_TO', 8);
  */
 interface StockTransactionsInterface {
 
-
   /**
    * Get the primary location for automatic stock allocation.
    *
@@ -51,7 +50,7 @@ interface StockTransactionsInterface {
    * @param float $unit_cost
    *   The unit cost.
    * @param int $transaction_type_id
-   *  Transaction type ID.
+   *   Transaction type ID.
    * @param array $metadata
    *   A metadata array.
    */

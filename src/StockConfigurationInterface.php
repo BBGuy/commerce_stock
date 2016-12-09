@@ -7,7 +7,6 @@ namespace Drupal\commerce_stock;
  */
 interface StockConfigurationInterface {
 
-
   /**
    * Get the primary location for automatic stock allocation.
    *
@@ -19,7 +18,7 @@ interface StockConfigurationInterface {
    * @param int $variation_id
    *   The product variation ID.
    *
-   * @return int.
+   * @return int
    *   The location ID.
    */
   public function getPrimaryTransactionLocation($variation_id, $quantity);

@@ -58,7 +58,7 @@ class LocalStockService implements StockServiceInterface {
   /**
    * Gets the stock checker.
    *
-   * @return \Drupal\commerce_stock\StockCheckInterface.
+   * @return \Drupal\commerce_stock\StockCheckInterface
    *   The stock checkers.
    */
   public function getStockChecker() {

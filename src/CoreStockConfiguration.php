@@ -10,7 +10,7 @@ class CoreStockConfiguration implements StockConfigurationInterface {
   /**
    * The stock checker.
    *
-   * @var \Drupal\commerce_stock\StockCheckInterface $stock_checker
+   * @var \Drupal\commerce_stock\StockCheckInterface
    */
   protected $stockChecker;
 

@@ -22,7 +22,7 @@ class StockItem extends FieldItemBase {
 
 
 
- /********************************************************************************/
+  /********************************************************************************/
 
   /**
    * {@inheritdoc}
@@ -52,7 +52,6 @@ class StockItem extends FieldItemBase {
     return $value === NULL;
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -60,7 +59,6 @@ class StockItem extends FieldItemBase {
 
     $properties['value'] = DataDefinition::create('float')
       ->setLabel(t('Available stock'));
-
 
     $properties['available_stock'] = DataDefinition::create('float')
       ->setLabel(t('Availab Stock'))
@@ -71,7 +69,6 @@ class StockItem extends FieldItemBase {
 
     return $properties;
   }
-
 
   /**************************  TESTING *********************************/
 
@@ -111,7 +108,7 @@ class StockItem extends FieldItemBase {
           $metadata = ['data' => ['message' => $transaction_note]];
           $unit_cost = NULL;
           $zone = '';
-          // Get the $location_id
+          // Get the $location_id.
           $location_id = $stockManager->getPrimaryTransactionLocation($product_variation, $transaction_qty);
           $stockManager->createTransaction($product_variation, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
         }
@@ -121,15 +118,10 @@ class StockItem extends FieldItemBase {
 
   }
 
-
-
-//  /**
-//   * {@inheritdoc}
-//   */
-//  protected function writePropertyValue($property_name, $value) {
-//    parent::writePropertyValue($property_name, $value);
-//  }
-
-
-
+  // /**
+  //   * {@inheritdoc}
+  //   */
+  //  protected function writePropertyValue($property_name, $value) {
+  //    parent::writePropertyValue($property_name, $value);
+  //  }.
 }

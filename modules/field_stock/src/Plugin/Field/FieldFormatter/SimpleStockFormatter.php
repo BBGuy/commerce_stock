@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\field_stock\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;
@@ -44,9 +43,10 @@ class SimpleStockFormatter extends FormatterBase {
       $elements[$delta] = [
         '#type' => 'html_tag',
         '#tag' => 'p',
-        '#value' => $level
+        '#value' => $level,
       ];
     }
     return $elements;
   }
+
 }

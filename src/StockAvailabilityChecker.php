@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\AvailabilityCheckerInterface;

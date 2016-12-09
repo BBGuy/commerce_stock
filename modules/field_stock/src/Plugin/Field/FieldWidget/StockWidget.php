@@ -7,7 +7,6 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 
-
 /**
  * Plugin implementation of the 'field_stock_widget' widget.
  *
@@ -22,7 +21,6 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
  */
 class StockWidget extends WidgetBase {
 
-
   /**
    * {@inheritdoc}
    */
@@ -33,13 +31,13 @@ class StockWidget extends WidgetBase {
     ] + parent::defaultSettings();
   }
 
-   /**
+  /**
    * {@inheritdoc}
    */
   public function settingsSummary() {
     $summary = [];
     $summary[] = t('Entry system: @entry_system', ['@entry_system' => $this->getSetting('entry_system')]);
-    $summary[] = t('Eransaction note: @transaction_note', ['@transaction_note' => $this->getSetting('transaction_note')? 'Yes' : 'No']);
+    $summary[] = t('Eransaction note: @transaction_note', ['@transaction_note' => $this->getSetting('transaction_note') ? 'Yes' : 'No']);
     return $summary;
   }
 
@@ -57,7 +55,7 @@ class StockWidget extends WidgetBase {
         'basic' => $this->t('Basic transactions'),
         'transactions' => $this->t('Use transactions (read only form)'),
       ],
-      '#default_value' =>  $this->getSetting('entry_system'),
+      '#default_value' => $this->getSetting('entry_system'),
     ];
 
     $element['transaction_note'] = [
@@ -91,7 +89,6 @@ class StockWidget extends WidgetBase {
     }
     $elements = [];
 
-
     // Check the Stock Entry system chosen.
     $entry_system = $this->getSetting('entry_system');
 
@@ -102,25 +99,26 @@ class StockWidget extends WidgetBase {
 
     // Common.
     $elements['stock']['stocked_variation_id'] = [
-      '#type' => 'value', '#value' => $entity->id(),
-       '#element_validate' => [
+      '#type' => 'value',
+      '#value' => $entity->id(),
+      '#element_validate' => [
          [$this, 'validateSimpleId'],
-       ],
+      ],
     ];
 
-    // Simple entry system = One edit box for stock level
+    // Simple entry system = One edit box for stock level.
     if ($entry_system == 'simple') {
 
-     $elements['stock']['value'] = [
-       '#description' => t('Available stock.'),
-       '#type' => 'textfield',
-       '#default_value' =>  $level,
-       '#size' => 10,
-       '#maxlength' => 12,
-       '#element_validate' => [
+      $elements['stock']['value'] = [
+        '#description' => t('Available stock.'),
+        '#type' => 'textfield',
+        '#default_value' => $level,
+        '#size' => 10,
+        '#maxlength' => 12,
+        '#element_validate' => [
          [$this, 'validateSimple'],
-       ],
-     ];
+        ],
+      ];
     }
     elseif ($entry_system == 'basic') {
       // A lable showing the stock.
@@ -134,7 +132,7 @@ class StockWidget extends WidgetBase {
         '#title' => t('Transaction'),
         '#description' => t('Valid options [number], +[number], -[number]. [number] for a new stock level, +[number] to add stock -[number] to remove stock. e.g. "5" we have 5 in stock, "+2" add 2 to stock or "-1" remove 1 from stock.'),
         '#type' => 'textfield',
-        '#default_value' =>  '',
+        '#default_value' => '',
         '#size' => 7,
         '#maxlength' => 7,
         '#element_validate' => [
@@ -158,103 +156,115 @@ class StockWidget extends WidgetBase {
 
     // Add a transaction note if enabled.
     if ($this->getSetting('transaction_note') && ($entry_system != 'transactions')) {
-     $elements['stock']['stock_transaction_note'] = [
-       '#title' => t('Transaction note'),
-       '#description' => t('Type in a note about this transaction.'),
-       '#type' => 'textfield',
-       '#default_value' =>  '',
-       '#size' => 20,
-     ];
+      $elements['stock']['stock_transaction_note'] = [
+        '#title' => t('Transaction note'),
+        '#description' => t('Type in a note about this transaction.'),
+        '#type' => 'textfield',
+        '#default_value' => '',
+        '#size' => 20,
+      ];
 
     }
 
     return $elements;
   }
 
-
+  /**
+   *
+   */
   private function multiKeyExists(array $arr, $key) {
-          if (array_key_exists($key, $arr)) {
-              return $arr[$key];
-          }
-          foreach ($arr as $element) {
-              if (is_array($element)) {
-                  if ($found_element = $this->multiKeyExists($element, $key)) {
-                      return $found_element;
-                  }
-              }
-          }
-          return false;
-      }
-
-    /**
-     * Save the Entity ID for stock update.
-     *
-     * This is a hack: As I don't know to get the relevent entity in the element
-     * submit for the stock value field. We will store the ID.
-     * @todo: This is not go live ready code,
-     */
-    public function validateSimpleId($element, FormStateInterface $form_state) {
-      $variation_id = $element['#value'];
-      $commerce_stock_widget_values = &drupal_static('commerce_stock_widget_values', []);
-      $commerce_stock_widget_values['variation_id'] = $variation_id;
+    if (array_key_exists($key, $arr)) {
+      return $arr[$key];
     }
-
-    /**
-     * Simple stock form - Used to update the stock level.
-     *
-     * @todo: This is not go live ready code,
-     */
-    public function validateSimple($element, FormStateInterface $form_state) {
-
-      if (!is_numeric($element['#value'])) {
-        $form_state->setError($element, t('Stock must be a number.'));
-        return;
-      }
-      $values = $form_state->getValues();
-      // Make sure we got variations.
-      if (!isset($values['variations'])) {
-        return;
-      }
-
-      $commerce_stock_widget_values = &drupal_static('commerce_stock_widget_values', []);
-
-      // Get $variation_id using a hack (no live ready).
-      $variation_id = $commerce_stock_widget_values['variation_id']['inline_entity_form']['entities'];
-
-      // Init variable in case we can't find it.
-      $transaction_note = FALSE;
-
-      // Find the entity deap inside .
-      $entities = $values['variations']['form']['inline_entity_form']['entities'];
-      foreach ($entities as $entity) {
-        $tmp_id = $this->multiKeyExists($entity, 'stocked_variation_id');
-        if ($tmp_id == $variation_id) {
-          $transaction_note = $this->multiKeyExists($entity, 'stock_transaction_note');
+    foreach ($arr as $element) {
+      if (is_array($element)) {
+        if ($found_element = $this->multiKeyExists($element, $key)) {
+          return $found_element;
         }
       }
+    }
+    return FALSE;
+  }
 
-      $commerce_stock_widget_values['update_type'] = 'simple';
-      $commerce_stock_widget_values['variation_id'] = $variation_id;
-      $commerce_stock_widget_values['stock_level'] = $element['#value'];
-      // Do we have a note.
-      $commerce_stock_widget_values['transaction_note'] = $transaction_note;
-      // Mark as need updating.
-      $commerce_stock_widget_values['update'] = TRUE;
+  /**
+   * Save the Entity ID for stock update.
+   *
+   * This is a hack: As I don't know to get the relevent entity in the element
+   * submit for the stock value field. We will store the ID.
+   *
+   * @todo: This is not go live ready code,
+   */
+  public function validateSimpleId($element, FormStateInterface $form_state) {
+    $variation_id = $element['#value'];
+    $commerce_stock_widget_values = &drupal_static('commerce_stock_widget_values', []);
+    $commerce_stock_widget_values['variation_id'] = $variation_id;
+  }
+
+  /**
+   * Simple stock form - Used to update the stock level.
+   *
+   * @todo: This is not go live ready code,
+   */
+  public function validateSimple($element, FormStateInterface $form_state) {
+
+    if (!is_numeric($element['#value'])) {
+      $form_state->setError($element, t('Stock must be a number.'));
+      return;
+    }
+    $values = $form_state->getValues();
+    // Make sure we got variations.
+    if (!isset($values['variations'])) {
+      return;
     }
 
-    public function validateBasic($element, FormStateInterface $form_state) {
-      // @to do.
-      return true;
+    $commerce_stock_widget_values = &drupal_static('commerce_stock_widget_values', []);
+
+    // Get $variation_id using a hack (no live ready).
+    $variation_id = $commerce_stock_widget_values['variation_id']['inline_entity_form']['entities'];
+
+    // Init variable in case we can't find it.
+    $transaction_note = FALSE;
+
+    // Find the entity deap inside .
+    $entities = $values['variations']['form']['inline_entity_form']['entities'];
+    foreach ($entities as $entity) {
+      $tmp_id = $this->multiKeyExists($entity, 'stocked_variation_id');
+      if ($tmp_id == $variation_id) {
+        $transaction_note = $this->multiKeyExists($entity, 'stock_transaction_note');
+      }
     }
 
+    $commerce_stock_widget_values['update_type'] = 'simple';
+    $commerce_stock_widget_values['variation_id'] = $variation_id;
+    $commerce_stock_widget_values['stock_level'] = $element['#value'];
+    // Do we have a note.
+    $commerce_stock_widget_values['transaction_note'] = $transaction_note;
+    // Mark as need updating.
+    $commerce_stock_widget_values['update'] = TRUE;
+  }
 
+  /**
+   *
+   */
+  public function validateBasic($element, FormStateInterface $form_state) {
+    // @to do.
+    return TRUE;
+  }
+
+  /**
+   *
+   */
   public static function closeForm($form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
     drupal_set_message('updated STOCK');
   }
 
+  /**
+   *
+   */
   public function submitAll(array &$form, FormStateInterface $form_state) {
     drupal_set_message('updated STOCK!!');
 
   }
+
 }

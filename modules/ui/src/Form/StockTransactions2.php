@@ -5,14 +5,12 @@ namespace Drupal\stock_ui\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-
 /**
  * Class StockTransactions.
  *
  * @package Drupal\stock_ui\Form
  */
 class StockTransactions2 extends FormBase {
-
 
   /**
    * {@inheritdoc}
@@ -33,17 +31,16 @@ class StockTransactions2 extends FormBase {
       $variation_id = $request->query->get('commerce_product_v_id');
     }
     // If no product variation.
-    else  {
-        // Send back to stage 1.
-        return $this->redirect('stock_ui.stock_transactions1');
+    else {
+      // Send back to stage 1.
+      return $this->redirect('stock_ui.stock_transactions1');
     }
 
     // Load the product variation.
     /** @var ProductVariationStorage $variation_storage */
     $variation_storage = \Drupal::service('entity_type.manager')
-        ->getStorage('commerce_product_variation');
+      ->getStorage('commerce_product_variation');
     $product_variation = $variation_storage->load($variation_id);
-
 
     // Get a list of locations relevent for our product.
     /** @var Drupal\commerce_stock\StockManager $stockManager */
@@ -55,7 +52,6 @@ class StockTransactions2 extends FormBase {
     foreach ($locations as $location_id => $location) {
       $location_options[$location_id] = $location['name'];
     }
-
 
     $form['transaction_type'] = [
       '#type' => 'select',
@@ -92,8 +88,6 @@ class StockTransactions2 extends FormBase {
       '#maxlength' => 50,
     ];
 
-
-
     $form['target'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Move target'),
@@ -118,7 +112,6 @@ class StockTransactions2 extends FormBase {
       '#maxlength' => 50,
     ];
 
-
     $form['user'] = [
       '#type' => 'entity_autocomplete',
       '#title' => $this->t('Optional user'),
@@ -132,7 +125,6 @@ class StockTransactions2 extends FormBase {
           ],
         ],
       ],
-
 
     ];
     $form['order'] = [
@@ -149,7 +141,6 @@ class StockTransactions2 extends FormBase {
         ],
       ],
     ];
-
 
     $form['transaction_qty'] = [
       '#type' => 'number',
@@ -168,16 +159,16 @@ class StockTransactions2 extends FormBase {
     ];
 
     $form['submit'] = [
-        '#type' => 'submit',
-        '#value' => t('Submit'),
+      '#type' => 'submit',
+      '#value' => t('Submit'),
     ];
 
     return $form;
   }
 
   /**
-    * {@inheritdoc}
-    */
+   * {@inheritdoc}
+   */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
   }
@@ -205,7 +196,6 @@ class StockTransactions2 extends FormBase {
     $variation_storage = \Drupal::service('entity_type.manager')
       ->getStorage('commerce_product_variation');
     $product_variation = $variation_storage->load($product_variation_id);
-
 
     /** @var Drupal\commerce_stock\StockManager $stockManager */
     $stockManager = \Drupal::service('commerce.stock_manager');
