@@ -6,6 +6,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\Core\Url;
 
 /**
  * Plugin implementation of the 'field_stock_widget' widget.
@@ -36,8 +37,8 @@ class StockWidget extends WidgetBase {
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = t('Entry system: @entry_system', ['@entry_system' => $this->getSetting('entry_system')]);
-    $summary[] = t('Eransaction note: @transaction_note', ['@transaction_note' => $this->getSetting('transaction_note') ? 'Yes' : 'No']);
+    $summary[] = $this->t('Entry system: @entry_system', ['@entry_system' => $this->getSetting('entry_system')]);
+    $summary[] = $this->t('Eransaction note: @transaction_note', ['@transaction_note' => $this->getSetting('transaction_note') ? 'Yes' : 'No']);
     return $summary;
   }
 
@@ -60,9 +61,9 @@ class StockWidget extends WidgetBase {
 
     $element['transaction_note'] = [
       '#type' => 'checkbox',
-      '#title' => t('Provide note'),
+      '#title' => $this->t('Provide note'),
       '#default_value' => $this->getSetting('transaction_note'),
-      '#description' => t('Provide an input box for a transaction note.'),
+      '#description' => $this->t('Provide an input box for a transaction note.'),
     ];
 
     return $element;
@@ -94,14 +95,14 @@ class StockWidget extends WidgetBase {
 
     $elements['stock'] = [
       '#type' => 'fieldgroup',
-      '#title' => t('Stock'),
+      '#title' => $this->t('Stock'),
     ];
     if (empty($entity->id())) {
       // We don't have a product ID as yet.
       $elements['stock']['stock_label'] = [
         '#type' => 'html_tag',
         '#tag' => 'strong',
-        '#value' => t('In order to set the stock level you need to save the product first!'),
+        '#value' => $this->t('In order to set the stock level you need to save the product first!'),
       ];
 
 
@@ -112,7 +113,7 @@ class StockWidget extends WidgetBase {
         '#type' => 'value',
         '#value' => $entity->id(),
         '#element_validate' => [
-           [$this, 'validateSimpleId'],
+          [$this, 'validateSimpleId'],
         ],
       ];
 
@@ -120,27 +121,26 @@ class StockWidget extends WidgetBase {
       if ($entry_system == 'simple') {
 
         $elements['stock']['value'] = [
-          '#description' => t('Available stock.'),
+          '#description' => $this->t('Available stock.'),
           '#type' => 'textfield',
           '#default_value' => $level,
           '#size' => 10,
           '#maxlength' => 12,
           '#element_validate' => [
-           [$this, 'validateSimple'],
+            [$this, 'validateSimple'],
           ],
         ];
-      }
-      elseif ($entry_system == 'basic') {
+      } elseif ($entry_system == 'basic') {
         // A lable showing the stock.
         $elements['stock']['stock_label'] = [
           '#type' => 'html_tag',
           '#tag' => 'strong',
-          '#value' => t('Stock level: @stock_level', ['@stock_level' => $level]),
+          '#value' => $this->t('Stock level: @stock_level', ['@stock_level' => $level]),
         ];
         // An entry box for entring the a transaction amount.
         $elements['stock']['adjustment'] = [
-          '#title' => t('Transaction'),
-          '#description' => t('Valid options [number], +[number], -[number]. [number] for a new stock level, +[number] to add stock -[number] to remove stock. e.g. "5" we have 5 in stock, "+2" add 2 to stock or "-1" remove 1 from stock.'),
+          '#title' => $this->t('Transaction'),
+          '#description' => $this->t('Valid options [number], +[number], -[number]. [number] for a new stock level, +[number] to add stock -[number] to remove stock. e.g. "5" we have 5 in stock, "+2" add 2 to stock or "-1" remove 1 from stock.'),
           '#type' => 'textfield',
           '#default_value' => '',
           '#size' => 7,
@@ -149,31 +149,30 @@ class StockWidget extends WidgetBase {
             array($this, 'validateBasic'),
           ],
         ];
-      }
-      elseif ($entry_system == 'transactions') {
+      } elseif ($entry_system == 'transactions') {
         // A lable showing the stock.
         $elements['stock']['stock_label'] = [
           '#type' => 'html_tag',
           '#tag' => 'strong',
-          '#value' => t('Stock level: @stock_level', ['@stock_level' => $level]),
+          '#value' => $this->t('Stock level: @stock_level', ['@stock_level' => $level]),
         ];
+
         $elements['stock']['stock_transactions_label'] = [
           '#type' => 'html_tag',
           '#tag' => 'p',
           '#value' => t('Please use the @transactions_page page for creating transactions.', ['@transactions_page' => '"To be developed"']),
         ];
-      }
 
-      // Add a transaction note if enabled.
-      if ($this->getSetting('transaction_note') && ($entry_system != 'transactions')) {
-        $elements['stock']['stock_transaction_note'] = [
-          '#title' => t('Transaction note'),
-          '#description' => t('Type in a note about this transaction.'),
-          '#type' => 'textfield',
-          '#default_value' => '',
-          '#size' => 20,
-        ];
-
+        // Add a transaction note if enabled.
+        if ($this->getSetting('transaction_note') && ($entry_system != 'transactions')) {
+          $elements['stock']['stock_transaction_note'] = [
+            '#title' => $this->t('Transaction note'),
+            '#description' => $this->t('Type in a note about this transaction.'),
+            '#type' => 'textfield',
+            '#default_value' => '',
+            '#size' => 20,
+          ];
+        }
       }
     }
 
@@ -219,7 +218,7 @@ class StockWidget extends WidgetBase {
   public function validateSimple($element, FormStateInterface $form_state) {
 
     if (!is_numeric($element['#value'])) {
-      $form_state->setError($element, t('Stock must be a number.'));
+      $form_state->setError($element, $this->t('Stock must be a number.'));
       return;
     }
     $values = $form_state->getValues();
