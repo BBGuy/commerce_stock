@@ -84,33 +84,35 @@ class StockItem extends FieldItemBase {
       if ($commerce_stock_widget_values['update_type'] == 'simple') {
         // Get the new requested details.
         $variation_id = $commerce_stock_widget_values['variation_id'];
-        $new_level = $commerce_stock_widget_values['stock_level'];
-        $transaction_note = $commerce_stock_widget_values['transaction_note'];
-        // Get the available Stock for the product variation.
-        /** @var ProductVariationStorage $variation_storage */
-        $variation_storage = \Drupal::service('entity_type.manager')
-          ->getStorage('commerce_product_variation');
-        $product_variation = $variation_storage->load($variation_id);
-        /** @var StockManager $stockManager */
-        $stockManager = \Drupal::service('commerce.stock_manager');
-        $level = $stockManager->getStockLevel($product_variation);
-        // Work out the adjustment.
-        $transaction_qty = $new_level - $level;
-        if ($transaction_qty > 0) {
-          $transaction_type = TRANSACTION_TYPE_STOCK_IN;
-        }
-        elseif ($transaction_qty < 0) {
-          $transaction_type = TRANSACTION_TYPE_STOCK_OUT;
-        }
+        // Make sure we have a product.
+        if (!empty($variation_id)) {
+          $new_level = $commerce_stock_widget_values['stock_level'];
+          $transaction_note = $commerce_stock_widget_values['transaction_note'];
+          // Get the available Stock for the product variation.
+          /** @var ProductVariationStorage $variation_storage */
+          $variation_storage = \Drupal::service('entity_type.manager')
+            ->getStorage('commerce_product_variation');
+          $product_variation = $variation_storage->load($variation_id);
+          /** @var StockManager $stockManager */
+          $stockManager = \Drupal::service('commerce.stock_manager');
+          $level = $stockManager->getStockLevel($product_variation);
+          // Work out the adjustment.
+          $transaction_qty = $new_level - $level;
+          if ($transaction_qty > 0) {
+            $transaction_type = TRANSACTION_TYPE_STOCK_IN;
+          } elseif ($transaction_qty < 0) {
+            $transaction_type = TRANSACTION_TYPE_STOCK_OUT;
+          }
 
-        if ($transaction_qty != 0) {
-          // @todo - add note.
-          $metadata = ['data' => ['message' => $transaction_note]];
-          $unit_cost = NULL;
-          $zone = '';
-          // Get the $location_id.
-          $location_id = $stockManager->getPrimaryTransactionLocation($product_variation, $transaction_qty);
-          $stockManager->createTransaction($product_variation, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+          if ($transaction_qty != 0) {
+            // @todo - add note.
+            $metadata = ['data' => ['message' => $transaction_note]];
+            $unit_cost = NULL;
+            $zone = '';
+            // Get the $location_id.
+            $location_id = $stockManager->getPrimaryTransactionLocation($product_variation, $transaction_qty);
+            $stockManager->createTransaction($product_variation, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+          }
         }
       }
       $commerce_stock_widget_values['update'] = FALSE;

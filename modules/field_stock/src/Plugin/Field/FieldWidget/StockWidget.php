@@ -96,74 +96,85 @@ class StockWidget extends WidgetBase {
       '#type' => 'fieldgroup',
       '#title' => t('Stock'),
     ];
-
-    // Common.
-    $elements['stock']['stocked_variation_id'] = [
-      '#type' => 'value',
-      '#value' => $entity->id(),
-      '#element_validate' => [
-         [$this, 'validateSimpleId'],
-      ],
-    ];
-
-    // Simple entry system = One edit box for stock level.
-    if ($entry_system == 'simple') {
-
-      $elements['stock']['value'] = [
-        '#description' => t('Available stock.'),
-        '#type' => 'textfield',
-        '#default_value' => $level,
-        '#size' => 10,
-        '#maxlength' => 12,
-        '#element_validate' => [
-         [$this, 'validateSimple'],
-        ],
-      ];
-    }
-    elseif ($entry_system == 'basic') {
-      // A lable showing the stock.
+    if (empty($entity->id())) {
+      // We don't have a product ID as yet.
       $elements['stock']['stock_label'] = [
         '#type' => 'html_tag',
         '#tag' => 'strong',
-        '#value' => t('Stock level: @stock_level', ['@stock_level' => $level]),
+        '#value' => t('In order to set the stock level you need to save the product first!'),
       ];
-      // An entry box for entring the a transaction amount.
-      $elements['stock']['adjustment'] = [
-        '#title' => t('Transaction'),
-        '#description' => t('Valid options [number], +[number], -[number]. [number] for a new stock level, +[number] to add stock -[number] to remove stock. e.g. "5" we have 5 in stock, "+2" add 2 to stock or "-1" remove 1 from stock.'),
-        '#type' => 'textfield',
-        '#default_value' => '',
-        '#size' => 7,
-        '#maxlength' => 7,
+
+
+    }
+    else {
+      // Common.
+      $elements['stock']['stocked_variation_id'] = [
+        '#type' => 'value',
+        '#value' => $entity->id(),
         '#element_validate' => [
-          array($this, 'validateBasic'),
+           [$this, 'validateSimpleId'],
         ],
       ];
-    }
-    elseif ($entry_system == 'transactions') {
-      // A lable showing the stock.
-      $elements['stock']['stock_label'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'strong',
-        '#value' => t('Stock level: @stock_level', ['@stock_level' => $level]),
-      ];
-      $elements['stock']['stock_transactions_label'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'p',
-        '#value' => t('Please use the @transactions_page page for creating transactions.', ['@transactions_page' => '"To be developed"']),
-      ];
-    }
 
-    // Add a transaction note if enabled.
-    if ($this->getSetting('transaction_note') && ($entry_system != 'transactions')) {
-      $elements['stock']['stock_transaction_note'] = [
-        '#title' => t('Transaction note'),
-        '#description' => t('Type in a note about this transaction.'),
-        '#type' => 'textfield',
-        '#default_value' => '',
-        '#size' => 20,
-      ];
+      // Simple entry system = One edit box for stock level.
+      if ($entry_system == 'simple') {
 
+        $elements['stock']['value'] = [
+          '#description' => t('Available stock.'),
+          '#type' => 'textfield',
+          '#default_value' => $level,
+          '#size' => 10,
+          '#maxlength' => 12,
+          '#element_validate' => [
+           [$this, 'validateSimple'],
+          ],
+        ];
+      }
+      elseif ($entry_system == 'basic') {
+        // A lable showing the stock.
+        $elements['stock']['stock_label'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'strong',
+          '#value' => t('Stock level: @stock_level', ['@stock_level' => $level]),
+        ];
+        // An entry box for entring the a transaction amount.
+        $elements['stock']['adjustment'] = [
+          '#title' => t('Transaction'),
+          '#description' => t('Valid options [number], +[number], -[number]. [number] for a new stock level, +[number] to add stock -[number] to remove stock. e.g. "5" we have 5 in stock, "+2" add 2 to stock or "-1" remove 1 from stock.'),
+          '#type' => 'textfield',
+          '#default_value' => '',
+          '#size' => 7,
+          '#maxlength' => 7,
+          '#element_validate' => [
+            array($this, 'validateBasic'),
+          ],
+        ];
+      }
+      elseif ($entry_system == 'transactions') {
+        // A lable showing the stock.
+        $elements['stock']['stock_label'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'strong',
+          '#value' => t('Stock level: @stock_level', ['@stock_level' => $level]),
+        ];
+        $elements['stock']['stock_transactions_label'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'p',
+          '#value' => t('Please use the @transactions_page page for creating transactions.', ['@transactions_page' => '"To be developed"']),
+        ];
+      }
+
+      // Add a transaction note if enabled.
+      if ($this->getSetting('transaction_note') && ($entry_system != 'transactions')) {
+        $elements['stock']['stock_transaction_note'] = [
+          '#title' => t('Transaction note'),
+          '#description' => t('Type in a note about this transaction.'),
+          '#type' => 'textfield',
+          '#default_value' => '',
+          '#size' => 20,
+        ];
+
+      }
     }
 
     return $elements;
