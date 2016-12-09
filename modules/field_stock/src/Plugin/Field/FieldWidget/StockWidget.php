@@ -157,10 +157,11 @@ class StockWidget extends WidgetBase {
           '#value' => $this->t('Stock level: @stock_level', ['@stock_level' => $level]),
         ];
 
+        $url = Url::fromRoute('stock_ui.stock_transactions2', [])->toString() . '?commerce_product_v_id=' . $entity->id();
         $elements['stock']['stock_transactions_label'] = [
           '#type' => 'html_tag',
           '#tag' => 'p',
-          '#value' => t('Please use the @transactions_page page for creating transactions.', ['@transactions_page' => '"To be developed"']),
+          '#value' => $this->t('Please use the   <a href=":transactions_page" target="_blank">New transaction</a>  page to make changes.', [':transactions_page' => $url]),
         ];
 
         // Add a transaction note if enabled.
