@@ -42,7 +42,7 @@ class StockConfigForm extends ConfigFormBase {
 
     $form['stock_manager'] = [
       '#type' => 'fieldset',
-      '#title' => t('Stock Manager'),
+      '#title' => $this->t('Stock Manager'),
     ];
 
     $form['stock_manager']['default_service_id'] = [

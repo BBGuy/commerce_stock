@@ -82,8 +82,8 @@ class StockTransactions2 extends FormBase {
 
     $form['source']['source_zone'] = [
       '#type' => 'textfield',
-      '#title' => t('Zone/Bins'),
-      '#description' => t('The location zone (bins)'),
+      '#title' => $this->t('Zone/Bins'),
+      '#description' => $this->t('The location zone (bins)'),
       '#size' => 60,
       '#maxlength' => 50,
     ];
@@ -106,8 +106,8 @@ class StockTransactions2 extends FormBase {
 
     $form['target']['target_zone'] = [
       '#type' => 'textfield',
-      '#title' => t('Zone/Bins'),
-      '#description' => t('The location zone (bins)'),
+      '#title' => $this->t('Zone/Bins'),
+      '#description' => $this->t('The location zone (bins)'),
       '#size' => 60,
       '#maxlength' => 50,
     ];
@@ -160,7 +160,7 @@ class StockTransactions2 extends FormBase {
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Submit'),
+      '#value' => $this->t('Submit'),
     ];
 
     return $form;

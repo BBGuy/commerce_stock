@@ -14,7 +14,7 @@ class FieldStockController extends ControllerBase {
    */
   public function description() {
     return array(
-      '#markup' => t(
+      '#markup' => $this->t(
         "The Stock Field"),
     );
   }
