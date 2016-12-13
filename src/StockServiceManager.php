@@ -22,31 +22,25 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   protected $stockServices = [];
 
   /**
-   * The stock service manager config.
-   *
-   * @var \Drupal\commerce_stock\StockServiceManagerConfig
-   */
-  protected $stockServiceManagerConfig;
-
-  /**
-   * Constructs a new StockServiceManagerConfig object.
-   */
-  public function __construct() {
-    $this->stockServiceManagerConfig = new StockServiceManagerConfig($this);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function addService(StockServiceInterface $stock_service) {
-    $this->stockServices[] = $stock_service;
+    $this->stockServices[$stock_service->getId()] = $stock_service;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getService(PurchasableEntityInterface $entity) {
-    return $this->stockServiceManagerConfig->getService($entity);
+    $config = \Drupal::config('commerce_stock.service_manager');
+    $default_service_id = $config->get('default_service_id');
+    $entity_type = $entity->getEntityType()->id();
+    $entity_bundle = $entity->bundle();
+    $entity_config_key = $entity_type . '_' . $entity_bundle . '_service_id';
+    $entity_service_id = $config->get($entity_config_key);
+    $service_id = $entity_service_id ?: $default_service_id;
+
+    return $this->stockServices[$service_id];
   }
 
   /**
