@@ -1,0 +1,6 @@
+commerce_stock_dev.stock_dev_form:
+  title: Stock Development Tools
+  description: 'Tools for the development of Drupal Commerce Stock'
+  parent: commerce.configuration
+  route_name: commerce_stock_dev.stock_dev_form
+  menu_name: Stock Dev Tools
