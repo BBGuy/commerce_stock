@@ -43,15 +43,10 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     // Check if a purchasable entity is a product variation.
     // @todo - should we be using instanceof? dosent work?
     if ($entity instanceof ProductVariationInterface) {
-
-      // Get product variation id.
       $variation_id = $entity->id();
-
-      // Check if stock is managed for the product.
       return $stock_checker->getIsStockManaged($variation_id);
     }
     else {
-      // If not a product variation then not applicable.
       return FALSE;
     }
   }

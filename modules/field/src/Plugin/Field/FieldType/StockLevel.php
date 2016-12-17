@@ -25,23 +25,19 @@ class StockLevel extends FieldItemBase {
   /**
    * The product variation storage.
    *
-   * @var \Drupal\commerce_product\ProductVariationStorage $variationStorage
+   * @var \Drupal\commerce_product\ProductVariationStorage
    */
   protected $variationStorage;
 
   /**
    * The stock service manager.
    *
-   * @var \Drupal\commerce_stock\StockServiceManager $stockServiceManager
+   * @var \Drupal\commerce_stock\StockServiceManager
    */
   protected $stockServiceManager;
 
   /**
-   * Constructs a new StockLevel type field.
-   *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
-   * @param null $name
-   * @param \Drupal\Core\TypedData\TypedDataInterface|NULL $parent
+   * {@inheritdoc}
    */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
@@ -120,6 +116,7 @@ class StockLevel extends FieldItemBase {
           $level = $this->stockServiceManager->getStockLevel($product_variation);
           $transaction_qty = $new_level - $level;
           break;
+
         case 'basic':
           $transaction_qty = (int) $values['stock']['adjustment'];
           break;

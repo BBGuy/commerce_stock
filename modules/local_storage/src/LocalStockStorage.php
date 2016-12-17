@@ -57,9 +57,9 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   /**
    * Gets stock level for a given location and variation.
    *
-   * @param $location_id
+   * @param int $location_id
    *   Location id.
-   * @param $variation_id
+   * @param int $variation_id
    *   Variation id.
    *
    * @return array
@@ -76,7 +76,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
 
     return [
       'qty' => $result ? $result->qty : 0,
-      'last_transaction' => $result ? $result->last_transaction_id : 0
+      'last_transaction' => $result ? $result->last_transaction_id : 0,
     ];
   }
 
@@ -195,7 +195,6 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    *
    * @param int $variation_id
    *   The product variation id.
-   *
    * @param array $locations
    *   Array of locations ids.
    *
@@ -208,7 +207,6 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
     $location_levels = [];
     foreach ($locations as $location_id) {
       $location_level = $this->getLocationStockLevel($location_id, $variation_id);
-
 
       $latest_txn = $this->getLocationStockTransactionLatest($location_id, $variation_id);
       $transactions_qty = $this->getLocationStockTransactionSum($location_id, $variation_id, $location_level['last_transaction'], $latest_txn);

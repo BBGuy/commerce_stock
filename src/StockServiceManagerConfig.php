@@ -31,6 +31,8 @@ class StockServiceManagerConfig implements StockServiceManagerConfigInterface {
     $default_service_id = $config->get('default_service_id');
 
     // Cycle all services to see if we got the default service.
+    // @todo Service should be determined by configuration of each product type.
+    // @todo Get product type -> stock service, not default or first.
     foreach ($services as $service) {
       if ($service->getId() == $default_service_id) {
         return $service;

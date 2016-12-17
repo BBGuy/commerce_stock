@@ -29,7 +29,7 @@ interface StockServiceConfigInterface {
    * @param int $variation_id
    *   The product variation ID.
    *
-   * @return array Array of relevant location IDs.
+   * @return array
    *   Array of relevant location IDs.
    */
   public function getLocationList($variation_id);

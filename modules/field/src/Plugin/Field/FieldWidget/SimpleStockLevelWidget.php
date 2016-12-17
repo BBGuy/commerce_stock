@@ -67,9 +67,9 @@ class SimpleStockLevelWidget extends WidgetBase {
       '#description' => $this->t('Provide an input box for a transaction note.'),
       '#states' => [
         'invisible' => [
-          'select[name="fields[field_stock_level][settings_edit_form][settings][entry_system]"]' => ['value' => 'transactions']
-        ]
-      ]
+          'select[name="fields[field_stock_level][settings_edit_form][settings][entry_system]"]' => ['value' => 'transactions'],
+        ],
+      ],
     ];
 
     return $element;
@@ -95,11 +95,11 @@ class SimpleStockLevelWidget extends WidgetBase {
       '#type' => 'fieldgroup',
       '#title' => $this->t('Stock'),
     ];
-    // Set the entry system so we know how to set the value
+    // Set the entry system so we know how to set the value.
     // @see StockLevel::setValue().
     $elements['stock']['entry_system'] = [
       '#type' => 'value',
-      '#value' => $entry_system
+      '#value' => $entry_system,
     ];
     if (empty($entity->id())) {
       // We don't have a product ID as yet.
@@ -108,8 +108,6 @@ class SimpleStockLevelWidget extends WidgetBase {
         '#tag' => 'strong',
         '#value' => $this->t('In order to set the stock level you need to save the product first!'),
       ];
-
-
     }
     else {
       $elements['stock']['stocked_variation_id'] = [

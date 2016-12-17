@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Commerce Stock Storage Views callbacks.
+ */
+
+/**
  * Implements hook_views_data().
  */
 function commerce_stock_local_views_data() {

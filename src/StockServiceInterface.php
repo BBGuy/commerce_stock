@@ -21,7 +21,7 @@ interface StockServiceInterface {
    * Gets the stock checker.
    *
    * @return \Drupal\commerce_stock\StockCheckInterface
-   *   The stock checkers.
+   *   The stock checker.
    */
   public function getStockChecker();
 
