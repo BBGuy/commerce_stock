@@ -1,8 +1,0 @@
-name: Stock Field
-type: module
-description: Reports the stock level
-package: Commerce (stock)
-# core: 8.x
-dependencies:
-  - commerce_product
-core: 8.x

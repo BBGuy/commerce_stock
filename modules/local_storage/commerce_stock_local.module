@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Implements hook_cron().
+ */
+function commerce_stock_local_cron() {
+  $next = \Drupal::state()->get('commerce_stock_local.update_level_next') ?: 0;
+  $interval = \Drupal::config('commerce_stock_local.cron')->get('update_interval');
+  if (REQUEST_TIME >= $next) {
+    _commerce_stock_local_update_stock_level_queue();
+    \Drupal::state()->set('commerce_stock_local.update_level_next', REQUEST_TIME + $interval);
+  }
+}
+
+/**
+ * Updates the stock level update queue.
+ *
+ * Adds purchasable entities from the latest unprocessed stock transactions
+ * to the queue worker responsible for totaling location stock levels.
+ */
+function _commerce_stock_local_update_stock_level_queue() {
+  $queue = \Drupal::queue('commerce_stock_local_stock_level_updater');
+
+  // Get the last processed product id.
+  $level_last_id = \Drupal::state()->get('commerce_stock_local.update_last_id');
+  $level_last_id = !empty($level_last_id) ? $level_last_id : 0;
+
+  // Check if Q empty and not initialized to 0.
+  if (($queue->numberOfItems() == 0) && ($level_last_id != 0)) {
+    // Set the Q reset state.
+    \Drupal::state()->set('commerce_stock_local.llq_reset', TRUE);
+    $llq_reset = TRUE;
+  }
+  else {
+    // Get the Q reset state.
+    $llq_reset = \Drupal::state()->get('commerce_stock_local.llq_reset');
+    $llq_reset = !empty($llq_reset) ? $llq_reset : FALSE;
+  }
+  // Get the batch size.
+  $llq_batchsize = \Drupal::state()->get('commerce_stock_local.llq_batchsize');
+  $llq_batchsize = !empty($llq_batchsize) ? $llq_batchsize : 50;
+
+  $result = \Drupal::entityQuery('commerce_product_variation')
+    ->condition('variation_id', $level_last_id, '>')
+    ->condition('status', 1, '=')
+    ->sort('variation_id', 'ASC')
+    ->range(0, $llq_batchsize)
+    ->execute();
+  foreach ($result as $pid) {
+    $queue->createItem($pid);
+  }
+  // Check if we can restrt processing products from the top.
+  if ($llq_reset && (count($result) < $llq_batchsize)) {
+    // Set reset to FALSE.
+    \Drupal::state()->set('commerce_stock_local.llq_reset', FALSE);
+    // Set last product id to 0.
+    \Drupal::state()->set('commerce_stock_local.update_last_id', 0);
+  }
+  else {
+    // Set the last product id for the Q bookmark.
+    if (!empty($result)) {
+      \Drupal::state()->set('commerce_stock_local.update_last_id', $pid);
+    }
+  }
+}

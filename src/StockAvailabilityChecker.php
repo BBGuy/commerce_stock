@@ -8,32 +8,36 @@ use Drupal\commerce\Context;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 
 /**
- * The Stock Availability checker declared by commerce core.
+ * The entry point for availability checking through Commerce Stock.
+ *
+ * Proxies requests to stock services configured for each entity.
+ *
+ * @package Drupal\commerce_stock
  */
 class StockAvailabilityChecker implements AvailabilityCheckerInterface {
 
   /**
-   * The stock manager service collector.
+   * The stock service manager.
    *
-   * @var \Drupal\commerce_stock\StockManagerInterface
+   * @var \Drupal\commerce_stock\StockServiceManagerInterface
    */
-  protected $stockManager;
+  protected $stockServiceManager;
 
   /**
    * Constructs a new StockAvailabilityChecker object.
    *
-   * @param \Drupal\commerce_stock\StockManagerInterface $stock_manager
-   *   The stock manager.
+   * @param \Drupal\commerce_stock\StockServiceManagerInterface $stock_service_manager
+   *   The stock service manager.
    */
-  public function __construct(StockManagerInterface $stock_manager) {
-    $this->stockManager = $stock_manager;
+  public function __construct(StockServiceManagerInterface $stock_service_manager) {
+    $this->stockServiceManager = $stock_service_manager;
   }
 
   /**
    * {@inheritdoc}
    */
   public function applies(PurchasableEntityInterface $entity) {
-    $stock_service = $this->stockManager->getService($entity);
+    $stock_service = $this->stockServiceManager->getService($entity);
     $stock_checker = $stock_service->getStockChecker();
 
     // Check if a purchasable entity is a product variation.
@@ -55,8 +59,11 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function check(PurchasableEntityInterface $entity, $quantity = 1, Context $context = NULL) {
-    $stock_service = $this->stockManager->getService($entity);
+  public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
+    if (empty($quantity)) {
+      $quantity = 1;
+    }
+    $stock_service = $this->stockServiceManager->getService($entity);
     $stock_checker = $stock_service->getStockChecker();
     $stock_config = $stock_service->getConfiguration();
 

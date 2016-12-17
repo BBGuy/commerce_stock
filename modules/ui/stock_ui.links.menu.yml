@@ -1,6 +1,0 @@
-stock_ui.stock_transactions:
-  title: 'Create a Stock transactions'
-  description: 'Create a commerce stock transactions'
-  parent: 'commerce.configuration'
-  route_name: stock_ui.stock_transactions1
-  menu_name: Stock Configuration

@@ -1,0 +1,5 @@
+commerce_stock_dev.stock_dev_tools:
+  title: Stock development tools
+  description: 'Tools for the development of Commerce Stock.'
+  parent: commerce.configuration
+  route_name: commerce_stock_dev.stock_dev_tools

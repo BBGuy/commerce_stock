@@ -1,0 +1,9 @@
+name: Commerce Stock Dev tools
+type: module
+description: Commerce Stock developer tools - For development only and will be removed at a later stage!!!!!
+core: 8.x
+package: 'Commerce Stock'
+dependencies:
+  - commerce_product
+  - commerce_stock
+  - commerce_store

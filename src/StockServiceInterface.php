@@ -36,7 +36,7 @@ interface StockServiceInterface {
   /**
    * Gets the stock Configuration.
    *
-   * @return \Drupal\commerce_stock\StockConfigurationInterface
+   * @return \Drupal\commerce_stock\StockServiceConfigInterface
    *   The stock Configuration.
    */
   public function getConfiguration();
