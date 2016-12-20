@@ -2,9 +2,6 @@
 
 namespace Drupal\commerce_stock;
 
-/**
- * The API class used by the always in stock service.
- */
 class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
   /**
@@ -26,7 +23,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIsInStock($variation_id, $locations) {
+  public function getIsInStock($variation_id, array $locations) {
     return TRUE;
   }
 

@@ -5,11 +5,6 @@ namespace Drupal\commerce_stock\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-/**
- * Class StockConfigForm.
- *
- * @package Drupal\commerce_stock\Form
- */
 class StockConfigForm extends ConfigFormBase {
 
   /**
@@ -17,7 +12,7 @@ class StockConfigForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'commerce_stock.manager',
+      'commerce_stock.service_manager',
     ];
   }
 
@@ -25,7 +20,7 @@ class StockConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'stock_config_form';
+    return 'commerce_stock_config_form';
   }
 
   /**
@@ -33,19 +28,19 @@ class StockConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Get the default service.
-    $config = $this->config('commerce_stock.manager');
+    $config = $this->config('commerce_stock.service_manager');
     $default_service_id = $config->get('default_service_id');
 
     // Get a list of available services from the stock manager.
-    $stock_manager = \Drupal::service('commerce.stock_manager');
-    $stock_services = $stock_manager->listServiceIds();
+    $stock_service_manager = \Drupal::service('commerce_stock.service_manager');
+    $stock_services = $stock_service_manager->listServiceIds();
 
-    $form['stock_manager'] = [
+    $form['service_manager'] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('Stock Manager'),
+      '#title' => $this->t('Stock Service Manager'),
     ];
 
-    $form['stock_manager']['default_service_id'] = [
+    $form['service_manager']['default_service_id'] = [
       '#type' => 'select',
       '#title' => $this->t('Default service'),
       '#options' => $stock_services,
@@ -67,7 +62,7 @@ class StockConfigForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
-    $this->config('commerce_stock.manager')
+    $this->config('commerce_stock.service_manager')
       ->set('default_service_id', $values['default_service_id'])
       ->save();
   }

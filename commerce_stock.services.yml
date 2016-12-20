@@ -1,16 +1,16 @@
 services:
-  commerce.availability_checker.stock_availability_checker:
+  commerce_stock.availability_checker:
     class: Drupal\commerce_stock\StockAvailabilityChecker
-    arguments: ['@commerce.stock_manager']
+    arguments: ['@commerce_stock.service_manager']
     tags:
-    - { name: commerce.availability_checker, priority: 0 }      
+      - { name: commerce.availability_checker, priority: 0 }
 
-  commerce.stock_manager:
-    class: Drupal\commerce_stock\StockManager
+  commerce_stock.service_manager:
+    class: Drupal\commerce_stock\StockServiceManager
     tags:
-      - { name: service_collector, tag: commerce.stock_service, call: addService }
-      
-  commerce.stock_manager.always_in_stock_service:
+      - { name: service_collector, tag: commerce_stock.stock_service, call: addService }
+
+  commerce_stock.always_in_stock_service:
     class: Drupal\commerce_stock\AlwaysInStockService
     tags:
-    - { name: commerce.stock_service, priority: 0 }          
+      - { name: commerce_stock.stock_service, priority: 0 }

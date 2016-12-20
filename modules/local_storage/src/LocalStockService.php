@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\commerce_stock;
+namespace Drupal\commerce_stock_local;
 
-/**
- * A stock service for always in stock products.
- */
-class AlwaysInStockService implements StockServiceInterface {
+use Drupal\commerce_stock\StockServiceInterface;
+use Drupal\commerce_stock\StockServiceConfig;
+
+class LocalStockService implements StockServiceInterface {
 
   /**
    * The stock checker.
@@ -22,51 +22,61 @@ class AlwaysInStockService implements StockServiceInterface {
   protected $stockUpdater;
 
   /**
-   * The stock service configuration.
+   * The stock configuration.
    *
    * @var \Drupal\commerce_stock\StockServiceConfigInterface
    */
   protected $stockServiceConfig;
 
   /**
-   * Constructs a new AlwaysInStockService object.
+   * Constructor for the service.
    */
   public function __construct() {
-    $this->stockChecker = new AlwaysInStock();
+    // Create the objects needed.
+    $this->stockChecker = new LocalStockStorage();
     $this->stockUpdater = $this->stockChecker;
     $this->stockServiceConfig = new StockServiceConfig($this->stockChecker);
   }
 
   /**
-   * {@inheritdoc}
+   * Get the name of the service.
    */
   public function getName() {
-    return 'Always in stock';
+    return 'Local stock';
   }
 
   /**
-   * {@inheritdoc}
+   * Get the ID of the service.
    */
   public function getId() {
-    return 'always_in_stock';
+    return 'local_stock';
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the stock checker.
+   *
+   * @return \Drupal\commerce_stock\StockCheckInterface
+   *   The stock checker.
    */
   public function getStockChecker() {
     return $this->stockChecker;
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the stock updater.
+   *
+   * @return \Drupal\commerce_stock\StockUpdateInterface
+   *   The stock updater.
    */
   public function getStockUpdater() {
     return $this->stockUpdater;
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the stock Configuration.
+   *
+   * @return \Drupal\commerce_stock\StockServiceConfigInterface
+   *   The stock Configuration.
    */
   public function getConfiguration() {
     return $this->stockServiceConfig;

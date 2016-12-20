@@ -1,6 +1,5 @@
-commerce_stock.stock:
-  title: 'Stock Configuration'
-  description: 'Configure Commerce Stock'
-  parent: 'commerce.configuration'  
-  route_name: commerce_stock.admin_settings
-  menu_name: Stock Configuration
+commerce_stock.stock_config:
+  title: 'Stock configuration'
+  description: 'Configure Commerce Stock settings.'
+  parent: 'commerce.configuration'
+  route_name: commerce_stock.stock_config

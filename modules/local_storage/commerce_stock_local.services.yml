@@ -1,0 +1,5 @@
+services:
+  commerce_stock.local_stock_service:
+    class: Drupal\commerce_stock_local\LocalStockService
+    tags:
+      - { name: commerce_stock.stock_service, priority: 0 }

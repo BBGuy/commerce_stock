@@ -1,0 +1,10 @@
+field.commerce_stock_level.value:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        value:
+          type: numeric
+          label: 'Value'

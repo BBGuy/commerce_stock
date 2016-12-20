@@ -1,7 +1,0 @@
-# Provides a simple user interface that tells the developer where to go.
-field_stock.description:
-  path: 'stock/field-stock'
-  defaults:
-    _controller: '\Drupal\field_stock\Controller\FieldStockController::description'
-  requirements:
-    _permission: 'access content'
