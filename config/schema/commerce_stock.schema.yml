@@ -1,0 +1,6 @@
+commerce_stock.service_manager:
+  type: config_object
+  mapping:
+    default_service_id:
+      type: string
+      label: 'Default service ID'
