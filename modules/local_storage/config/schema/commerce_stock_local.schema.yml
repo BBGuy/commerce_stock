@@ -1,5 +1,5 @@
 commerce_stock_local.cron:
- type: mapping
+ type: config_object
  label: 'Commerce Stock Local Cron'
  mapping:
    update_interval:
