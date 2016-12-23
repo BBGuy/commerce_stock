@@ -29,7 +29,7 @@ interface StockServiceManagerInterface {
    * Returns an array of all registered stock services.
    *
    * @return \Drupal\commerce_stock\StockServiceInterface[]
-   *   All registered stock services.
+   *   All registered stock services keyed by service ID.
    */
   public function listServices();
 
