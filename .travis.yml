@@ -97,8 +97,6 @@ mysql:
   encoding: utf8
 
 before_install:
-  # Remove xdebug. We aren't generating code coverage, and it slows down Composer.
-  - phpenv config-rm xdebug.ini || true
   - composer self-update
   - composer config repositories.drupal composer https://packagist.drupal-composer.org
   - composer global require "hirak/prestissimo:^0.3"
