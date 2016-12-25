@@ -4,6 +4,7 @@ namespace Drupal\Tests\commerce_stock\Unit;
 
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\Tests\UnitTestCase;
+use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\commerce_stock\StockServiceManager
@@ -23,7 +24,9 @@ class StockServiceManagerTest extends UnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $this->stockServiceManager = new StockServiceManager();
+
+    $configFactory = $this->prophesize('\Drupal\Core\Config\ConfigFactory');
+    $this->stockServiceManager = new StockServiceManager($configFactory->reveal());
   }
 
   /**

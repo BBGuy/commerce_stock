@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * The stock service manager, responsible for handling services and transactions.
@@ -21,6 +22,23 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   protected $stockServices = [];
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Constructs a StockServiceManager object.
+   *
+   * @param ConfigFactoryInterface $config_factory
+   *    The config factory.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory) {
+    $this->configFactory = $config_factory;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function addService(StockServiceInterface $stock_service) {
@@ -31,12 +49,13 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * {@inheritdoc}
    */
   public function getService(PurchasableEntityInterface $entity) {
-    $config = \Drupal::config('commerce_stock.service_manager');
-    $default_service_id = $config->get('default_service_id');
+    $default_service_id = $this->configFactory->get('commerce_stock.service_manager')->get('default_service_id');
+
     $entity_type = $entity->getEntityType()->id();
     $entity_bundle = $entity->bundle();
     $entity_config_key = $entity_type . '_' . $entity_bundle . '_service_id';
-    $entity_service_id = $config->get($entity_config_key);
+    $entity_service_id = $this->configFactory->get('commerce_stock.service_manager')->get($entity_config_key);
+
     $service_id = $entity_service_id ?: $default_service_id;
 
     return $this->stockServices[$service_id];
