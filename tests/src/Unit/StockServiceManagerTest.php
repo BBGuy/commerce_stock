@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce_stock\Unit;
 
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\Tests\UnitTestCase;
-use Prophecy\Argument;
+
 
 /**
  * @coversDefaultClass \Drupal\commerce_stock\StockServiceManager
