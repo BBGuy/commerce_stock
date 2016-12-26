@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_stock\Unit;
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\Tests\UnitTestCase;
 
-
 /**
  * @coversDefaultClass \Drupal\commerce_stock\StockServiceManager
  * @group commerce_stock
