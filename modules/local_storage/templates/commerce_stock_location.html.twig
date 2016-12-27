@@ -1,0 +1,22 @@
+{#
+/**
+ * @file commerce_stock_location.html.twig
+ * Default theme implementation to present Stock Location data.
+ *
+ * This template is used when viewing Stock Location pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_commerce_stock_location()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('commerce_stock_location') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

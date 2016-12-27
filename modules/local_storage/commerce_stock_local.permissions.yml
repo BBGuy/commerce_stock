@@ -1,0 +1,7 @@
+administer commerce stock location entities:
+  title: 'Administer stock location entities'
+  description: 'Allow to access the administration form to configure stock location entities.'
+  restrict access: true
+
+view stock location entities:
+  title: 'View stock location entities'

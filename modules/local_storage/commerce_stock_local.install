@@ -1,11 +1,19 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements hook_schema().
+ */use Drupal\commerce_stock_local\Entity\CommerceStockLocation;
+
+/**
+ * Schema definition.
  */
 function commerce_stock_local_schema() {
 
-  $schema['commerce_stock_location'] = [
+  $schema['commerce_stock_location_custom'] = [
     'description' => 'Commerce stock locations',
     'fields' => [
       'id' => [
@@ -151,7 +159,7 @@ function commerce_stock_local_schema() {
     'primary key' => ['id'],
     'foreign keys' => [
       'location' => [
-        'table' => 'commerce_stock_location',
+        'table' => 'commerce_stock_location_custom',
         'columns' => [
           'location_id' => 'location_id',
         ],
@@ -217,7 +225,7 @@ function commerce_stock_local_schema() {
     'primary key' => ['location_id', 'entity_id'],
     'foreign keys' => [
       'location' => [
-        'table' => 'commerce_stock_location',
+        'table' => 'commerce_stock_location_custom',
         'columns' => [
           'location_id' => 'location_id',
         ],
@@ -234,7 +242,7 @@ function commerce_stock_local_schema() {
 function commerce_stock_local_install() {
   $db = \Drupal::database();
   // Add primary stock location.
-  $db->insert('commerce_stock_location')
+  $db->insert('commerce_stock_location_custom')
     ->fields([
       'name' => 'Main',
       'status' => 1,
@@ -292,4 +300,12 @@ function commerce_stock_local_install() {
       'parent_id' => 1,
     ])
     ->execute();
+
+  $defaultStockLocation = CommerceStockLocation::create(array(
+    'name' => 'Main',
+    'status' => TRUE,
+    'type' => "default",
+  ));
+  $defaultStockLocation->save();
+
 }

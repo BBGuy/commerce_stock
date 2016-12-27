@@ -15,26 +15,26 @@ function commerce_stock_local_views_data() {
   // Stock Location
   // The outermost keys of $data are Views table names, which should usually
   // be the same as the hook_schema() table names.
-  $data['commerce_stock_location'] = [];
+  $data['commerce_stock_location_custom'] = [];
 
-  $data['commerce_stock_location']['table'] = [];
+  $data['commerce_stock_location_custom']['table'] = [];
 
   // Within 'table', the value of 'group' (translated string) is used as a
   // prefix in Views UI for this table's fields, filters, etc. When adding
   // a field, filter, etc. you can also filter by the group.
-  $data['commerce_stock_location']['table']['group'] = t('Commerce Stock Local');
+  $data['commerce_stock_location_custom']['table']['group'] = t('Commerce Stock Local');
 
   // Within 'table', the value of 'provider' is the module that provides schema
   // or the entity type that causes the table to exist. Setting this ensures
   // that views have the correct dependencies. This is automatically set to the
   // module that implements hook_views_data().
-  $data['commerce_stock_location']['table']['provider'] = 'commerce_stock_local';
+  $data['commerce_stock_location_custom']['table']['provider'] = 'commerce_stock_local';
 
   // Some tables are "base" tables, meaning that they can be the base tables
   // for views. Non-base tables can only be brought in via relationships in
   // views based on other tables. To define a table to be a base table, add
   // key 'base' to the 'table' array:
-  $data['commerce_stock_location']['table']['base'] = [
+  $data['commerce_stock_location_custom']['table']['base'] = [
     // Identifier (primary) field in this table for Views.
     'field' => 'location_id',
     // Label in the UI.
@@ -45,7 +45,7 @@ function commerce_stock_local_views_data() {
   ];
 
   // Fields.
-  $data['commerce_stock_location']['id'] = [
+  $data['commerce_stock_location_custom']['id'] = [
     'title' => t('Location ID'),
     'help' => t('The location ID.'),
     'field' => [
@@ -61,7 +61,7 @@ function commerce_stock_local_views_data() {
       'id' => 'standard',
     ],
   ];
-  $data['commerce_stock_location']['name'] = [
+  $data['commerce_stock_location_custom']['name'] = [
     'title' => t('Name'),
     'help' => t('The location name.'),
     'field' => [
@@ -78,7 +78,7 @@ function commerce_stock_local_views_data() {
     ],
   ];
 
-  $data['commerce_stock_location']['status'] = [
+  $data['commerce_stock_location_custom']['status'] = [
     'title' => t('Status'),
     'help' => t('Location active flag.'),
     'field' => [
@@ -171,7 +171,7 @@ function commerce_stock_local_views_data() {
       'id' => 'standard',
     ],
     'relationship' => [
-      'base' => 'commerce_stock_location',
+      'base' => 'commerce_stock_location_custom',
       'base field' => 'location_id',
       'id' => 'standard',
       'label' => t('Stock Location'),

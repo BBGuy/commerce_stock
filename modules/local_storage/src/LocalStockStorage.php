@@ -250,7 +250,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    */
   public function getLocationList($return_active_only = TRUE) {
     $db = \Drupal::database();
-    $query = $db->select('commerce_stock_location', 'loc')
+    $query = $db->select('commerce_stock_location_custom', 'loc')
       ->fields('loc');
     if ($return_active_only) {
       $query->condition('status', 1);

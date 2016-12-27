@@ -1,7 +1,15 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements hook_cron().
+ */
+
+/**
+ * Implements hook_cron.
  */
 function commerce_stock_local_cron() {
   $next = \Drupal::state()->get('commerce_stock_local.update_level_next') ?: 0;
@@ -62,4 +70,29 @@ function _commerce_stock_local_update_stock_level_queue() {
       \Drupal::state()->set('commerce_stock_local.update_last_id', $pid);
     }
   }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_stock_local_theme() {
+  $theme = [];
+  $theme['commerce_stock_location_custom'] = array(
+    'render element' => 'elements',
+    'file' => 'commerce_stock_location.page.inc',
+    'template' => 'commerce_stock_location',
+  );
+  $theme['commerce_stock_location_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'commerce_stock_location.page.inc',
+  ];
+  return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function commerce_stock_local_theme_suggestions_commerce_stock_location(array $variables) {
+  return _commerce_entity_theme_suggestions('commerce_stock_location', $variables);
 }
