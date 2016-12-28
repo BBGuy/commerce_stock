@@ -23,13 +23,6 @@ use Drupal\Core\TypedData\TypedDataInterface;
 class StockLevel extends FieldItemBase {
 
   /**
-   * The purchasable entity storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $entityStorage;
-
-  /**
    * The stock service manager.
    *
    * @var \Drupal\commerce_stock\StockServiceManager
@@ -41,8 +34,6 @@ class StockLevel extends FieldItemBase {
    */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
-
-    $this->entityStorage = \Drupal::service('entity_type.manager')->getStorage($this->getEntity()->getEntityType());
     $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
   }
 
@@ -108,7 +99,7 @@ class StockLevel extends FieldItemBase {
 
     $entity_id = $values['stock']['stocked_entity_id'];
     if (!empty($entity_id)) {
-      $purchasable_entity = $this->entityStorage->load($entity_id);
+      $purchasable_entity = $this->getEntity()->load($entity_id);
       $transaction_qty = 0;
       switch ($values['stock']['entry_system']) {
         case 'simple':
