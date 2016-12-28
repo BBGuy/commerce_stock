@@ -9,7 +9,7 @@
  */
 
 /**
- * Implements hook_cron.
+ * Implements hook_cron().
  */
 function commerce_stock_local_cron() {
   $next = \Drupal::state()->get('commerce_stock_local.update_level_next') ?: 0;
