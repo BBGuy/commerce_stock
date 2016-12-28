@@ -7,52 +7,50 @@ interface StockCheckInterface {
   /**
    * Gets the stock level.
    *
-   * @param int $variation_id
-   *   The product variation ID.
+   * @param int $entity_id
+   *   The purchasable entity ID.
    * @param array $locations
    *   Array of locations.
    *
    * @return int
    *   The stock level.
    */
-  public function getTotalStockLevel($variation_id, array $locations);
+  public function getTotalStockLevel($entity_id, array $locations);
 
   /**
-   * Check if product is in stock.
+   * Check if purchasable entity is in stock.
    *
-   * @param int $variation_id
-   *   The product variation ID.
+   * @param int $entity_id
+   *   The purchasable entity ID.
    * @param array $locations
    *   Array of locations.
    *
    * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   *   TRUE if the entity is in stock, FALSE otherwise.
    */
-  public function getIsInStock($variation_id, array $locations);
+  public function getIsInStock($entity_id, array $locations);
 
   /**
-   * Check if product is always in stock.
+   * Check if purchasable entity is always in stock.
    *
-   * @param int $variation_id
-   *   The product variation ID.
+   * @param int $entity_id
+   *   The purchasable entity ID.
    *
    * @return bool
-   *    TRUE if the product is in stock, FALSE otherwise.
+   *    TRUE if the entity is in stock, FALSE otherwise.
    */
-  public function getIsAlwaysInStock($variation_id);
+  public function getIsAlwaysInStock($entity_id);
 
   /**
-   * Check if product is managed by stock.
+   * Check if purchasable entity is managed by stock.
    *
-   * @todo - not sure if this is needed - not used at this point!!!
-   *
-   * @param int $variation_id
-   *   The product variation ID.
+   * @param int $entity_id
+   *   The purchasable entity ID.
    *
    * @return bool
-   *   TRUE if the product is in stock, FALSE otherwise.
+   *   TRUE if the entity is in stock, FALSE otherwise.
    */
-  public function getIsStockManaged($variation_id);
+  public function getIsStockManaged($entity_id);
 
   /**
    * Get list of locations.
