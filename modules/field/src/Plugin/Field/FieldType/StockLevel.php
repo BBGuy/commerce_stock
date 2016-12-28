@@ -23,11 +23,11 @@ use Drupal\Core\TypedData\TypedDataInterface;
 class StockLevel extends FieldItemBase {
 
   /**
-   * The product variation storage.
+   * The purchasable entity storage.
    *
-   * @var \Drupal\commerce_product\ProductVariationStorage
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $variationStorage;
+  protected $entityStorage;
 
   /**
    * The stock service manager.
@@ -42,7 +42,7 @@ class StockLevel extends FieldItemBase {
   public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
 
-    $this->variationStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
+    $this->entityStorage = \Drupal::service('entity_type.manager')->getStorage($this->getEntity()->getEntityType());
     $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
   }
 
@@ -106,14 +106,14 @@ class StockLevel extends FieldItemBase {
     }
     $called = TRUE;
 
-    $variation_id = $values['stock']['stocked_variation_id'];
-    if (!empty($variation_id)) {
-      $product_variation = $this->variationStorage->load($variation_id);
+    $entity_id = $values['stock']['stocked_entity_id'];
+    if (!empty($entity_id)) {
+      $purchasable_entity = $this->entityStorage->load($entity_id);
       $transaction_qty = 0;
       switch ($values['stock']['entry_system']) {
         case 'simple':
           $new_level = $values['stock']['value'];
-          $level = $this->stockServiceManager->getStockLevel($product_variation);
+          $level = $this->stockServiceManager->getStockLevel($purchasable_entity);
           $transaction_qty = $new_level - $level;
           break;
 
@@ -124,13 +124,13 @@ class StockLevel extends FieldItemBase {
       if ($transaction_qty) {
         $transaction_type = ($transaction_qty > 0) ? TRANSACTION_TYPE_STOCK_IN : TRANSACTION_TYPE_STOCK_OUT;
         // @todo Add zone and location to form.
-        $location_id = $this->stockServiceManager->getPrimaryTransactionLocation($product_variation, $transaction_qty);
+        $location_id = $this->stockServiceManager->getPrimaryTransactionLocation($purchasable_entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;
         $transaction_note = $values['stock']['stock_transaction_note'];
         $metadata = ['data' => ['message' => $transaction_note]];
-        $this->stockServiceManager->createTransaction($product_variation, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+        $this->stockServiceManager->createTransaction($purchasable_entity, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
       }
     }
   }
