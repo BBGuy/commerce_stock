@@ -67,7 +67,7 @@ env:
     - DRUPAL_TI_BEHAT_BROWSER="firefox"
 
     # PHPUnit specific commandline arguments.
-    - DRUPAL_TI_PHPUNIT_ARGS="--coverage-clover $DRUPAL_TI_COVERAGE_FILE"
+    - DRUPAL_TI_PHPUNIT_ARGS="--coverage-html ./report"
     # Specifying the phpunit-core src/ directory is useful when e.g. a vendor/
     # directory is present in the module directory, which phpunit would then
     # try to find tests in. This option is relative to $TRAVIS_BUILD_DIR.
@@ -113,7 +113,6 @@ install:
   - tar -xvf $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C $PWD/travis-phantomjs
   - export PATH=$PWD/travis-phantomjs:$PATH
   - phantomjs --version
-  - composer require --no-interaction --dev $DRUPAL_TI_COVERAGE
 
 before_script:
   - drupal-ti --include ".travis-before-script.sh"
@@ -126,7 +125,6 @@ script:
   - drupal-ti script
 
 after_script:
-  - ./vendor/bin/coveralls -v
   - drupal-ti after_script
 
 notifications:
