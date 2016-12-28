@@ -98,7 +98,7 @@ mysql:
 
 before_install:
   - composer self-update
-  - composer config repositories.drupal composer https://packages.drupal.org/8
+  - composer config repositories.drupal composer https://packagist.drupal-composer.org
   - composer global require "hirak/prestissimo:^0.3"
   - composer global require "lionsad/drupal_ti:dev-master"
   - composer global require "squizlabs/php_codesniffer:2.*"
