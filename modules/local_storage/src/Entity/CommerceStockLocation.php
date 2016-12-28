@@ -2,12 +2,9 @@
 
 namespace Drupal\commerce_stock_local\Entity;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the stock location entity.
@@ -48,7 +45,6 @@ use Drupal\user\UserInterface;
  *     "bundle" = "type",
  *     "label" = "name",
  *     "uuid" = "uuid",
- *     "uid" = "uid",
  *     "langcode" = "langcode",
  *     "status" = "status",
  *   },
@@ -65,18 +61,6 @@ use Drupal\user\UserInterface;
  * )
  */
 class CommerceStockLocation extends ContentEntityBase implements CommerceStockLocationInterface {
-
-  use EntityChangedTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += array(
-      'uid' => \Drupal::currentUser()->id(),
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -103,51 +87,6 @@ class CommerceStockLocation extends ContentEntityBase implements CommerceStockLo
   /**
    * {@inheritdoc}
    */
-  public function getCreatedTime() {
-    return $this->get('created')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('uid')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('uid')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('uid', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('uid', $account->id());
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function isActive() {
     return (bool) $this->getEntityKey('status');
   }
@@ -165,31 +104,6 @@ class CommerceStockLocation extends ContentEntityBase implements CommerceStockLo
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
-
-    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of author of the stock location entity.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => array(
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ),
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
@@ -215,14 +129,6 @@ class CommerceStockLocation extends ContentEntityBase implements CommerceStockLo
       ->setLabel(t('Publishing status'))
       ->setDescription(t('A boolean indicating whether the stock location is published.'))
       ->setDefaultValue(TRUE);
-
-    $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'));
-
-    $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the entity was last edited.'));
 
     return $fields;
   }

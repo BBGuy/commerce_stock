@@ -3,15 +3,13 @@
 namespace Drupal\commerce_stock_local\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface for defining stock location entities.
  *
  * @ingroup commerce_stock_local
  */
-interface CommerceStockLocationInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
+interface CommerceStockLocationInterface extends ContentEntityInterface {
 
   /**
    * Gets the stock location type.
