@@ -35,15 +35,15 @@ class StockServiceConfig implements StockServiceConfigInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLocationList($variation_id) {
+  public function getLocationList($entity_id) {
     return $this->stockLocations;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPrimaryTransactionLocation($variation_id, $quantity) {
-    $locations = $this->getLocationList($variation_id);
+  public function getPrimaryTransactionLocation($entity_id, $quantity) {
+    $locations = $this->getLocationList($entity_id);
     // @todo - we need a better way of managing this.
     return array_shift($locations);
   }
