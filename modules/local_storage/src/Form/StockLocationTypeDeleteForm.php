@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 /**
  * Builds the form to delete stock location type entities.
  */
-class CommerceStockLocationTypeDeleteForm extends EntityConfirmFormBase {
+class StockLocationTypeDeleteForm extends EntityConfirmFormBase {
 
   /**
    * {@inheritdoc}

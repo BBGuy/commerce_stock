@@ -11,11 +11,11 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   id = "commerce_stock_location_type",
  *   label = @Translation("Stock location type"),
  *   handlers = {
- *     "list_builder" = "Drupal\commerce_stock_local\CommerceStockLocationTypeListBuilder",
+ *     "list_builder" = "Drupal\commerce_stock_local\StockLocationTypeListBuilder",
  *     "form" = {
- *       "add" = "Drupal\commerce_stock_local\Form\CommerceStockLocationTypeForm",
- *       "edit" = "Drupal\commerce_stock_local\Form\CommerceStockLocationTypeForm",
- *       "delete" = "Drupal\commerce_stock_local\Form\CommerceStockLocationTypeDeleteForm"
+ *       "add" = "Drupal\commerce_stock_local\Form\StockLocationTypeForm",
+ *       "edit" = "Drupal\commerce_stock_local\Form\StockLocationTypeForm",
+ *       "delete" = "Drupal\commerce_stock_local\Form\StockLocationTypeDeleteForm"
  *     },
  *     "route_provider" = {
  *        "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
@@ -39,7 +39,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   }
  * )
  */
-class CommerceStockLocationType extends ConfigEntityBundleBase implements CommerceStockLocationTypeInterface {
+class StockLocationType extends ConfigEntityBundleBase implements StockLocationTypeInterface {
 
   /**
    * The stock location type ID.

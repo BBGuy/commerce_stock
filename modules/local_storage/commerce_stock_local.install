@@ -6,7 +6,7 @@
 
 /**
  * Implements hook_schema().
- */use Drupal\commerce_stock_local\Entity\CommerceStockLocation;
+ */use Drupal\commerce_stock_local\Entity\StockLocation;
 
 /**
  * Schema definition.
@@ -301,7 +301,7 @@ function commerce_stock_local_install() {
     ])
     ->execute();
 
-  $defaultStockLocation = CommerceStockLocation::create(array(
+  $defaultStockLocation = StockLocation::create(array(
     'name' => 'Main',
     'status' => TRUE,
     'type' => "default",

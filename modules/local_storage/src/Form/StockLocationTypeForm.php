@@ -6,11 +6,11 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class CommerceStockLocationTypeForm.
+ * Class StockLocationTypeForm.
  *
  * @package Drupal\commerce_stock_local\Form
  */
-class CommerceStockLocationTypeForm extends EntityForm {
+class StockLocationTypeForm extends EntityForm {
 
   /**
    * {@inheritdoc}
@@ -32,7 +32,7 @@ class CommerceStockLocationTypeForm extends EntityForm {
       '#type' => 'machine_name',
       '#default_value' => $commerce_stock_location_type->id(),
       '#machine_name' => [
-        'exists' => '\Drupal\commerce_stock_local\Entity\CommerceStockLocationType::load',
+        'exists' => '\Drupal\commerce_stock_local\Entity\StockLocationType::load',
       ],
       '#disabled' => !$commerce_stock_location_type->isNew(),
     ];

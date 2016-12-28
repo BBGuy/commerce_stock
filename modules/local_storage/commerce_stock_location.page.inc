@@ -20,7 +20,7 @@ use Drupal\Core\Render\Element;
  *   - attributes: HTML attributes for the containing element.
  */
 function template_preprocess_commerce_stock_location(array &$variables) {
-  // Fetch CommerceStockLocation Entity Object.
+  // Fetch StockLocation Entity Object.
   $commerce_stock_location = $variables['elements']['#commerce_stock_location'];
 
   // Helpful $content variable for templates.

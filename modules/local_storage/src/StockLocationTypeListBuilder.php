@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Provides a listing of Stock Location type entities.
  */
-class CommerceStockLocationTypeListBuilder extends ConfigEntityListBuilder {
+class StockLocationTypeListBuilder extends ConfigEntityListBuilder {
 
   /**
    * {@inheritdoc}

@@ -10,13 +10,13 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @ingroup commerce_stock_local
  */
-class CommerceStockLocationForm extends ContentEntityForm {
+class StockLocationForm extends ContentEntityForm {
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\commerce_stock_local\Entity\CommerceStockLocation */
+    /* @var $entity \Drupal\commerce_stock_local\Entity\StockLocation */
     $form = parent::buildForm($form, $form_state);
 
     $entity = $this->entity;

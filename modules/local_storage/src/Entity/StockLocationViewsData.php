@@ -7,7 +7,7 @@ use Drupal\views\EntityViewsData;
 /**
  * Provides Views data for Stock Location entities.
  */
-class CommerceStockLocationViewsData extends EntityViewsData {
+class StockLocationViewsData extends EntityViewsData {
 
   /**
    * {@inheritdoc}

@@ -2,17 +2,17 @@
 
 namespace Drupal\Tests\commerce_product_local\Kernel\Entity;
 
-use Drupal\commerce_stock_local\Entity\CommerceStockLocation;
+use Drupal\commerce_stock_local\Entity\StockLocation;
 use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 
 /**
- * Test the CommerceStockLocation entity.
+ * Test the StockLocation entity.
  *
- * @coversDefaultClass \Drupal\commerce_stock_local\Entity\CommerceStockLocation
+ * @coversDefaultClass \Drupal\commerce_stock_local\Entity\StockLocation
  *
  * @group commerce_stock
  */
-class CommerceStockLocationTest extends CommerceStockKernelTestBase {
+class StockLocationTest extends CommerceStockKernelTestBase {
 
   /**
    * A sample user.
@@ -42,9 +42,9 @@ class CommerceStockLocationTest extends CommerceStockKernelTestBase {
    * @covers ::isActive
    * @covers ::setActive
    */
-  public function testCommerceStockLocation() {
+  public function testStockLocation() {
 
-    $location = CommerceStockLocation::create([
+    $location = StockLocation::create([
       'type' => 'default',
     ]);
     $location->setName('TestName');
@@ -64,7 +64,7 @@ class CommerceStockLocationTest extends CommerceStockKernelTestBase {
 
     // Create 200 locations. Set each second on inactive.
     for ($i = 0; $i < 200; $i++) {
-      $location = CommerceStockLocation::create([
+      $location = StockLocation::create([
         'type' => 'default',
         'name' => 'TestName_' . $i,
       ]);
@@ -82,7 +82,7 @@ class CommerceStockLocationTest extends CommerceStockKernelTestBase {
       $activeLocations = $query->condition('status', 1)
         ->execute();
       $location_info = [];
-      $locations = CommerceStockLocation::loadMultiple($activeLocations);
+      $locations = StockLocation::loadMultiple($activeLocations);
       $loadend = microtime();
 
       $start = microtime();

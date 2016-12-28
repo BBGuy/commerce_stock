@@ -10,15 +10,15 @@ use Drupal\Core\Access\AccessResult;
 /**
  * Access controller for the stock location entity.
  *
- * @see \Drupal\commerce_stock_local\Entity\CommerceStockLocation.
+ * @see \Drupal\commerce_stock_local\Entity\StockLocation.
  */
-class CommerceStockLocationAccessControlHandler extends EntityAccessControlHandler {
+class StockLocationAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\commerce_stock_local\Entity\CommerceStockLocationInterface $entity */
+    /** @var \Drupal\commerce_stock_local\Entity\StockLocationInterface $entity */
     switch ($operation) {
       case 'view':
         if (!$entity->isActive()) {

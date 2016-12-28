@@ -12,7 +12,7 @@ use Drupal\Core\Url;
  *
  * @ingroup commerce_stock_local
  */
-class CommerceStockLocationListBuilder extends EntityListBuilder {
+class StockLocationListBuilder extends EntityListBuilder {
 
   use LinkGeneratorTrait;
 
@@ -29,7 +29,7 @@ class CommerceStockLocationListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\commerce_stock_local\Entity\CommerceStockLocation */
+    /* @var $entity \Drupal\commerce_stock_local\Entity\StockLocation */
     $row['id'] = $entity->id();
     $row['name'] = $this->l(
       $entity->label(),

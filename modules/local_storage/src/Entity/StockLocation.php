@@ -22,14 +22,14 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   bundle_label = @Translation("Stock location type"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "list_builder" = "Drupal\commerce_stock_local\CommerceStockLocationListBuilder",
- *     "views_data" = "Drupal\commerce_stock_local\Entity\CommerceStockLocationViewsData",
- *     "translation" = "Drupal\commerce_stock_local\CommerceStockLocationTranslationHandler",
+ *     "list_builder" = "Drupal\commerce_stock_local\StockLocationListBuilder",
+ *     "views_data" = "Drupal\commerce_stock_local\Entity\StockLocationViewsData",
+ *     "translation" = "Drupal\commerce_stock_local\StockLocationTranslationHandler",
  *     "form" = {
- *       "default" = "Drupal\commerce_stock_local\Form\CommerceStockLocationForm",
- *       "add" = "Drupal\commerce_stock_local\Form\CommerceStockLocationForm",
- *       "edit" = "Drupal\commerce_stock_local\Form\CommerceStockLocationForm",
- *       "delete" = "Drupal\commerce_stock_local\Form\CommerceStockLocationDeleteForm",
+ *       "default" = "Drupal\commerce_stock_local\Form\StockLocationForm",
+ *       "add" = "Drupal\commerce_stock_local\Form\StockLocationForm",
+ *       "edit" = "Drupal\commerce_stock_local\Form\StockLocationForm",
+ *       "delete" = "Drupal\commerce_stock_local\Form\StockLocationDeleteForm",
  *     },
  *     "route_provider" = {
  *        "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
@@ -60,7 +60,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   field_ui_base_route = "entity.commerce_stock_location_type.edit_form"
  * )
  */
-class CommerceStockLocation extends ContentEntityBase implements CommerceStockLocationInterface {
+class StockLocation extends ContentEntityBase implements StockLocationInterface {
 
   /**
    * {@inheritdoc}

@@ -9,7 +9,7 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
  *
  * @ingroup commerce_stock_local
  */
-class CommerceStockLocationDeleteForm extends ContentEntityDeleteForm {
+class StockLocationDeleteForm extends ContentEntityDeleteForm {
 
 
 }

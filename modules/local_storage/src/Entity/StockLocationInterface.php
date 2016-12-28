@@ -9,7 +9,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
  *
  * @ingroup commerce_stock_local
  */
-interface CommerceStockLocationInterface extends ContentEntityInterface {
+interface StockLocationInterface extends ContentEntityInterface {
 
   /**
    * Gets the stock location type.
@@ -33,7 +33,7 @@ interface CommerceStockLocationInterface extends ContentEntityInterface {
    * @param string $name
    *   The stock location name.
    *
-   * @return \Drupal\commerce_stock_local\Entity\CommerceStockLocationInterface
+   * @return \Drupal\commerce_stock_local\Entity\StockLocationInterface
    *   The called stock location entity.
    */
   public function setName($name);
@@ -54,7 +54,7 @@ interface CommerceStockLocationInterface extends ContentEntityInterface {
    * @param bool $active
    *   TRUE to set this stock location to active, FALSE to set it to inactive.
    *
-   * @return \Drupal\commerce_stock_local\Entity\CommerceStockLocationInterface
+   * @return \Drupal\commerce_stock_local\Entity\StockLocationInterface
    *   The called stock location entity.
    */
   public function setActive($active);

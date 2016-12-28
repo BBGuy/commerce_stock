@@ -7,7 +7,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 /**
  * Provides an interface for defining Stock Location type entities.
  */
-interface CommerceStockLocationTypeInterface extends ConfigEntityInterface {
+interface StockLocationTypeInterface extends ConfigEntityInterface {
 
   // Add get/set methods for your configuration properties here.
 }

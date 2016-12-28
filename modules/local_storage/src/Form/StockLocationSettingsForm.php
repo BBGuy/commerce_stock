@@ -6,13 +6,13 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class CommerceStockLocationSettingsForm.
+ * Class StockLocationSettingsForm.
  *
  * @package Drupal\commerce_stock_local\Form
  *
  * @ingroup commerce_stock_local
  */
-class CommerceStockLocationSettingsForm extends FormBase {
+class StockLocationSettingsForm extends FormBase {
 
   /**
    * Returns a unique string identifying the form.
@@ -21,7 +21,7 @@ class CommerceStockLocationSettingsForm extends FormBase {
    *   The unique string identifying the form.
    */
   public function getFormId() {
-    return 'CommerceStockLocation_settings';
+    return 'StockLocation_settings';
   }
 
   /**
@@ -48,7 +48,7 @@ class CommerceStockLocationSettingsForm extends FormBase {
    *   Form definition array.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['CommerceStockLocation_settings']['#markup'] = 'Settings form for stock location entities. Manage field settings here.';
+    $form['StockLocation_settings']['#markup'] = 'Settings form for stock location entities. Manage field settings here.';
     return $form;
   }
 
