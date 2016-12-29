@@ -49,12 +49,14 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * {@inheritdoc}
    */
   public function getService(PurchasableEntityInterface $entity) {
-    $default_service_id = $this->configFactory->get('commerce_stock.service_manager')->get('default_service_id');
+    $config = $this->configFactory->get('commerce_stock.service_manager');
+
+    $default_service_id = $config->get('default_service_id');
 
     $entity_type = $entity->getEntityType()->id();
     $entity_bundle = $entity->bundle();
     $entity_config_key = $entity_type . '_' . $entity_bundle . '_service_id';
-    $entity_service_id = $this->configFactory->get('commerce_stock.service_manager')->get($entity_config_key);
+    $entity_service_id = $config->get($entity_config_key);
 
     $service_id = $entity_service_id ?: $default_service_id;
 
