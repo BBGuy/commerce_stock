@@ -12,6 +12,8 @@ use Drupal\Core\Queue\QueueWorkerBase;
  *   title = @Translation("Commerce Stock Local stock level updater"),
  *   cron = {"time" = 10}
  * )
+ *
+ * @ToDo Inject the config factory instead of calling \Drupal::
  */
 class StockLevelUpdater extends QueueWorkerBase {
 
@@ -19,11 +21,11 @@ class StockLevelUpdater extends QueueWorkerBase {
    * {@inheritdoc}
    */
   public function processItem($data) {
-    $variation_id = $data;
+    $entity_id = $data;
     $updater = \Drupal::service('commerce_stock.local_stock_service')->getStockUpdater();
     $locations = $updater->getLocationList(TRUE);
     foreach ($locations as $location_id => $location) {
-      $updater->updateLocationStockLevel($location_id, $variation_id);
+      $updater->updateLocationStockLevel($location_id, $entity_id);
     }
   }
 
