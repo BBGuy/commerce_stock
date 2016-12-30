@@ -2,9 +2,17 @@
 
 namespace Drupal\commerce_stock_local;
 
+use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockServiceInterface;
 use Drupal\commerce_stock\StockServiceConfig;
+use Drupal\commerce_stock\StockUpdateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Class LocalStockService
+ *
+ * @package Drupal\commerce_stock_local
+ */
 class LocalStockService implements StockServiceInterface {
 
   /**
@@ -29,13 +37,30 @@ class LocalStockService implements StockServiceInterface {
   protected $stockServiceConfig;
 
   /**
-   * Constructor for the service.
+   * LocalStockService constructor.
+   *
+   * @param StockCheckInterface $stock_checker
+   *   The stock checker.
+   * @param StockUpdateInterface $stock_updater
+   *    The stock updater.
    */
-  public function __construct() {
+  public function __construct(StockCheckInterface $stock_checker, StockUpdateInterface $stock_updater) {
     // Create the objects needed.
-    $this->stockChecker = new LocalStockStorage();
-    $this->stockUpdater = $this->stockChecker;
+    $this->stockChecker = $stock_checker;
+    $this->stockUpdater = $stock_updater;
     $this->stockServiceConfig = new StockServiceConfig($this->stockChecker);
+  }
+
+  /**
+   * @param ContainerInterface $container
+   *
+   * @return static
+   */
+  public static function create(ContainerInterface $container){
+    return new static(
+     $container->get('commerce_stock.local_stock_checker'),
+     $container->get('commerce_stock.local_stock_updater')
+    );
   }
 
   /**
