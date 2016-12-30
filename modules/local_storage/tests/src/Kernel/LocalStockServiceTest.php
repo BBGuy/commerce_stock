@@ -24,8 +24,7 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
   protected function setUp() {
     parent::setUp();
 
-    $this->installEntitySchema('commerce_stock_location_type');
-    $this->installEntitySchema('commerce_stock_location');
+    $this->installSchema('commerce_stock_local', ['commerce_stock_location']);
     $this->installConfig(['commerce_stock']);
     $this->installConfig(['commerce_stock_local']);
   }
@@ -49,7 +48,7 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
     self::assertEquals($stockChecker, $localStockService->getStockChecker());
     self::assertEquals($stockUpdater, $localStockService->getStockUpdater());
     self::assertEquals('local_stock', $localStockService->getId());
-    self::assertEquals('Local Stock', $localStockService->getName());
+    self::assertEquals('Local stock', $localStockService->getName());
 
     // Test that instation through container works.
     $localStockService = LocalStockService::create($this->container);
