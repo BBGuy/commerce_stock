@@ -9,7 +9,7 @@ use Drupal\commerce_stock\StockUpdateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LocalStockService
+ * Class LocalStockService.
  *
  * @package Drupal\commerce_stock_local
  */
@@ -53,10 +53,11 @@ class LocalStockService implements StockServiceInterface {
 
   /**
    * @param ContainerInterface $container
+   *    The DI container.
    *
    * @return static
    */
-  public static function create(ContainerInterface $container){
+  public static function create(ContainerInterface $container) {
     return new static(
      $container->get('commerce_stock.local_stock_checker'),
      $container->get('commerce_stock.local_stock_updater')
