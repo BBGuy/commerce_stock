@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldFormatter;
 
+use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
 
 /**
  * Plugin implementation of the 'commerce_stock_level_simple' formatter.
@@ -27,14 +27,14 @@ class SimpleStockLevelFormatter extends FormatterBase {
 
     // Get the entity.
     $entity = $items->getEntity();
-    // @todo Support any purchasable entity.
-    if ($entity instanceof ProductVariationInterface) {
+
+    if ($entity instanceof PurchasableEntityInterface) {
       // Get the available Stock for the product variation.
       $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
       $level = $stockServiceManager->getStockLevel($entity);
     }
     else {
-      // No stock if this is not a product variation.
+      // No stock if this is not a purchasable entity.
       $level = 0;
     }
     $elements = [];

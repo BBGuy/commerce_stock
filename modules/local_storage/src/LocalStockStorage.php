@@ -13,7 +13,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
+  public function createTransaction($entity_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
     // Get optional fields.
     $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
     $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
@@ -22,7 +22,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
 
     // Create a record.
     $field_values = [
-      'variation_id' => $variation_id,
+      'entity_id' => $entity_id,
       'qty' => $quantity,
       'location_id' => $location_id,
       'location_zone' => $zone,
@@ -44,33 +44,33 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function updateLocationStockLevel($location_id, $variation_id) {
-    $current_level = $this->getLocationStockLevel($location_id, $variation_id);
+  public function updateLocationStockLevel($location_id, $entity_id) {
+    $current_level = $this->getLocationStockLevel($location_id, $entity_id);
     $last_update = $current_level['last_transaction'];
-    $latest_txn = $this->getLocationStockTransactionLatest($location_id, $variation_id);
-    $latest_sum = $this->getLocationStockTransactionSum($location_id, $variation_id, $last_update, $latest_txn);
+    $latest_txn = $this->getLocationStockTransactionLatest($location_id, $entity_id);
+    $latest_sum = $this->getLocationStockTransactionSum($location_id, $entity_id, $last_update, $latest_txn);
     $new_level = $current_level['qty'] + $latest_sum;
 
-    $this->setLocationStockLevel($location_id, $variation_id, $new_level, $latest_txn);
+    $this->setLocationStockLevel($location_id, $entity_id, $new_level, $latest_txn);
   }
 
   /**
-   * Gets stock level for a given location and variation.
+   * Gets stock level for a given location and purchasable entity.
    *
    * @param int $location_id
    *   Location id.
-   * @param int $variation_id
-   *   Variation id.
+   * @param int $entity_id
+   *   Purchasable entity ID.
    *
    * @return array
    *   An array of 'qty' and 'last_transaction_id' values.
    */
-  public function getLocationStockLevel($location_id, $variation_id) {
+  public function getLocationStockLevel($location_id, $entity_id) {
     $db = \Drupal::database();
     $result = $db->select('commerce_stock_location_level', 'll')
       ->fields('ll')
       ->condition('location_id', $location_id)
-      ->condition('variation_id', $variation_id)
+      ->condition('entity_id', $entity_id)
       ->execute()
       ->fetch();
 
@@ -81,25 +81,25 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * Sets the stock level and last transaction for a given location and variation.
+   * Sets the stock level and last transaction for a given location and purchasable entity.
    *
    * Creates first stock level transaction record if none exists.
    *
    * @param int $location_id
    *   Location id.
-   * @param int $variation_id
-   *   Variation id.
+   * @param int $entity_id
+   *   Purchasable entity ID.
    * @param int $qty
    *   Quantity.
    * @param int $last_txn
    *   Last transaction id.
    */
-  public function setLocationStockLevel($location_id, $variation_id, $qty, $last_txn) {
+  public function setLocationStockLevel($location_id, $entity_id, $qty, $last_txn) {
     $db = \Drupal::database();
     $existing = $db->select('commerce_stock_location_level', 'll')
       ->fields('ll')
       ->condition('location_id', $location_id)
-      ->condition('variation_id', $variation_id)
+      ->condition('entity_id', $entity_id)
       ->execute()->fetch();
     if ($existing) {
       $db->update('commerce_stock_location_level')
@@ -108,33 +108,33 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
           'last_transaction_id' => $last_txn,
         ])
         ->condition('location_id', $location_id, '=')
-        ->condition('variation_id', $variation_id, '=')
+        ->condition('entity_id', $entity_id, '=')
         ->execute();
     }
     else {
       $db->insert('commerce_stock_location_level')
-        ->fields(['location_id', 'variation_id', 'qty', 'last_transaction_id'])
-        ->values([$location_id, $variation_id, $qty, $last_txn])
+        ->fields(['location_id', 'entity_id', 'qty', 'last_transaction_id'])
+        ->values([$location_id, $entity_id, $qty, $last_txn])
         ->execute();
     }
   }
 
   /**
-   * Gets the last transaction id for a given location and variation.
+   * Gets the last transaction id for a given location and purchasable entity.
    *
    * @param int $location_id
    *   Location id.
-   * @param int $variation_id
-   *   Product variation id.
+   * @param int $entity_id
+   *   Purchasable entity ID.
    *
    * @return int
    *   The last location stock transaction id.
    */
-  public function getLocationStockTransactionLatest($location_id, $variation_id) {
+  public function getLocationStockTransactionLatest($location_id, $entity_id) {
     $db = \Drupal::database();
     $query = $db->select('commerce_stock_transaction')
       ->condition('location_id', $location_id)
-      ->condition('variation_id', $variation_id);
+      ->condition('entity_id', $entity_id);
     $query->addExpression('MAX(id)', 'max_id');
     $query->groupBy('location_id');
     $result = $query
@@ -149,22 +149,22 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    *
    * @param int $location_id
    *   The location id.
-   * @param int $variation_id
-   *   The variation id.
+   * @param int $entity_id
+   *   The purchasable entity ID.
    * @param int $min
    *   The minimum transaction number.
    * @param int $max
    *   The maximum transaction number.
    *
    * @return int
-   *   The sum of stock transactions for a given location and variation.
+   *   The sum of stock transactions for a given location and purchasable entity.
    */
-  public function getLocationStockTransactionSum($location_id, $variation_id, $min, $max) {
+  public function getLocationStockTransactionSum($location_id, $entity_id, $min, $max) {
     $db = \Drupal::database();
     $query = $db->select('commerce_stock_transaction', 'txn')
       ->fields('txn', ['location_id'])
       ->condition('location_id', $location_id)
-      ->condition('variation_id', $variation_id)
+      ->condition('entity_id', $entity_id)
       ->condition('id', $min, '>');
     if ($max) {
       $query->condition('id', $max, '<=');
@@ -180,8 +180,8 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTotalStockLevel($variation_id, array $locations) {
-    $location_info = $this->getLocationsStockLevels($variation_id, $locations);
+  public function getTotalStockLevel($entity_id, array $locations) {
+    $location_info = $this->getLocationsStockLevels($entity_id, $locations);
     $total = 0;
     foreach ($location_info as $location) {
       $total += $location['qty'] + $location['transactions_qty'];
@@ -193,8 +193,8 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   /**
    * Gets the stock levels for a set of locations.
    *
-   * @param int $variation_id
-   *   The product variation id.
+   * @param int $entity_id
+   *   The purchasable entity ID.
    * @param array $locations
    *   Array of locations ids.
    *
@@ -203,13 +203,13 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    *     - 'qty': The quantity.
    *     - 'last_transaction': The id of the last transaction.
    */
-  public function getLocationsStockLevels($variation_id, array $locations) {
+  public function getLocationsStockLevels($entity_id, array $locations) {
     $location_levels = [];
     foreach ($locations as $location_id) {
-      $location_level = $this->getLocationStockLevel($location_id, $variation_id);
+      $location_level = $this->getLocationStockLevel($location_id, $entity_id);
 
-      $latest_txn = $this->getLocationStockTransactionLatest($location_id, $variation_id);
-      $transactions_qty = $this->getLocationStockTransactionSum($location_id, $variation_id, $location_level['last_transaction'], $latest_txn);
+      $latest_txn = $this->getLocationStockTransactionLatest($location_id, $entity_id);
+      $transactions_qty = $this->getLocationStockTransactionSum($location_id, $entity_id, $location_level['last_transaction'], $latest_txn);
 
       $location_levels[$location_id] = [
         'qty' => $location_level['qty'],
@@ -223,14 +223,14 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIsInStock($variation_id, array $locations) {
-    return ($this->getTotalStockLevel($variation_id, $locations) > 0);
+  public function getIsInStock($entity_id, array $locations) {
+    return ($this->getTotalStockLevel($entity_id, $locations) > 0);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getIsAlwaysInStock($variation_id) {
+  public function getIsAlwaysInStock($entity_id) {
     // @todo - not yet implamanted.
     return FALSE;
   }
@@ -238,7 +238,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIsStockManaged($variation_id) {
+  public function getIsStockManaged($entity_id) {
     // @todo - not yet implemented, so for now all products are managed.
     // Also we have the "always in stock" function so unless we have cascading s
     // service functionality this is not needed and can just return TRUE.

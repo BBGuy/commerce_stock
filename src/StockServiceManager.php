@@ -3,7 +3,6 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
 
 /**
  * The stock service manager, responsible for handling services and transactions.
@@ -58,6 +57,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     foreach ($this->stockServices as $service) {
       $ids[$service->getId()] = $service->getName();
     }
+
     return $ids;
   }
 
@@ -73,140 +73,111 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * {@inheritdoc}
    */
   public function createTransaction(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata = []) {
-    if ($purchasable_entity instanceof ProductVariationInterface) {
-      $variation_id = $purchasable_entity->id();
-      $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
-      $stock_updater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
-    }
-    else {
-      // @todo - raise exception.
-    }
+    $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
+    $stock_updater->createTransaction($purchasable_entity->id(), $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
   public function receiveStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $message = NULL) {
-    if ($purchasable_entity instanceof ProductVariationInterface) {
-      $variation_id = $purchasable_entity->id();
-      $transaction_type_id = TRANSACTION_TYPE_NEW_STOCK;
-      if (is_null($message)) {
-        $metadata = [];
-      }
-      else {
-        $metadata = [
-          'data' => [
-            'message' => $message,
-          ],
-        ];
-      }
-      // Make sure quantity is positive.
-      $quantity = abs($quantity);
-      $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
-      $stock_updater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
+    $transaction_type_id = TRANSACTION_TYPE_NEW_STOCK;
+    if (is_null($message)) {
+      $metadata = [];
     }
     else {
-      // @todo - raise exception.
+      $metadata = [
+        'data' => [
+          'message' => $message,
+        ],
+      ];
     }
+    // Make sure quantity is positive.
+    $quantity = abs($quantity);
+    $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
+    $stock_updater->createTransaction($purchasable_entity->id(), $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
   public function sellStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL) {
-    if ($purchasable_entity instanceof ProductVariationInterface) {
-      $variation_id = $purchasable_entity->id();
-      $transaction_type_id = TRANSACTION_TYPE_SALE;
-      $metadata = [
-        'related_oid' => $order_id,
-        'related_uid' => $user_id,
-      ];
-      if (!is_null($message)) {
-        $metadata['data']['message'] = $message;
-      }
-      // Make sure quantity is positive.
-      $quantity = -1 * abs($quantity);
-      $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
-      $stock_updater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
+    $transaction_type_id = TRANSACTION_TYPE_SALE;
+    $metadata = [
+      'related_oid' => $order_id,
+      'related_uid' => $user_id,
+    ];
+    if (!is_null($message)) {
+      $metadata['data']['message'] = $message;
     }
-    else {
-      // @todo - raise exception.
-    }
+    // Make sure quantity is positive.
+    $quantity = -1 * abs($quantity);
+    $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
+    $stock_updater->createTransaction($purchasable_entity->id(), $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
   public function moveStock(PurchasableEntityInterface $purchasable_entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $message = NULL) {
-    if ($purchasable_entity instanceof ProductVariationInterface) {
-      $variation_id = $purchasable_entity->id();
-      if (is_null($message)) {
-        $metadata = [];
-      }
-      else {
-        $metadata = [
-          'data' => [
-            'message' => $message,
-          ],
-        ];
-      }
-      // Make sure quantity is positive.
-      $quantity_from = -1 * abs($quantity);
-      $quantity_to = abs($quantity);
-      $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
-      $tid = $stock_updater->createTransaction($variation_id, $from_location_id, $from_zone, $quantity_from, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_FROM, $metadata);
-      // The second transaction will point to the first one.
-      $metadata['related_tid'] = $tid;
-      $stock_updater->createTransaction($variation_id, $to_location_id, $to_zone, $quantity_to, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_TO, $metadata);
+    $entity_id = $purchasable_entity->id();
+    if (is_null($message)) {
+      $metadata = [];
     }
     else {
-      // @todo - raise exception.
+      $metadata = [
+        'data' => [
+          'message' => $message,
+        ],
+      ];
     }
+    // Make sure quantity is positive.
+    $quantity_from = -1 * abs($quantity);
+    $quantity_to = abs($quantity);
+    $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
+    $tid = $stock_updater->createTransaction($entity_id, $from_location_id, $from_zone, $quantity_from, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_FROM, $metadata);
+    // The second transaction will point to the first one.
+    $metadata['related_tid'] = $tid;
+    $stock_updater->createTransaction($entity_id, $to_location_id, $to_zone, $quantity_to, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_TO, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
   public function returnStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL) {
-    if ($purchasable_entity instanceof ProductVariationInterface) {
-      $variation_id = $purchasable_entity->id();
-      $transaction_type_id = TRANSACTION_TYPE_RETURN;
-      $metadata = [
-        'related_oid' => $order_id,
-        'related_uid' => $user_id,
-      ];
-      if (!is_null($message)) {
-        $metadata['data']['message'] = $message;
-      }
-      // Make sure quantity is positive.
-      $quantity = abs($quantity);
-      $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
-      $stock_updater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
+    $transaction_type_id = TRANSACTION_TYPE_RETURN;
+    $metadata = [
+      'related_oid' => $order_id,
+      'related_uid' => $user_id,
+    ];
+    if (!is_null($message)) {
+      $metadata['data']['message'] = $message;
     }
-    else {
-      // @todo - raise exception.
-    }
+    // Make sure quantity is positive.
+    $quantity = abs($quantity);
+    $stock_updater = $this->getService($purchasable_entity)->getStockUpdater();
+    $stock_updater->createTransaction($purchasable_entity->id(), $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
   }
 
   /**
    * Gets the total stock level for a given purchasable entity.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
+   *   The purchasable entity to get the stock level for.
+   *
+   * @return int
+   *   The stock level.
    */
   public function getStockLevel(PurchasableEntityInterface $purchasable_entity) {
-    if ($purchasable_entity instanceof ProductVariationInterface) {
-      $variation_id = $purchasable_entity->id();
-      if (is_null($variation_id)) {
-        return 0;
-      }
-      $stock_checker = $this->getService($purchasable_entity)->getStockChecker();
-      // @todo - we need a better way to determine the locations.
-      $locations = array_keys($stock_checker->getLocationList());
-
-      return $stock_checker->getTotalStockLevel($variation_id, $locations);
+    $entity_id = $purchasable_entity->id();
+    if (is_null($entity_id)) {
+      return 0;
     }
-    else {
-      // @todo - raise exception.
-    }
+    $stock_checker = $this->getService($purchasable_entity)->getStockChecker();
+    // @todo - we need a better way to determine the locations.
+    $locations = array_keys($stock_checker->getLocationList());
 
+    return $stock_checker->getTotalStockLevel($entity_id, $locations);
   }
 
 }

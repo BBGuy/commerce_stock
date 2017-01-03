@@ -5,7 +5,6 @@ namespace Drupal\commerce_stock;
 use Drupal\commerce\AvailabilityCheckerInterface;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Context;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
 
 /**
  * The entry point for availability checking through Commerce Stock.
@@ -40,15 +39,7 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     $stock_service = $this->stockServiceManager->getService($entity);
     $stock_checker = $stock_service->getStockChecker();
 
-    // Check if a purchasable entity is a product variation.
-    // @todo - should we be using instanceof? dosent work?
-    if ($entity instanceof ProductVariationInterface) {
-      $variation_id = $entity->id();
-      return $stock_checker->getIsStockManaged($variation_id);
-    }
-    else {
-      return FALSE;
-    }
+    return $stock_checker->getIsStockManaged($entity->id());
   }
 
   /**
@@ -62,19 +53,19 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     $stock_checker = $stock_service->getStockChecker();
     $stock_config = $stock_service->getConfiguration();
 
-    // Get product variation id.
-    // @todo - validation of $entity type.
-    $variation_id = $entity->id();
+    $entity_id = $entity->id();
 
     // Get locations.
-    $locations = $stock_config->getLocationList($variation_id);
+    $locations = $stock_config->getLocationList($entity_id);
 
     // Check if always in stock.
-    if (!$stock_checker->getIsAlwaysInStock($variation_id)) {
+    if (!$stock_checker->getIsAlwaysInStock($entity_id)) {
       // Check if quantity is available.
-      $stock_level = $stock_checker->getTotalStockLevel($variation_id, $locations);
+      $stock_level = $stock_checker->getTotalStockLevel($entity_id, $locations);
+
       return ($stock_level >= $quantity);
     }
+
     return TRUE;
   }
 

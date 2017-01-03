@@ -123,9 +123,9 @@ function commerce_stock_local_views_data() {
       'id' => 'standard',
     ],
   ];
-  $data['commerce_stock_transaction']['variation_id'] = [
-    'title' => t('Variation ID'),
-    'help' => t('The product variation ID.'),
+  $data['commerce_stock_transaction']['entity_id'] = [
+    'title' => t('Purchasable entity ID'),
+    'help' => t('The purchasable entity ID.'),
     'field' => [
       'id' => 'numeric',
     ],
@@ -137,12 +137,6 @@ function commerce_stock_local_views_data() {
     ],
     'sort' => [
       'id' => 'standard',
-    ],
-    'relationship' => [
-      'base' => 'commerce_product_variation_field_data',
-      'base field' => 'variation_id',
-      'id' => 'standard',
-      'label' => t('Product variation relating the transaction'),
     ],
   ];
   $data['commerce_stock_transaction']['qty'] = [

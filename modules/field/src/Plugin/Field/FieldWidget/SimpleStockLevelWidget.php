@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldWidget;
 
-use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -81,14 +81,15 @@ class SimpleStockLevelWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $field = $items->first();
     $entity = $items->getEntity();
-    if ($entity instanceof ProductVariationInterface) {
-      // Get the available stock level.
-      $level = $field->available_stock;
-    }
-    else {
-      // No stock if this is not a product variation.
+
+    if (!($entity instanceof PurchasableEntityInterface)) {
+      // No stock if this is not a purchasable entity.
       return [];
     }
+
+    // Get the available stock level.
+    $level = $field->available_stock;
+
     $elements = [];
     $entry_system = $this->getSetting('entry_system');
     $elements['stock'] = [
@@ -110,7 +111,7 @@ class SimpleStockLevelWidget extends WidgetBase {
       ];
     }
     else {
-      $elements['stock']['stocked_variation_id'] = [
+      $elements['stock']['stocked_entity_id'] = [
         '#type' => 'value',
         '#value' => $entity->id(),
       ];

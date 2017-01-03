@@ -12,13 +12,15 @@ interface StockServiceConfigInterface {
    * at that time. To help support this we are including the quantity related to
    * the transaction.
    *
-   * @param int $variation_id
-   *   The product variation ID.
+   * @param int $entity_id
+   *   The purchasable entity ID.
+   * @param int $quantity
+   *    The quantity.
    *
    * @return int
    *   The location ID.
    */
-  public function getPrimaryTransactionLocation($variation_id, $quantity);
+  public function getPrimaryTransactionLocation($entity_id, $quantity);
 
   /**
    * Get a list of location relevant for the provided product.
@@ -26,12 +28,12 @@ interface StockServiceConfigInterface {
    * The product can be ignored. Any other contextual information like active
    * store/department/.. needs to be managed by the implementing class.
    *
-   * @param int $variation_id
-   *   The product variation ID.
+   * @param int $entity_id
+   *   The purchasable entity ID.
    *
    * @return array
    *   Array of relevant location IDs.
    */
-  public function getLocationList($variation_id);
+  public function getLocationList($entity_id);
 
 }
