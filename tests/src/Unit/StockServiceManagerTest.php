@@ -23,7 +23,9 @@ class StockServiceManagerTest extends UnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $this->stockServiceManager = new StockServiceManager();
+
+    $configFactory = $this->prophesize('\Drupal\Core\Config\ConfigFactory');
+    $this->stockServiceManager = new StockServiceManager($configFactory->reveal());
   }
 
   /**
