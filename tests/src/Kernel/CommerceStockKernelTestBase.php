@@ -5,9 +5,7 @@ namespace Drupal\Tests\commerce_stock\Kernel;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
- * Class CommerceStockKernelTestBase.
- *
- * Provides a base class for commerce stock and submodules.
+ * Base class for Commerce Stock kernel tests.
  */
 class CommerceStockKernelTestBase extends CommerceKernelTestBase {
 

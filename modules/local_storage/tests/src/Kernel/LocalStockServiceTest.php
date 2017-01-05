@@ -10,7 +10,7 @@ use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 use Prophecy\Argument;
 
 /**
- * Tests the LocalStockService.
+ * Tests the local stock service.
  *
  * @coversDefaultClass \Drupal\commerce_stock_local\LocalStockService
  *
@@ -50,7 +50,7 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
     self::assertEquals('local_stock', $localStockService->getId());
     self::assertEquals('Local stock', $localStockService->getName());
 
-    // Test that instation through container works.
+    // Test that instantiation through container works.
     $localStockService = LocalStockService::create($this->container);
     self::assertInstanceOf(LocalStockService::class, $localStockService);
     $stockChecker = $localStockService->getStockChecker();
