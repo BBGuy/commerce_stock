@@ -47,7 +47,7 @@ class LocalStockService implements StockServiceInterface {
 
   /**
    * @param ContainerInterface $container
-   *    The DI container.
+   *   The DI container.
    *
    * @return static
    */
