@@ -137,9 +137,9 @@ function commerce_stock_local_schema() {
     'primary key' => ['id'],
     'foreign keys' => [
       'location' => [
-        'table' => 'commerce_stock_location_custom',
+        'table' => 'commerce_stock_location',
         'columns' => [
-          'location_id' => 'location_id',
+          'location_id' => 'id',
         ],
       ],
       'transaction_type' => [
@@ -203,9 +203,9 @@ function commerce_stock_local_schema() {
     'primary key' => ['location_id', 'entity_id'],
     'foreign keys' => [
       'location' => [
-        'table' => 'commerce_stock_location_custom',
+        'table' => 'commerce_stock_location',
         'columns' => [
-          'location_id' => 'location_id',
+          'location_id' => 'id',
         ],
       ],
     ],
@@ -219,13 +219,6 @@ function commerce_stock_local_schema() {
  */
 function commerce_stock_local_install() {
   $db = \Drupal::database();
-  // Add primary stock location.
-  $db->insert('commerce_stock_location_custom')
-    ->fields([
-      'name' => 'Main',
-      'status' => 1,
-    ])
-    ->execute();
 
   // Add core transaction types.
   $db->insert('commerce_stock_transaction_type')
