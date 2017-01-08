@@ -1,43 +1,21 @@
 <?php
 
+
 /**
  * @file
+ * Contains install and update functions for commerce stock local.
  */
 
 /**
  * Implements hook_schema().
- */use Drupal\commerce_stock_local\Entity\StockLocation;
+ */
+
+use Drupal\commerce_stock_local\Entity\StockLocation;
 
 /**
  * Schema definition.
  */
 function commerce_stock_local_schema() {
-
-  $schema['commerce_stock_location_custom'] = [
-    'description' => 'Commerce stock locations',
-    'fields' => [
-      'id' => [
-        'description' => 'Location ID',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'name' => [
-        'description' => 'Location name',
-        'type' => 'varchar_ascii',
-        'not null' => TRUE,
-        'default' => '',
-        'length' => 128,
-      ],
-      'status' => [
-        'description' => 'Location active flag',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-    ],
-    'primary key' => ['id'],
-  ];
 
   $schema['commerce_stock_transaction_type'] = [
     'description' => 'Commerce Stock transaction types',
