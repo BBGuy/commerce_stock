@@ -56,48 +56,4 @@ class StockLocationTest extends CommerceStockKernelTestBase {
     $location->setActive(TRUE);
     self::assertTrue($location->isActive());
   }
-
-  /**
-   * Special test for guy_schneerson ;-)
-   */
-  public function testPerformance() {
-
-    // Create 200 locations. Set each second on inactive.
-    for ($i = 0; $i < 200; $i++) {
-      $location = StockLocation::create([
-        'type' => 'default',
-        'name' => 'TestName_' . $i,
-      ]);
-
-      if ($i % 2 == 0) {
-        $location->setActive(FALSE);
-      }
-      $location->save();
-    }
-
-    for ($i = 0; $i < 5; $i++) {
-
-      $loadstart = microtime();
-      $query = $this->entityManager->getStorage('commerce_stock_location')->getQuery();
-      $activeLocations = $query->condition('status', 1)
-        ->execute();
-      $location_info = [];
-      $locations = StockLocation::loadMultiple($activeLocations);
-      $loadend = microtime();
-
-      $start = microtime();
-      foreach ($locations as $location) {
-        $location_info[$location->id()] = [
-          'name'   => $location->getName(),
-          'status' => $location->isActive(),
-        ];
-      }
-      $end = microtime();
-
-      echo printf("\nLocation List has %s Elements", count($location_info));
-      echo printf("\nLocation List Building code takes: %s", $end - $start);
-      echo printf("\nLocation loading takes: %s", $loadend - $loadstart);
-    }
-  }
-
 }
