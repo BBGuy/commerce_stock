@@ -292,11 +292,12 @@ class StockDevTools extends FormBase {
 
   /**
    * Submit handler for getting list of stock locations.
+   *
+   * This one is broken, as soon as location as entity patch
+   * gets applied. Will be removed anyway. No need to fix.
    */
   public function submitGetLocations(array &$form, FormStateInterface $form_state) {
-    $active_only = $form_state->getValue('active_only');
-    $locations = $this->localStockStorage->getLocationList($active_only);
-    drupal_set_message($this->t('Locations: @locations', ['@locations' => print_r($locations, TRUE)]));
+    drupal_set_message('Broken. Better write some tests for it :P');
   }
 
   /**
