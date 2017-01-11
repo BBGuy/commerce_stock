@@ -22,7 +22,7 @@ class FilterLocationsEvent extends Event {
   /**
    * The enabled stock locations.
    *
-   * @var \Drupal\commerce_stock_local\Entity\StockLocationInterface
+   * @var \Drupal\commerce_stock_local\Entity\LocalStockLocationInterface
    */
   protected $locations;
 
@@ -30,7 +30,7 @@ class FilterLocationsEvent extends Event {
    * Constructs a new FilterLocationsEvent object.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   * @param \Drupal\commerce_stock_local\Entity\StockLocationInterface[] $locations
+   * @param \Drupal\commerce_stock_local\Entity\LocalStockLocationInterface[] $locations
    */
   public function __construct(PurchasableEntityInterface $entity, array $locations) {
     $this->purchasableEntity = $entity;
@@ -40,7 +40,7 @@ class FilterLocationsEvent extends Event {
   /**
    * Gets the enabled stock locations.
    *
-   * @return \Drupal\commerce_stock_local\Entity\StockLocationInterface[]
+   * @return \Drupal\commerce_stock_local\Entity\LocalStockLocationInterface[]
    */
   public function getLocations() {
     return $this->locations;
@@ -49,7 +49,7 @@ class FilterLocationsEvent extends Event {
   /**
    * Sets the enabled stock locations.
    *
-   * @param \Drupal\commerce_stock_local\Entity\StockLocationInterface[] $locations
+   * @param \Drupal\commerce_stock_local\Entity\LocalStockLocationInterface[] $locations
    *   The stock locations.
    */
   public function setLocations(array $locations) {

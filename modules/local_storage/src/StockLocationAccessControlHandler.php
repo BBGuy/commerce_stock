@@ -18,7 +18,7 @@ class StockLocationAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\commerce_stock_local\Entity\StockLocationInterface $entity */
+    /** @var \Drupal\commerce_stock_local\Entity\LocalStockLocationInterface $entity */
     switch ($operation) {
       case 'view':
         if (!$entity->isActive()) {
