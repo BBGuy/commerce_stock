@@ -194,11 +194,12 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     if (is_null($entity_id)) {
       return 0;
     }
+    $stock_config = $this->getService($purchasable_entity)->getConfiguration();
     $stock_checker = $this->getService($purchasable_entity)->getStockChecker();
-    // @todo - we need a better way to determine the locations.
-    $locations = array_keys($stock_checker->getLocationList());
+    $locations = $stock_config->getEnabledLocations($entity_id);
 
     return $stock_checker->getTotalStockLevel($entity_id, $locations);
+
   }
 
 }
