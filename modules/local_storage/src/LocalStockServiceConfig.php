@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_local_stock;
+namespace Drupal\commerce_stock_local;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_stock\StockServiceConfigInterface;

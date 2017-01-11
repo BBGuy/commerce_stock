@@ -57,7 +57,7 @@ class LocalStockService implements StockServiceInterface {
     return new static(
       $container->get('commerce_stock.local_stock_checker'),
       $container->get('commerce_stock.local_stock_updater'),
-      $container->get('commerce_stock.local_stock_config')
+      $container->get('commerce_stock.local_stock_service_config')
     );
   }
 

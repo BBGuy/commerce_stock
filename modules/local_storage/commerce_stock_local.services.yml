@@ -19,4 +19,3 @@ services:
   commerce_stock.local_stock_service_config:
     class: Drupal\commerce_stock_local\LocalStockServiceConfig
     arguments: ['@entity_type.manager']
-    public: false
