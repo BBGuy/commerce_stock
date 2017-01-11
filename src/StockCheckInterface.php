@@ -9,8 +9,8 @@ interface StockCheckInterface {
    *
    * @param int $entity_id
    *   The purchasable entity ID.
-   * @param array $locations
-   *   Array of locations.
+   * @param \Drupal\commerce_stock\StockLocationInterface[] $locations
+   *  The locations.
    *
    * @return int
    *   The stock level.
@@ -22,8 +22,8 @@ interface StockCheckInterface {
    *
    * @param int $entity_id
    *   The purchasable entity ID.
-   * @param array $locations
-   *   Array of locations.
+   * @param \Drupal\commerce_stock\StockLocationInterface[] $locations
+   *   The locations to check against.
    *
    * @return bool
    *   TRUE if the entity is in stock, FALSE otherwise.
@@ -51,16 +51,5 @@ interface StockCheckInterface {
    *   TRUE if the entity is in stock, FALSE otherwise.
    */
   public function getIsStockManaged($entity_id);
-
-  /**
-   * Get list of locations.
-   *
-   * @param bool $return_active_only
-   *   Whether or not only return active locations.
-   *
-   * @return array
-   *   List of locations keyed by ID.
-   */
-  public function getLocationList($return_active_only = TRUE);
 
 }
