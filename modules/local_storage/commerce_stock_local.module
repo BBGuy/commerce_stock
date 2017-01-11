@@ -77,7 +77,7 @@ function _commerce_stock_local_update_stock_level_queue() {
  */
 function commerce_stock_local_theme() {
   $theme = [];
-  $theme['commerce_stock_location_custom'] = array(
+  $theme['commerce_stock_location'] = array(
     'render element' => 'elements',
     'file' => 'commerce_stock_location.page.inc',
     'template' => 'commerce_stock_location',
