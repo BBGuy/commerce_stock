@@ -3,11 +3,12 @@
 namespace Drupal\commerce_stock_local;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 
 /**
  * Defines the interface for local stock location storage.
  */
-interface StockLocationStorageInterface {
+interface StockLocationStorageInterface extends SqlEntityStorageInterface {
 
   /**
    * Loads the enabled variations for the given product.
