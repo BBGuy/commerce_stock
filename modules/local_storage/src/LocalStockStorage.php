@@ -247,30 +247,4 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
     return TRUE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getLocationList($entity_id) {
-    // For now this is a quick.
-    // @ToDo Get the StockService and ask for the locations.
-    $entityManager = \Drupal::entityTypeManager();
-    $query = $entityManager->getStorage('commerce_stock_location')->getQuery();
-    $query->condition('status', TRUE);
-    $result = $query->execute();
-    if (empty($result)) {
-      return [];
-    }
-    $enabled_locations = $this->loadMultiple($result);
-    $location_info = [];
-    /** @var StockLocation $location */
-    foreach ($enabled_locations as $location) {
-      $location_info[$location->id()] = [
-        'name' => $location->getName(),
-        'status' => $location->isActive(),
-      ];
-    }
-
-    return $location_info;
-  }
-
 }
