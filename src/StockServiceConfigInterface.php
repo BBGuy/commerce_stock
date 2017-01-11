@@ -17,23 +17,39 @@ interface StockServiceConfigInterface {
    * @param int $quantity
    *    The quantity.
    *
-   * @return int
-   *   The location ID.
+   * @return \Drupal\commerce_stock\StockLocationInterface
+   *   The stock location.
    */
   public function getPrimaryTransactionLocation($entity_id, $quantity);
 
   /**
-   * Get a list of location relevant for the provided product.
+   * Get list of enabled locations for a purchasable entity.
    *
-   * The product can be ignored. Any other contextual information like active
-   * store/department/.. needs to be managed by the implementing class.
+   * Enabled locations are active locations that
+   * may have been further filtered by other criteria.
    *
    * @param int $entity_id
    *   The purchasable entity ID.
    *
-   * @return array
-   *   Array of relevant location IDs.
+   * @return \Drupal\commerce_stock\StockLocationInterface[]
+   *   List of enabled locations.
    */
-  public function getLocationList($entity_id);
+  public function getEnabledLocations($entity_id);
+
+
+  /**
+   * Get list of all locations.
+   *
+   * Note: The returned locations are not checked against
+   * the status or filtered in any way. The caller needs to check
+   * the status itself.
+   *
+   * @param int $entity_id
+   *   The purchasable entity ID.
+   *
+   * @return \Drupal\commerce_stock\StockLocationInterface[]
+   *   List of locations.
+   */
+  public function getLocations($entity_id);
 
 }
