@@ -4,6 +4,7 @@ namespace Drupal\commerce_stock_local;
 
 use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
+use Drupal\commerce_stock_local\Entity\StockLocation;
 
 /**
  * The backend for the local stock service.
@@ -42,7 +43,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * {@inheritdoc
    */
   public function updateLocationStockLevel($location_id, $entity_id) {
     $current_level = $this->getLocationStockLevel($location_id, $entity_id);
@@ -205,7 +206,9 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    */
   public function getLocationsStockLevels($entity_id, array $locations) {
     $location_levels = [];
-    foreach ($locations as $location_id) {
+    /** @var \Drupal\commerce_stock\StockLocationInterface $location */
+    foreach ($locations as $location) {
+      $location_id = $location->id();
       $location_level = $this->getLocationStockLevel($location_id, $entity_id);
 
       $latest_txn = $this->getLocationStockTransactionLatest($location_id, $entity_id);
@@ -245,25 +248,25 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
     return TRUE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getLocationList($return_active_only = TRUE) {
-    $db = \Drupal::database();
-    $query = $db->select('commerce_stock_location_custom', 'loc')
-      ->fields('loc');
-    if ($return_active_only) {
-      $query->condition('status', 1);
+
+  public function getLocationList($entity_id) {
+    // For now this is a quick.
+    //@ToDo Get the StockService and ask for the locations.
+    $entityManager = \Drupal::entityTypeManager();
+    $query = $entityManager->getStorage('commerce_stock_location')->getQuery();
+    $query->condition('status', TRUE);
+    $result = $query->execute();
+    if (empty($result)) {
+      return [];
     }
-    $result = $query->execute()->fetchAll();
+    $enabled_locations = $this->loadMultiple($result);
     $location_info = [];
-    if ($result) {
-      foreach ($result as $record) {
-        $location_info[$record->id] = [
-          'name' => $record->name,
-          'status' => $record->status,
-        ];
-      }
+    /** @var StockLocation $location */
+    foreach ($enabled_locations as $location) {
+      $location_info[$location->id()] = [
+        'name' => $location->getName(),
+        'status' => $location->isActive(),
+      ];
     }
 
     return $location_info;

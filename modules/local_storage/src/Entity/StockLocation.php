@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_stock_local\Entity;
 
+use Drupal\commerce_stock\StockLocationInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -21,6 +22,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   ),
  *   bundle_label = @Translation("Stock location type"),
  *   handlers = {
+ *     "event" = "Drupal\commerce_stock_local\Event\StockLocationEvent",
+ *     "storage" = "Drupal\commerce_stock_local\StockLocationStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_stock_local\StockLocationListBuilder",
  *     "views_data" = "Drupal\commerce_stock_local\Entity\StockLocationViewsData",
@@ -60,7 +63,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   field_ui_base_route = "entity.commerce_stock_location_type.edit_form"
  * )
  */
-class StockLocation extends ContentEntityBase implements StockLocationInterface {
+class StockLocation extends ContentEntityBase implements LocalStockLocationInterface, StockLocationInterface {
 
   /**
    * {@inheritdoc}
@@ -97,6 +100,13 @@ class StockLocation extends ContentEntityBase implements StockLocationInterface 
   public function setActive($active) {
     $this->set('status', $active ? TRUE : FALSE);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getId(){
+    return $this->id();
   }
 
   /**
