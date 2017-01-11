@@ -42,8 +42,8 @@ interface StockServiceConfigInterface {
    * Get list of all locations.
    *
    * Note: The returned locations are not checked against
-   * the status or filtered in any way. The caller needs to check
-   * the status itself.
+   * the status or filtered in any way. The caller needs to apply
+   * its own logic.
    *
    * @return \Drupal\commerce_stock\StockLocationInterface[]
    *   List of locations.
