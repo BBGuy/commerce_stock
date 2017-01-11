@@ -42,7 +42,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * {@inheritdoc.
+   * {@inheritdoc}
    */
   public function updateLocationStockLevel($location_id, $entity_id) {
     $current_level = $this->getLocationStockLevel($location_id, $entity_id);
