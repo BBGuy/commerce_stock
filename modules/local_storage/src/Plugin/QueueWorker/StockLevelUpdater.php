@@ -22,10 +22,16 @@ class StockLevelUpdater extends QueueWorkerBase {
    */
   public function processItem($data) {
     $entity_id = $data;
+    /** @var \Drupal\commerce_stock\StockUpdateInterface $updater */
     $updater = \Drupal::service('commerce_stock.local_stock_service')->getStockUpdater();
-    $locations = $updater->getLocationList(TRUE);
-    foreach ($locations as $location_id => $location) {
-      $updater->updateLocationStockLevel($location_id, $entity_id);
+    /** @var \Drupal\commerce_stock\StockServiceConfigInterface $config */
+    $config = \Drupal::service('commerce_stock.local_stock_service')->getConfiguration();
+    $locations = $config->getEnabledLocations($entity_id);
+    /** @var \Drupal\commerce_stock\StockLocationInterface $location */
+    foreach ($locations as $location) {
+      //@ToDo This method is not defined in any interface.  So it is not guaranteed, that a StockUpdater has that method.
+      //@see https://www.drupal.org/node/2842583
+      $updater->updateLocationStockLevel($location->getId(), $entity_id);
     }
   }
 
