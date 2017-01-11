@@ -1,7 +1,7 @@
 services:
   commerce_stock.local_stock_service:
     class: Drupal\commerce_stock_local\LocalStockService
-    arguments: ['@commerce_stock.local_stock_checker', '@commerce_stock.local_stock_updater']
+    arguments: ['@commerce_stock.local_stock_checker', '@commerce_stock.local_stock_updater', '@commerce_stock.local_stock_service_config']
     tags:
       - { name: commerce_stock.stock_service, priority: 0 }
 
@@ -14,4 +14,7 @@ services:
     alias: commerce_stock.local_stock_storage
 
   commerce_stock.local_stock_updater:
+    alias: commerce_stock.local_stock_storage
+
+  commerce_stock.local_stock_service_config:
     alias: commerce_stock.local_stock_storage

@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_stock;
 
-class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
+class AlwaysInStock implements StockCheckInterface, StockUpdateInterface, StockServiceConfigInterface {
 
   /**
    * {@inheritdoc}
@@ -47,8 +47,21 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLocationList($return_active_only = TRUE) {
-    // We don't have locations, so return an empty array.
+  public function getPrimaryTransactionLocation($entity_id, $quantity) {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEnabledLocations($entity_id) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLocations($entity_id) {
     return [];
   }
 
