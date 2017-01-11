@@ -26,7 +26,6 @@ interface StockLocationInterface {
    */
   public function getName();
 
-
   /**
    * Returns the stock location status indicator.
    *
@@ -34,7 +33,5 @@ interface StockLocationInterface {
    *   TRUE if the stock location is active.
    */
   public function isActive();
-
-
 
 }

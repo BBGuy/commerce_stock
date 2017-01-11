@@ -5,7 +5,7 @@ namespace Drupal\commerce_stock_local;
 use Drupal\commerce\PurchasableEntityInterface;
 
 /**
- * Defines the interface for stock location storage.
+ * Defines the interface for local stock location storage.
  */
 interface StockLocationStorageInterface {
 

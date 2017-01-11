@@ -56,4 +56,5 @@ class StockLocationTest extends CommerceStockKernelTestBase {
     $location->setActive(TRUE);
     self::assertTrue($location->isActive());
   }
+
 }

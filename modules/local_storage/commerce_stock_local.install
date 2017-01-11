@@ -1,19 +1,14 @@
 <?php
 
-
 /**
  * @file
  * Contains install and update functions for commerce stock local.
  */
 
-/**
- * Implements hook_schema().
- */
-
 use Drupal\commerce_stock_local\Entity\StockLocation;
 
 /**
- * Schema definition.
+ * Implements hook_schema().
  */
 function commerce_stock_local_schema() {
 

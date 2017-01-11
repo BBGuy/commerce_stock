@@ -10,7 +10,7 @@ interface StockCheckInterface {
    * @param int $entity_id
    *   The purchasable entity ID.
    * @param \Drupal\commerce_stock\StockLocationInterface[] $locations
-   *  The locations.
+   *   The locations.
    *
    * @return int
    *   The stock level.

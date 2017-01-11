@@ -36,7 +36,6 @@ interface StockServiceConfigInterface {
    */
   public function getEnabledLocations($entity_id);
 
-
   /**
    * Get list of all locations.
    *

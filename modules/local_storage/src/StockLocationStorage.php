@@ -8,7 +8,7 @@ use Drupal\commerce_stock_local\Event\FilterLocationsEvent;
 use Drupal\commerce_stock_local\Event\LocalStockEvents;
 
 /**
- * Defines the product variation storage.
+ * Defines the local stock location storage.
  */
 class StockLocationStorage extends CommerceContentEntityStorage implements StockLocationStorageInterface {
 
@@ -33,6 +33,5 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
 
     return $enabled_locations;
   }
-
 
 }

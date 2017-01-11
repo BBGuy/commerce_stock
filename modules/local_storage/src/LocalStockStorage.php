@@ -4,7 +4,6 @@ namespace Drupal\commerce_stock_local;
 
 use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
-use Drupal\commerce_stock_local\Entity\StockLocation;
 
 /**
  * The backend for the local stock service.
@@ -43,7 +42,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
   }
 
   /**
-   * {@inheritdoc
+   * {@inheritdoc.
    */
   public function updateLocationStockLevel($location_id, $entity_id) {
     $current_level = $this->getLocationStockLevel($location_id, $entity_id);
@@ -248,10 +247,12 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
     return TRUE;
   }
 
-
+  /**
+   * {@inheritdoc}
+   */
   public function getLocationList($entity_id) {
     // For now this is a quick.
-    //@ToDo Get the StockService and ask for the locations.
+    // @ToDo Get the StockService and ask for the locations.
     $entityManager = \Drupal::entityTypeManager();
     $query = $entityManager->getStorage('commerce_stock_location')->getQuery();
     $query->condition('status', TRUE);

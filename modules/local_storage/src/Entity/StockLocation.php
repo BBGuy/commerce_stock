@@ -105,7 +105,7 @@ class StockLocation extends ContentEntityBase implements LocalStockLocationInter
   /**
    * {@inheritdoc}
    */
-  public function getId(){
+  public function getId() {
     return $this->id();
   }
 

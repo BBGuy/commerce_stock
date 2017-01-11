@@ -6,7 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Provides a listing of Stock Location type entities.
+ * Provides a listing of stock location type entities.
  */
 class StockLocationTypeListBuilder extends ConfigEntityListBuilder {
 

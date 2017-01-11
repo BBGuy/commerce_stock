@@ -54,7 +54,7 @@ class StockTransactions2 extends FormBase {
     $location_options = [];
     /** @var \Drupal\commerce_stock\StockLocationInterface $location */
     foreach ($locations as $location) {
-      if($location->isActive()){
+      if ($location->isActive()) {
         $location_options[$location->getId()] = $location->getName();
       }
     }

@@ -1,9 +1,4 @@
 <?php
-/**
- * This file is part of the dc2-stock package.
- *
- * @author Olaf Karsten <olaf.karsten@beckerundkarsten.de>
- */
 
 namespace Drupal\Tests\commerce_product_local\Kernel\Entity;
 
