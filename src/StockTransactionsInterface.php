@@ -30,9 +30,11 @@ interface StockTransactionsInterface {
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
+   * @param int $quantity
+   *   The quantity.
    *
-   * @return int
-   *   The location ID.
+   * @return \Drupal\commerce_stock\StockLocationInterface
+   *   The stock location.
    */
   public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity);
 
