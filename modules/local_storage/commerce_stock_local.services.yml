@@ -17,4 +17,6 @@ services:
     alias: commerce_stock.local_stock_storage
 
   commerce_stock.local_stock_service_config:
-    alias: commerce_stock.local_stock_storage
+    class: Drupal\commerce_stock_local\LocalStockServiceConfig
+    arguments: ['@entity_type.manager']
+    public: false
