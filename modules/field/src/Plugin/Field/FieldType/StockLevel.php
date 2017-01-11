@@ -99,6 +99,7 @@ class StockLevel extends FieldItemBase {
 
     $entity_id = $values['stock']['stocked_entity_id'];
     if (!empty($entity_id)) {
+      /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $this->getEntity()->load($entity_id);
       $transaction_qty = 0;
       switch ($values['stock']['entry_system']) {
@@ -115,13 +116,14 @@ class StockLevel extends FieldItemBase {
       if ($transaction_qty) {
         $transaction_type = ($transaction_qty > 0) ? TRANSACTION_TYPE_STOCK_IN : TRANSACTION_TYPE_STOCK_OUT;
         // @todo Add zone and location to form.
-        $location_id = $this->stockServiceManager->getPrimaryTransactionLocation($purchasable_entity, $transaction_qty);
+        /** @var \Drupal\commerce_stock\StockLocationInterface $location */
+        $location = $this->stockServiceManager->getPrimaryTransactionLocation($purchasable_entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;
         $transaction_note = $values['stock']['stock_transaction_note'];
         $metadata = ['data' => ['message' => $transaction_note]];
-        $this->stockServiceManager->createTransaction($purchasable_entity, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+        $this->stockServiceManager->createTransaction($purchasable_entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
       }
     }
   }
