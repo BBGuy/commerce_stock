@@ -15,8 +15,12 @@ class StockLocationViewsData extends EntityViewsData {
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    // Additional information for Views integration, such as table joins, can be
-    // put here.
+    $data['commerce_stock_location']['table']['base'] = array(
+      'field' => 'id',
+      'title' => $this->t('Commerce stock location'),
+      'help' => $this->t('The stock location ID.'),
+    );
+
     return $data;
   }
 
