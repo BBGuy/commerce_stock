@@ -44,7 +44,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   translatable = TRUE,
  *   admin_permission = "administer commerce_stock location entities",
  *   entity_keys = {
- *     "id" = "id",
+ *     "id" = "location_id",
  *     "bundle" = "type",
  *     "label" = "name",
  *     "uuid" = "uuid",
@@ -118,11 +118,13 @@ class StockLocation extends ContentEntityBase implements LocalStockLocationInter
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
       ->setDescription(t('The name of the stock location entity.'))
+      ->setRequired(TRUE)
+      ->setTranslatable(TRUE)
       ->setSettings(array(
-        'max_length' => 50,
+        'default_value' => '',
+        'max_length' => 255,
         'text_processing' => 0,
       ))
-      ->setDefaultValue('')
       ->setDisplayOptions('view', array(
         'label' => 'above',
         'type' => 'string',
@@ -136,9 +138,11 @@ class StockLocation extends ContentEntityBase implements LocalStockLocationInter
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Publishing status'))
-      ->setDescription(t('A boolean indicating whether the stock location is published.'))
-      ->setDefaultValue(TRUE);
+      ->setLabel(t('Status'))
+      ->setDescription(t('A boolean indicating whether the stock location is active.'))
+      ->setDefaultValue(TRUE)
+      ->setTranslatable(TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }
