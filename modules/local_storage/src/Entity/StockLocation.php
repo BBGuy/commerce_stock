@@ -42,7 +42,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   base_table = "commerce_stock_location",
  *   data_table = "commerce_stock_location_field_data",
  *   translatable = TRUE,
- *   admin_permission = "administer commerce_stock location entities",
+ *   admin_permission = "administer commerce stock location entities",
  *   entity_keys = {
  *     "id" = "location_id",
  *     "bundle" = "type",
