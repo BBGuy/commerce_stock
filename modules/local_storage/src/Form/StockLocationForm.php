@@ -19,8 +19,6 @@ class StockLocationForm extends ContentEntityForm {
     /* @var $entity \Drupal\commerce_stock_local\Entity\StockLocation */
     $form = parent::buildForm($form, $form_state);
 
-    $entity = $this->entity;
-
     return $form;
   }
 
