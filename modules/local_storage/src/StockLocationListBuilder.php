@@ -2,10 +2,9 @@
 
 namespace Drupal\commerce_stock_local;
 
+use Drupal\commerce_stock_local\Entity\StockLocationType;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\Routing\LinkGeneratorTrait;
-use Drupal\Core\Url;
 
 /**
  * Defines a class to build a listing of stock location entities.
@@ -13,8 +12,6 @@ use Drupal\Core\Url;
  * @ingroup commerce_stock_local
  */
 class StockLocationListBuilder extends EntityListBuilder {
-
-  use LinkGeneratorTrait;
 
   /**
    * {@inheritdoc}
@@ -29,16 +26,18 @@ class StockLocationListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\commerce_stock_local\Entity\StockLocation */
+
+    /** @var \Drupal\commerce_stock_local\Entity\StockLocationType $location_type */
+    $location_type = StockLocationType::load($entity->bundle());
+
     $row['id'] = $entity->id();
-    $row['name'] = $this->l(
-      $entity->label(),
-      new Url(
-        'entity.commerce_stock_location.edit_form', array(
-          'commerce_stock_location' => $entity->id(),
-        )
-      )
-    );
+    $row['type'] = $location_type->label();
+    $row['status'] = $entity->isActive() ? $this->t('Active') : $this->t('Inactive');
+    $row['name']['data'] =  [
+        '#type' => 'link',
+        '#title' => $entity->label(),
+      ] + $entity->toUrl()->toRenderArray();
+
     return $row + parent::buildRow($entity);
   }
 
