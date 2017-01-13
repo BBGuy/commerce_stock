@@ -18,7 +18,12 @@ class StockLocationForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     /* @var $entity \Drupal\commerce_stock_local\Entity\StockLocation */
     $form = parent::buildForm($form, $form_state);
-
+    $form['status'] = [
+      '#type'          => 'checkbox',
+      '#title'         => $this->t('Active'),
+      '#default_value' => $this->entity->isActive(),
+      '#weight'        => 99,
+    ];
     return $form;
   }
 
