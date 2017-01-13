@@ -97,7 +97,7 @@ class StockLevel extends FieldItemBase {
     }
     $called = TRUE;
 
-    $entity_id = empty($values['stock']['stocked_entity_id']) ? null : $values['stock']['stocked_entity_id'];
+    $entity_id = empty($values['stock']['stocked_entity_id']) ? NULL : $values['stock']['stocked_entity_id'];
     if (!empty($entity_id)) {
       /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
       $purchasable_entity = $this->getEntity()->load($entity_id);
@@ -123,7 +123,7 @@ class StockLevel extends FieldItemBase {
         $unit_cost = NULL;
         $transaction_note = empty($values['stock']['stock_transaction_note']) ? '' : $values['stock']['stock_transaction_note'];
         $metadata = ['data' => ['message' => $transaction_note]];
-        $this->stockServiceManager->createTransaction($purchasable_entity, $location->getId() , $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+        $this->stockServiceManager->createTransaction($purchasable_entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
       }
     }
   }

@@ -38,7 +38,7 @@ class LocalStockServiceConfig implements StockServiceConfigInterface {
    */
   public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity) {
     $locations = $this->getEnabledLocations($entity);
-    return empty($locations) ? null : array_shift($locations);
+    return empty($locations) ? NULL : array_shift($locations);
   }
 
   /**
