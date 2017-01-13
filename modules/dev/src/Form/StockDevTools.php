@@ -286,7 +286,9 @@ class StockDevTools extends FormBase {
   public function submitCheckStockForm(array &$form, FormStateInterface $form_state) {
     $prod_id = $form_state->getValue('prod_vid');
     $location_ids = explode(',', $form_state->getValue('location_ids'));
-    $stock_level = $this->localStockStorage->getTotalStockLevel($prod_id, $location_ids);
+    $storage = \Drupal::entityTypeManager()->getStorage('commerce_stock_location');
+    $locations = $storage->loadMultiple($location_ids);
+    $stock_level = $this->localStockStorage->getTotalStockLevel($prod_id, $locations);
     drupal_set_message($this->t('Stock level is: @stock_level', ['@stock_level' => $stock_level]));
   }
 
