@@ -33,10 +33,10 @@ class StockLocationListBuilder extends EntityListBuilder {
     $row['id'] = $entity->id();
     $row['type'] = $location_type->label();
     $row['status'] = $entity->isActive() ? $this->t('Active') : $this->t('Inactive');
-    $row['name']['data'] =  [
-        '#type' => 'link',
-        '#title' => $entity->label(),
-      ] + $entity->toUrl()->toRenderArray();
+    $row['name']['data'] = [
+      '#type' => 'link',
+      '#title' => $entity->label(),
+    ] + $entity->toUrl()->toRenderArray();
 
     return $row + parent::buildRow($entity);
   }

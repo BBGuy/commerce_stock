@@ -2,14 +2,13 @@
 
 /**
  * @file
- *
+ * Contains commerce_stock_local.module.
  */
 
 use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_cron().
- * Contains commerce_stock_local.module.
  */
 function commerce_stock_local_cron() {
   $next = \Drupal::state()->get('commerce_stock_local.update_level_next') ?: 0;
