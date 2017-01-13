@@ -140,7 +140,7 @@ function commerce_stock_local_schema() {
       'transaction_type' => [
         'table' => 'commerce_stock_transaction_type',
         'columns' => [
-          'transaction_type_id' => 'location_id',
+          'transaction_type_id' => 'id',
         ],
       ],
       'related_transaction' => [
