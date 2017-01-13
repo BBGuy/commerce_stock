@@ -2,14 +2,14 @@
 
 /**
  * @file
+ *
  */
+
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_cron().
- */
-
-/**
- * Implements hook_cron().
+ * Contains commerce_stock_local.module.
  */
 function commerce_stock_local_cron() {
   $next = \Drupal::state()->get('commerce_stock_local.update_level_next') ?: 0;
@@ -79,13 +79,10 @@ function commerce_stock_local_theme() {
   $theme = [];
   $theme['commerce_stock_location'] = array(
     'render element' => 'elements',
-    'file' => 'commerce_stock_location.page.inc',
-    'template' => 'commerce_stock_location',
   );
   $theme['commerce_stock_location_content_add_list'] = [
     'render element' => 'content',
     'variables' => ['content' => NULL],
-    'file' => 'commerce_stock_location.page.inc',
   ];
   return $theme;
 }
@@ -95,4 +92,28 @@ function commerce_stock_local_theme() {
  */
 function commerce_stock_local_theme_suggestions_commerce_stock_location(array $variables) {
   return _commerce_entity_theme_suggestions('commerce_stock_location', $variables);
+}
+
+/**
+ * Prepares variables for Stock location templates.
+ *
+ * Default template: commerce-stock-location.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the user information and any
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_stock_location(array &$variables) {
+  // Fetch StockLocation Entity Object.
+  $commerce_stock_location = $variables['elements']['#commerce_stock_location'];
+
+  $variables['commerce_stock_location_entity'] = $commerce_stock_location;
+  $variables['commerce_stock_location_url'] = $commerce_stock_location->toUrl();
+  $variables['commerce_stock_location'] = [];
+  // Helpful $content variable for templates.
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['commerce_stock_location'][$key] = $variables['elements'][$key];
+  }
+
 }
