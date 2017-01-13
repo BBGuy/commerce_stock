@@ -27,8 +27,8 @@ class LocalStockServiceConfig implements StockServiceConfigInterface {
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager->getStorage('commerce_stock_location');
-    $this->storage = $entity_type_manager;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->storage = $entity_type_manager->getStorage('commerce_stock_location');
   }
 
   /**
@@ -37,7 +37,8 @@ class LocalStockServiceConfig implements StockServiceConfigInterface {
    * @ToDo Do we really need a primary transaction location. If so users need a way to set this.
    */
   public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity) {
-    return array_shift($this->getEnabledLocations($entity));
+    $locations = $this->getEnabledLocations($entity);
+    return empty($locations) ? null : array_shift($locations);
   }
 
   /**
