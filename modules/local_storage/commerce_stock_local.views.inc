@@ -88,7 +88,7 @@ function commerce_stock_local_views_data() {
       'id' => 'standard',
     ],
     'relationship' => [
-      'base' => 'commerce_stock_location_custom',
+      'base' => 'commerce_stock_location',
       'base field' => 'location_id',
       'id' => 'standard',
       'label' => t('Stock Location'),
