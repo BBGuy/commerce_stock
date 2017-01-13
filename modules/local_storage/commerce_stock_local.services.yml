@@ -1,5 +1,17 @@
 services:
   commerce_stock.local_stock_service:
     class: Drupal\commerce_stock_local\LocalStockService
+    arguments: ['@commerce_stock.local_stock_checker', '@commerce_stock.local_stock_updater']
     tags:
       - { name: commerce_stock.stock_service, priority: 0 }
+
+  commerce_stock.local_stock_storage:
+    class: Drupal\commerce_stock_local\LocalStockStorage
+    arguments: ['@entity_type.manager', '@database']
+    public: false
+
+  commerce_stock.local_stock_checker:
+    alias: commerce_stock.local_stock_storage
+
+  commerce_stock.local_stock_updater:
+    alias: commerce_stock.local_stock_storage
