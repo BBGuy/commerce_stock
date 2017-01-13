@@ -32,7 +32,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *       "default" = "Drupal\commerce_stock_local\Form\StockLocationForm",
  *       "add" = "Drupal\commerce_stock_local\Form\StockLocationForm",
  *       "edit" = "Drupal\commerce_stock_local\Form\StockLocationForm",
- *       "delete" = "Drupal\commerce_stock_local\Form\StockLocationDeleteForm",
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
  *     },
  *     "route_provider" = {
  *        "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
@@ -52,10 +52,10 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "status" = "status",
  *   },
  *   links = {
- *     "canonical" = "/admin/commerce/commerce_stock_location/{commerce_stock_location}",
- *     "add-page" = "/admin/commerce/commerce_stock_location/add",
- *     "add-form" = "/admin/commerce/commerce_stock_location/add/{commerce_stock_location_type}",
- *     "edit-form" = "/admin/commerce/commerce_stock_location/{commerce_stock_location}/edit",
+ *     "canonical" = "/commerce_stock_location/{commerce_stock_location}",
+ *     "add-page" = "/commerce_stock_location/add",
+ *     "add-form" = "/commerce_stock_location/add/{commerce_stock_location_type}",
+ *     "edit-form" = "/commerce_stock_location/{commerce_stock_location}/edit",
  *     "delete-form" = "/admin/commerce/commerce_stock_location/{commerce_stock_location}/delete",
  *     "collection" = "/admin/commerce/commerce_stock_location",
  *   },
