@@ -27,7 +27,7 @@ class StockLevelUpdater extends QueueWorkerBase {
     /** @var \Drupal\commerce_stock\StockServiceConfigInterface $config */
     $config = \Drupal::service('commerce_stock.local_stock_service')->getConfiguration();
 
-    // @ToDo Figure out how to get the entity instead of the id?.
+    // @ToDo Figure out how to get the entity instead of the id? This will break.
     $locations = $config->getEnabledLocations($entity_id);
     /** @var \Drupal\commerce_stock\StockLocationInterface $location */
     foreach ($locations as $location) {
