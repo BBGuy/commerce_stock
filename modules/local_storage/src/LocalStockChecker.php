@@ -3,42 +3,40 @@
 namespace Drupal\commerce_stock_local;
 
 use Drupal\commerce_stock\StockCheckInterface;
-use Drupal\commerce_stock\StockUpdateInterface;
+use Drupal\Core\Database\Connection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * The backend for the local stock service.
- */
-class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
+class LocalStockChecker implements StockCheckInterface {
 
   /**
-   * {@inheritdoc}
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
    */
-  public function createTransaction($entity_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
-    // Get optional fields.
-    $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
-    $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
-    $related_uid = isset($metadata['related_uid']) ? $metadata['related_uid'] : NULL;
-    $data = isset($metadata['data']) ? $metadata['data'] : NULL;
+  protected $database;
 
-    // Create a record.
-    $field_values = [
-      'entity_id' => $entity_id,
-      'qty' => $quantity,
-      'location_id' => $location_id,
-      'location_zone' => $zone,
-      'unit_cost' => $unit_cost,
-      'transaction_time' => time(),
-      'transaction_type_id' => $transaction_type_id,
-      'related_tid' => $related_tid,
-      'related_oid' => $related_oid,
-      'related_uid' => $related_uid,
-      'data' => serialize($data),
-    ];
-    $insert = \Drupal::database()->insert('commerce_stock_transaction')
-      ->fields(array_keys($field_values))
-      ->values(array_values($field_values))->execute();
 
-    return $insert;
+  /**
+   * Constructs the local stock checker.
+   *
+   * @param \Drupal\Core\Database\Connection $database
+   */
+  public function __construct(Connection $database){
+      $this->database = $database;
+  }
+
+  /**
+   * Creates an instance of the local stock checker.
+   *
+   * @param ContainerInterface $container
+   *   The DI container.
+   *
+   * @return static
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database')
+    );
   }
 
   /**
@@ -66,8 +64,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    *   An array of 'qty' and 'last_transaction_id' values.
    */
   public function getLocationStockLevel($location_id, $entity_id) {
-    $db = \Drupal::database();
-    $result = $db->select('commerce_stock_location_level', 'll')
+    $result = $this->database->select('commerce_stock_location_level', 'll')
       ->fields('ll')
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity_id)
@@ -95,14 +92,13 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    *   Last transaction id.
    */
   public function setLocationStockLevel($location_id, $entity_id, $qty, $last_txn) {
-    $db = \Drupal::database();
-    $existing = $db->select('commerce_stock_location_level', 'll')
+    $existing = $this->database->select('commerce_stock_location_level', 'll')
       ->fields('ll')
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity_id)
       ->execute()->fetch();
     if ($existing) {
-      $db->update('commerce_stock_location_level')
+      $this->database->update('commerce_stock_location_level')
         ->fields([
           'qty' => $qty,
           'last_transaction_id' => $last_txn,
@@ -112,7 +108,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
         ->execute();
     }
     else {
-      $db->insert('commerce_stock_location_level')
+      $this->database->insert('commerce_stock_location_level')
         ->fields(['location_id', 'entity_id', 'qty', 'last_transaction_id'])
         ->values([$location_id, $entity_id, $qty, $last_txn])
         ->execute();
@@ -131,8 +127,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    *   The last location stock transaction id.
    */
   public function getLocationStockTransactionLatest($location_id, $entity_id) {
-    $db = \Drupal::database();
-    $query = $db->select('commerce_stock_transaction')
+    $query = $this->database->select('commerce_stock_transaction')
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity_id);
     $query->addExpression('MAX(id)', 'max_id');
@@ -160,8 +155,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    *   The sum of stock transactions for a given location and purchasable entity.
    */
   public function getLocationStockTransactionSum($location_id, $entity_id, $min, $max) {
-    $db = \Drupal::database();
-    $query = $db->select('commerce_stock_transaction', 'txn')
+    $query = $this->database->select('commerce_stock_transaction', 'txn')
       ->fields('txn', ['location_id'])
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity_id)
@@ -249,8 +243,7 @@ class LocalStockStorage implements StockCheckInterface, StockUpdateInterface {
    * {@inheritdoc}
    */
   public function getLocationList($return_active_only = TRUE) {
-    $db = \Drupal::database();
-    $query = $db->select('commerce_stock_location', 'loc')
+    $query = $this->database->select('commerce_stock_location', 'loc')
       ->fields('loc');
     if ($return_active_only) {
       $query->condition('status', 1);

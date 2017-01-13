@@ -30,11 +30,18 @@ class StockDevTools extends FormBase {
   protected $stockServiceManager;
 
   /**
-   * The local stock service storage.
+   * The local stock checker.
    *
-   * @var \Drupal\commerce_stock_local\LocalStockStorage
+   * @var \Drupal\commerce_stock_local\LocalStockChecker
    */
-  protected $localStockStorage;
+  protected $localStockChecker;
+
+  /**
+   * The local stock updater.
+   *
+   * @var \Drupal\commerce_stock_local\LocalStockChecker
+   */
+  protected $localStockUpdater;
 
   /**
    * The stock availability checker.
@@ -58,7 +65,8 @@ class StockDevTools extends FormBase {
     $this->currentStore = \Drupal::service('commerce_store.store_context')->getStore();
     $this->stockAvailabilityChecker = \Drupal::service('commerce_stock.availability_checker');
     $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
-    $this->localStockStorage = \Drupal::service('commerce_stock.local_stock_service')->getStockChecker();
+    $this->localStockChecker = \Drupal::service('commerce_stock.local_stock_service')->getStockChecker();
+    $this->localStockUpdater = \Drupal::service('commerce_stock.local_stock_service')->getStockUpdater();
     $this->variationStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
   }
 
@@ -286,7 +294,7 @@ class StockDevTools extends FormBase {
   public function submitCheckStockForm(array &$form, FormStateInterface $form_state) {
     $prod_id = $form_state->getValue('prod_vid');
     $location_ids = explode(',', $form_state->getValue('location_ids'));
-    $stock_level = $this->localStockStorage->getTotalStockLevel($prod_id, $location_ids);
+    $stock_level = $this->localStockChecker->getTotalStockLevel($prod_id, $location_ids);
     drupal_set_message($this->t('Stock level is: @stock_level', ['@stock_level' => $stock_level]));
   }
 
@@ -295,7 +303,7 @@ class StockDevTools extends FormBase {
    */
   public function submitGetLocations(array &$form, FormStateInterface $form_state) {
     $active_only = $form_state->getValue('active_only');
-    $locations = $this->localStockStorage->getLocationList($active_only);
+    $locations = $this->localStockChecker->getLocationList($active_only);
     drupal_set_message($this->t('Locations: @locations', ['@locations' => print_r($locations, TRUE)]));
   }
 
@@ -309,7 +317,7 @@ class StockDevTools extends FormBase {
     $quantity = $form_state->getValue('quantity');
     $unit_cost = NULL;
     $options = [];
-    $this->localStockStorage->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, 1, $options);
+    $this->localStockUpdater->createTransaction($variation_id, $location_id, $zone, $quantity, $unit_cost, 1, $options);
   }
 
   /**
@@ -318,7 +326,7 @@ class StockDevTools extends FormBase {
   public function submitUpdateProductInventoryLocationLevel(array &$form, FormStateInterface $form_state) {
     $variation_id = $form_state->getValue('prod_vid');
     $location_id = $form_state->getValue('location');
-    $this->localStockStorage->updateLocationStockLevel($location_id, $variation_id);
+    $this->localStockChecker->updateLocationStockLevel($location_id, $variation_id);
   }
 
   /**
