@@ -120,26 +120,24 @@ class StockLocation extends ContentEntityBase implements LocalStockLocationInter
       ->setDescription(t('The name of the stock location entity.'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
-      ->setSettings(array(
+      ->setSettings([
         'default_value' => '',
         'max_length' => 255,
-        'text_processing' => 0,
-      ))
-      ->setDisplayOptions('view', array(
-        'label' => 'above',
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
         'type' => 'string',
-        'weight' => -4,
-      ))
-      ->setDisplayOptions('form', array(
+        'weight' => -5,
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'string_textfield',
-        'weight' => -4,
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+        'weight' => -5,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))
-      ->setDescription(t('A boolean indicating whether the stock location is active.'))
+      ->setDescription(t('Whether the stock location is active.'))
       ->setDefaultValue(TRUE)
       ->setTranslatable(TRUE)
       ->setDisplayConfigurable('form', TRUE);
