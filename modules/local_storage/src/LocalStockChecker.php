@@ -15,14 +15,14 @@ class LocalStockChecker implements StockCheckInterface {
    */
   protected $database;
 
-
   /**
    * Constructs the local stock checker.
    *
    * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
    */
-  public function __construct(Connection $database){
-      $this->database = $database;
+  public function __construct(Connection $database) {
+    $this->database = $database;
   }
 
   /**

@@ -7,7 +7,7 @@ use Drupal\Core\Database\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LocalStockUpdater
+ * Class LocalStockUpdater.
  */
 class LocalStockUpdater implements StockUpdateInterface {
 
@@ -22,8 +22,9 @@ class LocalStockUpdater implements StockUpdateInterface {
    * Constructs the local stock checker.
    *
    * @param \Drupal\Core\Database\Connection $database
+   *    The database connection.
    */
-  public function __construct(Connection $database){
+  public function __construct(Connection $database) {
     $this->database = $database;
   }
 
