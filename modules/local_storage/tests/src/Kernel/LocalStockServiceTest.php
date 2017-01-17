@@ -23,7 +23,6 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
     $this->installConfig(['commerce_stock']);
     $this->installConfig(['commerce_stock_local']);
   }
@@ -50,6 +49,7 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
     self::assertEquals($stockChecker, $localStockService->getStockChecker());
     self::assertEquals($stockUpdater, $localStockService->getStockUpdater());
     self::assertEquals($stockServiceConfig, $localStockService->getConfiguration());
+
     self::assertEquals('local_stock', $localStockService->getId());
     self::assertEquals('Local stock', $localStockService->getName());
 

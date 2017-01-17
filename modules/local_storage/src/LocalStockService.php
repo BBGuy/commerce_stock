@@ -59,7 +59,6 @@ class LocalStockService implements StockServiceInterface {
       $container->get('commerce_stock.local_stock_updater'),
       $container->get('commerce_stock.local_stock_service_config')
     );
-  }
 
   /**
    * Get the name of the service.
