@@ -58,6 +58,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
+      'administer commerce_order',
       'administer commerce_product',
       'administer commerce_product_type',
       'administer commerce_product fields',

@@ -50,9 +50,39 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order placed.'],
+          'data' => ['message' => 'order placed'],
         ];
         $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $quantity, NULL, $transaction_type, $metadata);
+      }
+    }
+  }
+
+  /**
+   * Acts on the order update event to create transactions for new items.
+   *
+   * The reason this isn't handled by OrderEvents::ORDER_ITEM_INSERT is because
+   * that event never has the correct values.
+   *
+   * @param \Drupal\commerce_order\Event\OrderEvent $event
+   *   The order event.
+   */
+  public function onOrderUpdate(OrderEvent $event) {
+    $order = $event->getOrder();
+    $original_order = $order->original;
+    foreach ($order->getItems() as $item) {
+      if (!$original_order->hasItem($item)) {
+        if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
+          $entity = $item->getPurchasedEntity();
+          $service = $this->stockServiceManager->getService($entity);
+          $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
+          $amount = -1 * $item->getQuantity();
+          $metadata = [
+            'related_oid' => $order->id(),
+            'related_uid' => $order->getCustomerId(),
+            'data' => ['message' => 'order item added'],
+          ];
+          $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $amount, NULL, TRANSACTION_TYPE_SALE, $metadata);
+        }
       }
     }
   }
@@ -75,7 +105,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order canceled.'],
+          'data' => ['message' => 'order canceled'],
         ];
         $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
       }
@@ -85,12 +115,18 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   /**
    * Performs a stock transaction on an order delete event.
    *
+   * This happens on PREDELETE since the items are not available after DELETE.
+   *
    * @param \Drupal\commerce_order\Event\OrderEvent $event
    *   The order event.
    */
   public function onOrderDelete(OrderEvent $event) {
     $order = $event->getOrder();
-    foreach ($order->getItems() as $item) {
+    if ($order->getState()->value == 'canceled') {
+      return;
+    }
+    $items = $order->getItems();
+    foreach ($items as $item) {
       $entity = $item->getPurchasedEntity();
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
@@ -100,33 +136,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order deleted.'],
+          'data' => ['message' => 'order deleted'],
         ];
         $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
       }
-    }
-  }
-
-  /**
-   * Performs a stock transaction when an order item is created.
-   *
-   * @param \Drupal\commerce_order\Event\OrderItemEvent $event
-   *   The order item event.
-   */
-  public function onOrderItemCreate(OrderItemEvent $event) {
-    $item = $event->getOrderItem();
-    $order = $item->getOrder();
-    if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
-      $entity = $item->getPurchasedEntity();
-      $service = $this->stockServiceManager->getService($entity);
-      $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
-      $amount = -1 * $item->getQuantity();
-      $metadata = [
-        'related_oid' => $order->id(),
-        'related_uid' => $order->getCustomerId(),
-        'data' => ['message' => 'order item added'],
-      ];
-      $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $amount, NULL, TRANSACTION_TYPE_SALE, $metadata);
     }
   }
 
@@ -187,8 +200,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       'commerce_order.place.post_transition' => ['onOrderPlace', -100],
       'commerce_order.cancel.post_transition' => ['onOrderCancel', -100],
       // Order storage events dispatched during entity operations in CommerceContentEntityStorage.
-      OrderEvents::ORDER_DELETE => ['onOrderDelete', -100],
-      OrderEvents::ORDER_ITEM_PRESAVE => ['onOrderItemCreate', -100],
+      // ORDER_UPDATE handles new order items since ORDER_ITEM_INSERT doesn't.
+      OrderEvents::ORDER_UPDATE => ['onOrderUpdate', -100],
+      OrderEvents::ORDER_PREDELETE => ['onOrderDelete', -100],
       OrderEvents::ORDER_ITEM_UPDATE => ['onOrderItemUpdate', -100],
       OrderEvents::ORDER_ITEM_DELETE => ['onOrderItemDelete', -100],
     ];

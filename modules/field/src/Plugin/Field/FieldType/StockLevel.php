@@ -129,7 +129,7 @@ class StockLevel extends FieldItemBase {
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;
-        $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field.';
+        $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field';
         $metadata = ['data' => ['message' => $transaction_note]];
         $this->stockServiceManager->createTransaction($entity, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
       }
