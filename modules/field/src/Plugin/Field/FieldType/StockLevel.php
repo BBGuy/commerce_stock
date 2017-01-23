@@ -88,8 +88,6 @@ class StockLevel extends FieldItemBase {
    * This updates the stock based on parameters set by the stock widget.
    */
   public function setValue($values, $notify = TRUE) {
-    parent::setValue($values, $notify);
-
     // @todo Figure out why sometimes this is called twice.
     static $called = FALSE;
     if ($called) {
@@ -97,31 +95,43 @@ class StockLevel extends FieldItemBase {
     }
     $called = TRUE;
 
-    $entity_id = $values['stock']['stocked_entity_id'];
-    if (!empty($entity_id)) {
-      $purchasable_entity = $this->getEntity()->load($entity_id);
+    if (!empty($this->getEntity())) {
+      $entity = $this->getEntity();
       $transaction_qty = 0;
-      switch ($values['stock']['entry_system']) {
-        case 'simple':
-          $new_level = $values['stock']['value'];
-          $level = $this->stockServiceManager->getStockLevel($purchasable_entity);
-          $transaction_qty = $new_level - $level;
-          break;
 
-        case 'basic':
-          $transaction_qty = (int) $values['stock']['adjustment'];
-          break;
+      // Supports absolute values being passed in directly, i.e. programmatically.
+      if (!is_array($values)) {
+        $values = ['stock' => ['value' => $values]];
       }
+      if (empty($values['stock']['entry_system'])) {
+        $transaction_qty = (int) $values['stock']['value'];
+      }
+
+      // Or supports a field widget entry system.
+      else {
+        switch ($values['stock']['entry_system']) {
+          case 'simple':
+            $new_level = $values['stock']['value'];
+            $level = $this->stockServiceManager->getStockLevel($entity);
+            $transaction_qty = $new_level - $level;
+            break;
+
+          case 'basic':
+            $transaction_qty = (int) $values['stock']['adjustment'];
+            break;
+        }
+      }
+
       if ($transaction_qty) {
         $transaction_type = ($transaction_qty > 0) ? TRANSACTION_TYPE_STOCK_IN : TRANSACTION_TYPE_STOCK_OUT;
         // @todo Add zone and location to form.
-        $location_id = $this->stockServiceManager->getPrimaryTransactionLocation($purchasable_entity, $transaction_qty);
+        $location_id = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;
-        $transaction_note = $values['stock']['stock_transaction_note'];
+        $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field.';
         $metadata = ['data' => ['message' => $transaction_note]];
-        $this->stockServiceManager->createTransaction($purchasable_entity, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+        $this->stockServiceManager->createTransaction($entity, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
       }
     }
   }
