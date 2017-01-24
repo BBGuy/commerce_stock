@@ -26,7 +26,6 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
     'commerce_product',
     'commerce_order',
     'commerce_stock',
-    'commerce_stock_local',
     'commerce_stock_ui',
     'field_ui',
     'options',
@@ -43,7 +42,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
   /**
    * The product to test against.
    *
-   * @var \Drupal\commerce_product\Entity\ProductInterface[]
+   * @var \Drupal\commerce_product\Entity\ProductInterface
    */
   protected $product;
 
@@ -59,6 +58,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
    */
   protected function getAdministratorPermissions() {
     return array_merge([
+      'administer commerce_order',
       'administer commerce_product',
       'administer commerce_product_type',
       'administer commerce_product fields',

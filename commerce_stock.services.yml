@@ -15,3 +15,9 @@ services:
     class: Drupal\commerce_stock\AlwaysInStockService
     tags:
       - { name: commerce_stock.stock_service, priority: 0 }
+
+  commerce_stock.order_event_subscriber:
+    class: Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber
+    arguments: ['@commerce_stock.service_manager']
+    tags:
+      - { name: 'event_subscriber' }
