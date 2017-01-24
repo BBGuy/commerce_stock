@@ -88,15 +88,14 @@ class StockLevel extends FieldItemBase {
    * This updates the stock based on parameters set by the stock widget.
    */
   public function setValue($values, $notify = TRUE) {
-    // @todo Figure out why sometimes this is called twice.
-    static $called = FALSE;
-    if ($called) {
-      return;
-    }
-    $called = TRUE;
-
+    static $called = [];
     if (!empty($this->getEntity())) {
       $entity = $this->getEntity();
+      // @todo Figure out why sometimes this is called twice.
+      if (isset($called[$entity->id()])) {
+        return;
+      }
+      $called[$entity->id()] = TRUE;
       $transaction_qty = 0;
 
       // Supports absolute values being passed in directly, i.e. programmatically.
