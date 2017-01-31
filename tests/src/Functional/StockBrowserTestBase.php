@@ -65,6 +65,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
       'administer commerce_product_variation fields',
       'administer commerce_product_variation display',
       'access commerce_product overview',
+      'administer commerce_stock',
     ], parent::getAdministratorPermissions());
   }
 

@@ -4,6 +4,6 @@ commerce_stock.stock_config:
     _form: '\Drupal\commerce_stock\Form\StockConfigForm'
     _title: 'Configure Commerce Stock'
   requirements:
-    _permission: 'access administration pages'
+    _permission: 'administer commerce_stock'
   options:
     _admin_route: TRUE

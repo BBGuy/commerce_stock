@@ -1,0 +1,4 @@
+'administer commerce_stock':
+   title: 'Administer Commerce Stock'
+   description: 'Use Commerce Stock administrative pages and functionality.'
+   'restrict access': TRUE
