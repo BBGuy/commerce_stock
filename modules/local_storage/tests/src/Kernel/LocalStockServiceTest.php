@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce_product_local\Kernel\Entity;
+namespace Drupal\Tests\commerce_stock_local\Kernel;
 
 use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockServiceConfigInterface;
@@ -17,6 +17,13 @@ use Prophecy\Argument;
  * @group commerce_stock
  */
 class LocalStockServiceTest extends CommerceStockKernelTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'commerce_stock_local',
+  ];
 
   /**
    * {@inheritdoc}

@@ -12,6 +12,15 @@ namespace Drupal\Tests\commerce_stock\Functional;
 class StockServiceTest extends StockBrowserTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = [
+    'commerce_stock_local',
+  ];
+
+  /**
    * Tests stock service manager and configuration changes through the UI.
    *
    * @covers ::getService

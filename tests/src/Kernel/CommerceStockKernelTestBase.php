@@ -19,8 +19,6 @@ class CommerceStockKernelTestBase extends CommerceKernelTestBase {
    */
   public static $modules = [
     'commerce_stock',
-    'commerce_stock_local',
-    'commerce_stock_field',
   ];
 
 }

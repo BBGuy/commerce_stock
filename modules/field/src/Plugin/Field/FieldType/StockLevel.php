@@ -88,42 +88,51 @@ class StockLevel extends FieldItemBase {
    * This updates the stock based on parameters set by the stock widget.
    */
   public function setValue($values, $notify = TRUE) {
-    parent::setValue($values, $notify);
-
-    // @todo Figure out why sometimes this is called twice.
-    static $called = FALSE;
-    if ($called) {
-      return;
-    }
-    $called = TRUE;
-
-    $entity_id = empty($values['stock']['stocked_entity_id']) ? NULL : $values['stock']['stocked_entity_id'];
-    if (!empty($entity_id)) {
-      /** @var \Drupal\commerce\PurchasableEntityInterface $purchasable_entity */
-      $purchasable_entity = $this->getEntity()->load($entity_id);
-      $transaction_qty = 0;
-      switch ($values['stock']['entry_system']) {
-        case 'simple':
-          $new_level = $values['stock']['value'];
-          $level = $this->stockServiceManager->getStockLevel($purchasable_entity);
-          $transaction_qty = $new_level - $level;
-          break;
-
-        case 'basic':
-          $transaction_qty = (int) $values['stock']['adjustment'];
-          break;
+    static $called = [];
+    if (!empty($this->getEntity())) {
+      $entity = $this->getEntity();
+      // @todo Figure out why sometimes this is called twice.
+      if (isset($called[$entity->id()])) {
+        return;
       }
+      $called[$entity->id()] = TRUE;
+      $transaction_qty = 0;
+
+      // Supports absolute values being passed in directly, i.e. programmatically.
+      if (!is_array($values)) {
+        $values = ['stock' => ['value' => $values]];
+      }
+      if (empty($values['stock']['entry_system'])) {
+        $transaction_qty = (int) $values['stock']['value'];
+      }
+
+      // Or supports a field widget entry system.
+      else {
+        switch ($values['stock']['entry_system']) {
+          case 'simple':
+            $new_level = $values['stock']['value'];
+            $level = $this->stockServiceManager->getStockLevel($entity);
+            $transaction_qty = $new_level - $level;
+            break;
+
+          case 'basic':
+            $transaction_qty = (int) $values['stock']['adjustment'];
+            break;
+        }
+      }
+
       if ($transaction_qty) {
         $transaction_type = ($transaction_qty > 0) ? TRANSACTION_TYPE_STOCK_IN : TRANSACTION_TYPE_STOCK_OUT;
         // @todo Add zone and location to form.
         /** @var \Drupal\commerce_stock\StockLocationInterface $location */
-        $location = $this->stockServiceManager->getPrimaryTransactionLocation($purchasable_entity, $transaction_qty);
+        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;
-        $transaction_note = empty($values['stock']['stock_transaction_note']) ? '' : $values['stock']['stock_transaction_note'];
+        // @ToDo Make this hardcoded note translatable or remove it at all.
+        $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field';
         $metadata = ['data' => ['message' => $transaction_note]];
-        $this->stockServiceManager->createTransaction($purchasable_entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+        $this->stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
       }
     }
   }
