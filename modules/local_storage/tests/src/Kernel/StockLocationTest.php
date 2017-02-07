@@ -15,6 +15,13 @@ use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 class StockLocationTest extends CommerceStockKernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'commerce_stock_local',
+  ];
+
+  /**
    * A sample user.
    *
    * @var \Drupal\user\UserInterface

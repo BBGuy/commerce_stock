@@ -9,9 +9,9 @@ services:
     class: Drupal\commerce_stock_local\LocalStockChecker
     arguments: ['@database']
 
-  ccommerce_stock.local_stock_updater:
-       class: Drupal\commerce_stock_local\LocalStockUpdater
-       arguments: ['@database']
+  commerce_stock.local_stock_updater:
+    class: Drupal\commerce_stock_local\LocalStockUpdater
+    arguments: ['@database']
 
   commerce_stock.local_stock_service_config:
     class: Drupal\commerce_stock_local\LocalStockServiceConfig
