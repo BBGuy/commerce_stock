@@ -9,7 +9,7 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_stock\StockServiceManagerInterface;
-use Drupal\commerce_stock_local\LocalStockStorage;
+use Drupal\commerce_stock_local\LocalStockChecker;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\profile\Entity\Profile;
 
@@ -213,7 +213,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
 
     // Tests initial stock level transactions set by the field values.
     $this->assertInstanceOf(StockServiceManagerInterface::class, $this->stockServiceManager);
-    $this->assertInstanceOf(LocalStockStorage::class, $this->checker);
+    $this->assertInstanceOf(LocalStockChecker::class, $this->checker);
     $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
     $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2->id(), $this->locations2));
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
