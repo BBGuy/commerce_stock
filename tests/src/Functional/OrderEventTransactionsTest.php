@@ -11,7 +11,6 @@ use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\commerce_stock_local\LocalStockChecker;
 use Drupal\commerce_stock_local\LocalStockServiceConfig;
-use Drupal\commerce_stock_local\LocalStockStorage;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\profile\Entity\Profile;
 
@@ -85,14 +84,14 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
   /**
    * The stock service configuration.
    *
-   * @var \Drupal\commerce_stock\$stockServiceConfiguration
+   * @var \Drupal\commerce_stock\stockServiceConfiguration
    */
   protected $stockServiceConfiguration;
 
   /**
    * The second stock service configuration.
    *
-   * @var \Drupal\commerce_stock\$stockServiceConfiguration2
+   * @var \Drupal\commerce_stock\stockServiceConfiguration2
    */
   protected $stockServiceConfiguration2;
 
