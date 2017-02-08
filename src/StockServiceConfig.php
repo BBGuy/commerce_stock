@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_stock;
 
+use Drupal\commerce\PurchasableEntityInterface;
+
 class StockServiceConfig implements StockServiceConfigInterface {
 
   /**
@@ -35,15 +37,15 @@ class StockServiceConfig implements StockServiceConfigInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLocationList($entity_id) {
+  public function getLocationList(PurchasableEntityInterface $entity) {
     return $this->stockLocations;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPrimaryTransactionLocation($entity_id, $quantity) {
-    $locations = $this->getLocationList($entity_id);
+  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity) {
+    $locations = $this->getLocationList($entity);
     // @todo - we need a better way of managing this.
     return array_shift($locations);
   }

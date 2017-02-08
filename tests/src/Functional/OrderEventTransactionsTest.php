@@ -214,8 +214,8 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     // Tests initial stock level transactions set by the field values.
     $this->assertInstanceOf(StockServiceManagerInterface::class, $this->stockServiceManager);
     $this->assertInstanceOf(LocalStockChecker::class, $this->checker);
-    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
-    $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2->id(), $this->locations2));
+    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
+    $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2, $this->locations2));
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('transaction_type_id', TRANSACTION_TYPE_STOCK_IN);
@@ -233,7 +233,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->order->getState()->applyTransition($transition['place']);
     $this->order->save();
     $this->assertEquals($this->order->getState()->getLabel(), 'Validation');
-    $this->assertEquals(9, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
+    $this->assertEquals(9, $this->checker->getTotalStockLevel($this->variation, $this->locations));
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation->id())
@@ -252,7 +252,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
    * Tests that transactions are created for the order cancel workflow event.
    */
   public function testWorkflowCancelEvent() {
-    $this->assertEquals(9, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
+    $this->assertEquals(9, $this->checker->getTotalStockLevel($this->variation, $this->locations));
     $transition = $this->order->getState()->getTransitions();
     $this->order->getState()->applyTransition($transition['cancel']);
     $this->order->save();
@@ -269,7 +269,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('1.00', $result[0]->qty);
     $this->assertEquals('order canceled', unserialize($result[0]->data)['message']);
-    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
+    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
   }
 
   /**
@@ -277,7 +277,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
    */
   public function testOrderEvents() {
     // Tests the order item creation event.
-    $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2->id(), $this->locations2));
+    $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2, $this->locations2));
     $this->drupalGet($this->order->toUrl('edit-form'));
     $this->assertSession()->statusCodeEquals(200);
     $this->submitForm([], 'Add new order item');
@@ -305,11 +305,12 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->assertCount(1, $result);
     $this->assertEquals('4', $result[0]->id);
     $this->assertEquals($this->variation2->id(), $result[0]->entity_id);
+    $this->assertEquals($this->variation2->getEntityTypeId(), $result[0]->entity_type);
     $this->assertEquals($this->order->id(), $result[0]->related_oid);
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('-1.00', $result[0]->qty);
     $this->assertEquals('order item added', unserialize($result[0]->data)['message']);
-    $this->assertEquals(9, $this->checker->getTotalStockLevel($this->variation2->id(), $this->locations2));
+    $this->assertEquals(9, $this->checker->getTotalStockLevel($this->variation2, $this->locations2));
 
     // Tests the order item update event.
     $this->drupalGet($this->order->toUrl('edit-form'));
@@ -331,7 +332,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->assertEquals($this->order->getCustomerId(), $result[1]->related_uid);
     $this->assertEquals('-2.00', $result[1]->qty);
     $this->assertEquals('order item quantity updated', unserialize($result[1]->data)['message']);
-    $this->assertEquals(7, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
+    $this->assertEquals(7, $this->checker->getTotalStockLevel($this->variation, $this->locations));
 
     // Tests the order item delete event.
     $this->drupalGet($this->order->toUrl('edit-form'));
@@ -350,7 +351,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('3.00', $result[0]->qty);
     $this->assertEquals('order item deleted', unserialize($result[0]->data)['message']);
-    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
+    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
 
     // Tests the order delete event.
     $this->drupalGet($this->order->toUrl('delete-form'));
@@ -368,8 +369,8 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('1.00', $result[0]->qty);
     $this->assertEquals('order deleted', unserialize($result[0]->data)['message']);
-    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation->id(), $this->locations));
-    $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2->id(), $this->locations2));
+    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
+    $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2, $this->locations2));
   }
 
 }

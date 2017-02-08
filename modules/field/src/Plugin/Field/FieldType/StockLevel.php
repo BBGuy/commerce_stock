@@ -92,10 +92,10 @@ class StockLevel extends FieldItemBase {
     if (!empty($this->getEntity())) {
       $entity = $this->getEntity();
       // @todo Figure out why sometimes this is called twice.
-      if (isset($called[$entity->id()])) {
+      if (isset($called[$entity->getEntityTypeId() . $entity->id()])) {
         return;
       }
-      $called[$entity->id()] = TRUE;
+      $called[$entity->getEntityTypeId() . $entity->id()] = TRUE;
       $transaction_qty = 0;
 
       // Supports absolute values being passed in directly, i.e. programmatically.

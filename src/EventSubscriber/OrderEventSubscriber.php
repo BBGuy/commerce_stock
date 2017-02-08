@@ -52,7 +52,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order placed'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $quantity, NULL, $transaction_type, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $quantity, NULL, $transaction_type, $metadata);
       }
     }
   }
@@ -81,7 +81,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
             'related_uid' => $order->getCustomerId(),
             'data' => ['message' => 'order item added'],
           ];
-          $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $amount, NULL, TRANSACTION_TYPE_SALE, $metadata);
+          $service->getStockUpdater()->createTransaction($entity, $location, '', $amount, NULL, TRANSACTION_TYPE_SALE, $metadata);
         }
       }
     }
@@ -107,7 +107,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order canceled'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
       }
     }
   }
@@ -138,7 +138,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order deleted'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
       }
     }
   }
@@ -164,7 +164,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order item quantity updated'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $diff, NULL, $transaction_type, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $diff, NULL, $transaction_type, $metadata);
       }
     }
   }
@@ -187,7 +187,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         'related_uid' => $order->getCustomerId(),
         'data' => ['message' => 'order item deleted'],
       ];
-      $service->getStockUpdater()->createTransaction($entity->id(), $location, '', $item->getQuantity(), NULL, TRANSACTION_TYPE_RETURN, $metadata);
+      $service->getStockUpdater()->createTransaction($entity, $location, '', $item->getQuantity(), NULL, TRANSACTION_TYPE_RETURN, $metadata);
     }
   }
 

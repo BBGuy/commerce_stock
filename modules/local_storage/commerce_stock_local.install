@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\Core\Entity\EntityTypeInterface;
+
 /**
  * Implements hook_schema().
  */
@@ -80,6 +82,12 @@ function commerce_stock_local_schema() {
         'type'        => 'int',
         'unsigned'    => TRUE,
         'not null'    => TRUE,
+      ],
+      'entity_type' => [
+        'description' => 'Purchasable entity type',
+        'type'        => 'varchar_ascii',
+        'length'      => EntityTypeInterface::ID_MAX_LENGTH,
+        'not null'    => FALSE,
       ],
       'qty' => [
         'description' => 'Transaction quantity',
@@ -292,4 +300,18 @@ function commerce_stock_local_install() {
       'parent_id' => 1,
     ])
     ->execute();
+}
+
+/**
+ * Adds 'entity_type' column to commerce_stock_transaction table.
+ */
+function commerce_stock_local_update_8001() {
+  $spec = array(
+    'description' => 'Purchasable entity type',
+    'type'        => 'varchar_ascii',
+    'length'      => EntityTypeInterface::ID_MAX_LENGTH,
+    'not null'    => FALSE,
+  );
+  $schema = \Drupal::database()->schema();
+  $schema->addField('commerce_stock_transaction', 'entity_type', $spec);
 }

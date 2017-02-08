@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_stock_local;
 
+use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
 use Drupal\Core\Database\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -45,7 +46,7 @@ class LocalStockUpdater implements StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function createTransaction($entity_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
     // Get optional fields.
     $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
     $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
@@ -54,7 +55,8 @@ class LocalStockUpdater implements StockUpdateInterface {
 
     // Create a record.
     $field_values = [
-      'entity_id' => $entity_id,
+      'entity_id' => $entity->id(),
+      'entity_type' => $entity->getEntityTypeId(),
       'qty' => $quantity,
       'location_id' => $location_id,
       'location_zone' => $zone,
