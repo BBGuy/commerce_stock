@@ -9,6 +9,7 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_stock\StockServiceManagerInterface;
+use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce_stock_local\LocalStockChecker;
 use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\profile\Entity\Profile;
@@ -218,7 +219,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2, $this->locations2));
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
-      ->condition('transaction_type_id', TRANSACTION_TYPE_STOCK_IN);
+      ->condition('transaction_type_id', StockTransactionsInterface::STOCK_IN);
     $result = $query->execute()->fetchAll();
     $this->assertEquals('1', $result[0]->id);
     $this->assertEquals($this->variation->id(), $result[0]->entity_id);
@@ -237,7 +238,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation->id())
-      ->condition('transaction_type_id', TRANSACTION_TYPE_SALE);
+      ->condition('transaction_type_id', StockTransactionsInterface::STOCK_SALE);
     $result = $query->execute()->fetchAll();
     $this->assertCount(1, $result);
     $this->assertEquals('3', $result[0]->id);
@@ -260,7 +261,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation->id())
-      ->condition('transaction_type_id', TRANSACTION_TYPE_RETURN);
+      ->condition('transaction_type_id', StockTransactionsInterface::STOCK_RETURN);
     $result = $query->execute()->fetchAll();
     $this->assertCount(1, $result);
     $this->assertEquals('4', $result[0]->id);
@@ -300,7 +301,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation2->id())
-      ->condition('transaction_type_id', TRANSACTION_TYPE_SALE);
+      ->condition('transaction_type_id', StockTransactionsInterface::STOCK_SALE);
     $result = $query->execute()->fetchAll();
     $this->assertCount(1, $result);
     $this->assertEquals('4', $result[0]->id);
@@ -323,7 +324,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation->id())
-      ->condition('transaction_type_id', TRANSACTION_TYPE_SALE);
+      ->condition('transaction_type_id', StockTransactionsInterface::STOCK_SALE);
     $result = $query->execute()->fetchAll();
     $this->assertCount(2, $result);
     $this->assertEquals('5', $result[1]->id);
@@ -342,7 +343,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation->id())
-      ->condition('transaction_type_id', TRANSACTION_TYPE_RETURN);
+      ->condition('transaction_type_id', StockTransactionsInterface::STOCK_RETURN);
     $result = $query->execute()->fetchAll();
     $this->assertCount(1, $result);
     $this->assertEquals('6', $result[0]->id);
@@ -360,7 +361,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation2->id())
-      ->condition('transaction_type_id', TRANSACTION_TYPE_RETURN);
+      ->condition('transaction_type_id', StockTransactionsInterface::STOCK_RETURN);
     $result = $query->execute()->fetchAll();
     $this->assertCount(1, $result);
     $this->assertEquals('7', $result[0]->id);

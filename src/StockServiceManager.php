@@ -102,7 +102,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * {@inheritdoc}
    */
   public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $message = NULL) {
-    $transaction_type_id = TRANSACTION_TYPE_NEW_STOCK;
+    $transaction_type_id = StockTransactionsInterface::NEW_STOCK;
     if (is_null($message)) {
       $metadata = [];
     }
@@ -123,7 +123,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * {@inheritdoc}
    */
   public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL) {
-    $transaction_type_id = TRANSACTION_TYPE_SALE;
+    $transaction_type_id = StockTransactionsInterface::STOCK_SALE;
     $metadata = [
       'related_oid' => $order_id,
       'related_uid' => $user_id,
@@ -155,17 +155,17 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     $quantity_from = -1 * abs($quantity);
     $quantity_to = abs($quantity);
     $stock_updater = $this->getService($entity)->getStockUpdater();
-    $tid = $stock_updater->createTransaction($entity, $from_location_id, $from_zone, $quantity_from, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_FROM, $metadata);
+    $tid = $stock_updater->createTransaction($entity, $from_location_id, $from_zone, $quantity_from, $unit_cost, StockTransactionsInterface::MOVEMENT_FROM, $metadata);
     // The second transaction will point to the first one.
     $metadata['related_tid'] = $tid;
-    $stock_updater->createTransaction($entity, $to_location_id, $to_zone, $quantity_to, $unit_cost, TRANSACTION_TYPE_STOCK_MOVMENT_TO, $metadata);
+    $stock_updater->createTransaction($entity, $to_location_id, $to_zone, $quantity_to, $unit_cost, StockTransactionsInterface::MOVEMENT_TO, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
   public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL) {
-    $transaction_type_id = TRANSACTION_TYPE_RETURN;
+    $transaction_type_id = StockTransactionsInterface::STOCK_RETURN;
     $metadata = [
       'related_oid' => $order_id,
       'related_uid' => $user_id,
