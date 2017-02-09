@@ -22,10 +22,10 @@ class StockLevelUpdater extends QueueWorkerBase {
    */
   public function processItem($data) {
     $entity_id = $data;
-    $updater = \Drupal::service('commerce_stock.local_stock_service')->getStockUpdater();
-    $locations = $updater->getLocationList(TRUE);
+    $checker = \Drupal::service('commerce_stock.local_stock_service')->getStockChecker();
+    $locations = $checker->getLocationList(TRUE);
     foreach ($locations as $location_id => $location) {
-      $updater->updateLocationStockLevel($location_id, $entity_id);
+      $checker->updateLocationStockLevel($location_id, $entity_id);
     }
   }
 
