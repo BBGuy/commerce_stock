@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\AvailabilityCheckerInterface;
+use Drupal\commerce\AvailabilityResponse\AvailabilityResponse;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Context;
 
@@ -46,27 +47,25 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
    * {@inheritdoc}
    */
   public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
-    if (empty($quantity)) {
-      $quantity = 1;
-    }
     $stock_service = $this->stockServiceManager->getService($entity);
     $stock_checker = $stock_service->getStockChecker();
     $stock_config = $stock_service->getConfiguration();
-
     $entity_id = $entity->id();
-
-    // Get locations.
     $locations = $stock_config->getLocationList($entity_id);
 
-    // Check if always in stock.
-    if (!$stock_checker->getIsAlwaysInStock($entity_id)) {
-      // Check if quantity is available.
-      $stock_level = $stock_checker->getTotalStockLevel($entity_id, $locations);
-
-      return ($stock_level >= $quantity);
+    if ($stock_checker->getIsAlwaysInStock($entity_id)) {
+      return AvailabilityResponse::available(0, $quantity);
     }
 
-    return TRUE;
+    $stock_level = $stock_checker->getTotalStockLevel($entity_id, $locations);
+    // @todo Minimum qty instead of 0?
+
+    if ($stock_level > $quantity) {
+      return AvailabilityResponse::available(0, $stock_level);
+    }
+    else {
+      return AvailabilityResponse::unavailable(0, $stock_level, 'maximum exceeded');
+    }
   }
 
 }

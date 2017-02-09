@@ -1,5 +1,30 @@
 <?php
 
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\commerce\Context;
+
+function commerce_stock_local_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (!empty($form['base_form_id']) && $form['base_form_id']['#value'] == 'commerce_order_item_add_to_cart_form') {
+    /** @var \Drupal\commerce_cart\Form\AddToCartForm $form_object */
+    $form_object = $form_state->getBuildInfo()['callback_object'];
+
+    /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+    $order_item = $form_object->getEntity();
+    $purchasable_entity = $order_item->getPurchasedEntity();
+    $store = $form_object->selectStore($purchasable_entity);
+    $context = new Context($form_object->getCurrentUser(), $store);
+    /** @var \Drupal\commerce\AvailabilityResponse\AvailabilityResponseInterface $availability */
+    $availability = $form_object->getAvailabilityManager()->check($purchasable_entity, 1, $context);
+
+    if ($availability->isUnavailable()) {
+      $form['actions']['submit']['#value'] = t('Unavailable');
+      $form['actions']['submit']['#attributes'] = [
+        'disabled' => 'disabled',
+      ];
+    }
+  }
+}
+
 /**
  * Implements hook_cron().
  */
