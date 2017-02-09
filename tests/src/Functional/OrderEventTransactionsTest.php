@@ -289,13 +289,13 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     ];
     $this->submitForm($edit, 'Create order item');
     $edit = [
-        'billing_profile[0][profile][address][0][address][given_name]' => 'John',
-        'billing_profile[0][profile][address][0][address][family_name]' => 'Smith',
-        'billing_profile[0][profile][address][0][address][address_line1]' => '123 Main St.',
-        'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
-        'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
-        'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
-      ];
+      'billing_profile[0][profile][address][0][address][given_name]' => 'John',
+      'billing_profile[0][profile][address][0][address][family_name]' => 'Smith',
+      'billing_profile[0][profile][address][0][address][address_line1]' => '123 Main St.',
+      'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
+      'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
+      'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
+    ];
     $this->submitForm($edit, 'Save');
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
