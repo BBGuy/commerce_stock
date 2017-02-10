@@ -296,10 +296,8 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
 
   /**
    * Tests that transactions are created for all other order and order item events.
-   *
-   * @ToDo Do not pass automated tests. Investigate and fix.
    */
-  public function disabledTestOrderEvents() {
+  public function testOrderEvents() {
     // Tests the order item creation event.
     $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2->id(), $this->locations2));
     $this->drupalGet($this->order->toUrl('edit-form'));
@@ -312,7 +310,15 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
       'order_items[form][inline_entity_form][unit_price][0][number]' => '9.99',
     ];
     $this->submitForm($edit, 'Create order item');
-    $this->submitForm([], 'Save');
+    $edit = [
+      'billing_profile[0][profile][address][0][address][given_name]' => 'John',
+      'billing_profile[0][profile][address][0][address][family_name]' => 'Smith',
+      'billing_profile[0][profile][address][0][address][address_line1]' => '123 Main St.',
+      'billing_profile[0][profile][address][0][address][locality]' => 'Mountain View',
+      'billing_profile[0][profile][address][0][address][administrative_area]' => 'CA',
+      'billing_profile[0][profile][address][0][address][postal_code]' => '94043',
+    ];
+    $this->submitForm($edit, 'Save');
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
       ->condition('entity_id', $this->variation2->id())
