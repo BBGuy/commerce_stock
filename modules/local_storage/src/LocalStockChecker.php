@@ -41,19 +41,6 @@ class LocalStockChecker implements StockCheckInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function updateLocationStockLevel($location_id, PurchasableEntityInterface $entity) {
-    $current_level = $this->getLocationStockLevel($location_id, $entity);
-    $last_update = $current_level['last_transaction'];
-    $latest_txn = $this->getLocationStockTransactionLatest($location_id, $entity);
-    $latest_sum = $this->getLocationStockTransactionSum($location_id, $entity, $last_update, $latest_txn);
-    $new_level = $current_level['qty'] + $latest_sum;
-
-    $this->setLocationStockLevel($location_id, $entity, $new_level, $latest_txn);
-  }
-
-  /**
    * Gets stock level for a given location and purchasable entity.
    *
    * @param int $location_id
@@ -76,44 +63,6 @@ class LocalStockChecker implements StockCheckInterface {
       'qty' => $result ? $result->qty : 0,
       'last_transaction' => $result ? $result->last_transaction_id : 0,
     ];
-  }
-
-  /**
-   * Sets the stock level and last transaction for a given location and purchasable entity.
-   *
-   * Creates first stock level transaction record if none exists.
-   *
-   * @param int $location_id
-   *   Location id.
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   Purchasable entity.
-   * @param int $qty
-   *   Quantity.
-   * @param int $last_txn
-   *   Last transaction id.
-   */
-  public function setLocationStockLevel($location_id, PurchasableEntityInterface $entity, $qty, $last_txn) {
-    $existing = $this->database->select('commerce_stock_location_level', 'll')
-      ->fields('ll')
-      ->condition('location_id', $location_id)
-      ->condition('entity_id', $entity->id())
-      ->execute()->fetch();
-    if ($existing) {
-      $this->database->update('commerce_stock_location_level')
-        ->fields([
-          'qty' => $qty,
-          'last_transaction_id' => $last_txn,
-        ])
-        ->condition('location_id', $location_id, '=')
-        ->condition('entity_id', $entity->id(), '=')
-        ->execute();
-    }
-    else {
-      $this->database->insert('commerce_stock_location_level')
-        ->fields(['location_id', 'entity_id', 'qty', 'last_transaction_id'])
-        ->values([$location_id, $entity->id(), $qty, $last_txn])
-        ->execute();
-    }
   }
 
   /**
