@@ -172,6 +172,37 @@ class LocalStockChecker implements StockCheckInterface {
   }
 
   /**
+   * Gets the sum of all stock transactions for an entity on an order.
+   *
+   * If an AvailabilityChecker were to allow purchasing something with 0 stock, but also tracks stock
+   * i.e. backordering, then the process of canceling an order and returning order items to stock
+   * cannot depend on the quantity of items in the order to determine how much stock to return.
+   * In this case such an AvailabilityChecker could use this method to find how much stock
+   * was removed for the order and return that.
+   *
+   * @param int $order_id
+   *   The order id.
+   * @param int $entity_id
+   *   The purchasable entity ID.
+   *
+   * @return int
+   *   The sum of stock transactions for a given location and purchasable entity.
+   */
+  public function getOrderStockTransactionSum($order_id, $entity_id) {
+    $query = $this->database->select('commerce_stock_transaction', 'txn')
+      ->groupBy('location_id')
+      ->fields('txn', ['location_id'])
+      ->condition('entity_id', $entity_id)
+      ->condition('related_oid', $order_id)
+      ->condition('transaction_type_id', [4,5], 'IN'); // sale or return transactions only
+    $query->addExpression('SUM(qty)', 'qty');
+    $result = $query->execute()
+      ->fetch();
+
+    return $result ? $result->qty : 0;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getTotalStockLevel($entity_id, array $locations) {
