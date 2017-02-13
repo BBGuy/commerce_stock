@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldType;
 
+use Drupal\commerce_price\Price;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -129,8 +130,7 @@ class StockLevel extends FieldItemBase {
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
-        $unit_cost = NULL;
-        // @ToDo Make this hardcoded note translatable or remove it at all.
+        $unit_cost = new Price('0', 'XXX');
         $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field';
         $metadata = ['data' => ['message' => $transaction_note]];
         $this->stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);

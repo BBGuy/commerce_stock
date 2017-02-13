@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_stock\EventSubscriber;
 
+use Drupal\commerce_price\Price;
 use Drupal\commerce_order\Event\OrderEvents;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderItemEvent;
@@ -52,12 +53,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         $quantity = -1 * $item->getQuantity();
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
         $transaction_type = StockTransactionsInterface::STOCK_SALE;
+        $price = new Price('0', 'XXX');
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order placed'],
         ];
-        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $quantity, NULL, $transaction_type, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $quantity, $price, $transaction_type, $metadata);
       }
     }
   }
@@ -86,12 +88,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           }
           $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
           $amount = -1 * $item->getQuantity();
+          $price = new Price('0', 'XXX');
           $metadata = [
             'related_oid' => $order->id(),
             'related_uid' => $order->getCustomerId(),
             'data' => ['message' => 'order item added'],
           ];
-          $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $amount, NULL, StockTransactionsInterface::STOCK_SALE, $metadata);
+          $service->getStockUpdater()->createTransaction($entity, $location, '', $amount, $price, StockTransactionsInterface::STOCK_SALE, $metadata);
         }
       }
     }
@@ -116,12 +119,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         }
         $quantity = $item->getQuantity();
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
+        $price = new Price('0', 'XXX');
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order canceled'],
         ];
-        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $quantity, NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $quantity, $price, StockTransactionsInterface::STOCK_RETURN, $metadata);
       }
     }
   }
@@ -151,12 +155,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         }
         $quantity = $item->getQuantity();
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
+        $price = new Price('0', 'XXX');
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order deleted'],
         ];
-        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $quantity, NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $quantity, $price, StockTransactionsInterface::STOCK_RETURN, $metadata);
       }
     }
   }
@@ -183,13 +188,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           }
           $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
           $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $diff);
+          $price = new Price('0', 'XXX');
           $metadata = [
             'related_oid' => $order->id(),
             'related_uid' => $order->getCustomerId(),
             'data' => ['message' => 'order item quantity updated'],
           ];
-          $service->getStockUpdater()
-            ->createTransaction($entity, $location->getId(), '', $diff, NULL, $transaction_type, $metadata);
+          $service->getStockUpdater()->createTransaction($entity, $location, '', $diff, $price, $transaction_type, $metadata);
         }
       }
     }
@@ -214,13 +219,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           return;
         }
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
+        $price = new Price('0', 'XXX');
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order item deleted'],
         ];
-        $service->getStockUpdater()
-          ->createTransaction($entity, $location->getId(), '', $item->getQuantity(), NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location, '', $item->getQuantity(), $price, StockTransactionsInterface::STOCK_RETURN, $metadata);
       }
     }
   }
@@ -244,3 +249,4 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   }
 
 }
+

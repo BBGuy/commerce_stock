@@ -210,7 +210,7 @@ function commerce_stock_local_views_data() {
     ],
   ];
   $data['commerce_stock_transaction']['unit_cost'] = [
-    'title' => t('Unit cost'),
+    'title' => t('Unit cost amount'),
     'help' => t('The cost of a single unit.'),
     'field' => [
       'id' => 'numeric',
@@ -220,6 +220,22 @@ function commerce_stock_local_views_data() {
     ],
     'argument' => [
       'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+  $data['commerce_stock_transaction']['unit_cost_currency_code'] = [
+    'title' => t('Unit cost currency code'),
+    'help' => t('The currency code of the cost of a single unit.'),
+    'field' => [
+      'id' => 'standard',
+    ],
+    'filter' => [
+      'id' => 'string',
+    ],
+    'argument' => [
+      'id' => 'string',
     ],
     'sort' => [
       'id' => 'standard',

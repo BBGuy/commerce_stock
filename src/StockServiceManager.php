@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_price\Price;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
@@ -93,7 +94,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata = []) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $transaction_type_id, array $metadata = []) {
     $stock_updater = $this->getService($entity)->getStockUpdater();
     $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, $metadata);
   }
@@ -101,7 +102,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $message = NULL) {
+  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $message = NULL) {
     $transaction_type_id = StockTransactionsInterface::NEW_STOCK;
     if (is_null($message)) {
       $metadata = [];
@@ -122,7 +123,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL) {
+  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $order_id, $user_id, $message = NULL) {
     $transaction_type_id = StockTransactionsInterface::STOCK_SALE;
     $metadata = [
       'related_oid' => $order_id,
@@ -140,7 +141,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $message = NULL) {
+  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, Price $unit_cost, $message = NULL) {
     if (is_null($message)) {
       $metadata = [];
     }
@@ -164,7 +165,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL) {
+  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $order_id, $user_id, $message = NULL) {
     $transaction_type_id = StockTransactionsInterface::STOCK_RETURN;
     $metadata = [
       'related_oid' => $order_id,

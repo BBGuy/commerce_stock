@@ -3,13 +3,14 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_price\Price;
 
 class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $transaction_type_id, array $metadata) {
     // Do nothing and return a NULL value as its N/A.
     return NULL;
   }

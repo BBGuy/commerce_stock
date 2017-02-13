@@ -98,6 +98,12 @@ function commerce_stock_local_schema() {
         'precision' => 19,
         'scale' => 6,
       ],
+      'unit_cost_currency_code' => [
+        'description' => 'Currency code (ISO 4217) of unit cost',
+        'type' => 'varchar_ascii',
+        'length' => 3,
+        'not null' => FALSE,
+      ],
       'transaction_time' => [
         'type' => 'int',
         'not null' => TRUE,
@@ -295,4 +301,18 @@ function commerce_stock_local_update_8001() {
   );
   $schema = \Drupal::database()->schema();
   $schema->addField('commerce_stock_transaction', 'entity_type', $spec);
+}
+
+/**
+ * Adds 'unit_cost_currency_code' column to commerce_stock_transaction table.
+ */
+function commerce_stock_local_update_8002() {
+  $spec = array(
+    'description' => 'Currency code (ISO 4217) of unit cost',
+    'type' => 'varchar_ascii',
+    'length' => 3,
+    'not null' => FALSE,
+  );
+  $schema = \Drupal::database()->schema();
+  $schema->addField('commerce_stock_transaction', 'unit_cost_currency_code', $spec);
 }

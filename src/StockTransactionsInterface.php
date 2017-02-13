@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_price\Price;
 
 /**
  * Defines a common interface for creating stock transactions.
@@ -46,14 +47,14 @@ interface StockTransactionsInterface {
    *   The zone.
    * @param float $quantity
    *   The quantity.
-   * @param float $unit_cost
+   * @param \Drupal\commerce_price\Price $unit_cost
    *   The unit cost.
    * @param int $transaction_type_id
    *   Transaction type ID.
    * @param array $metadata
    *   A metadata array.
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata = []);
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $transaction_type_id, array $metadata = []);
 
   /**
    * Receive stock.
@@ -66,12 +67,12 @@ interface StockTransactionsInterface {
    *   The zone.
    * @param float $quantity
    *   The quantity.
-   * @param float $unit_cost
+   * @param \Drupal\commerce_price\Price $unit_cost
    *   The unit cost.
    * @param string $message
    *   The message.
    */
-  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $message = NULL);
+  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $message = NULL);
 
   /**
    * Sell stock.
@@ -84,7 +85,7 @@ interface StockTransactionsInterface {
    *   The zone.
    * @param float $quantity
    *   The quantity.
-   * @param float $unit_cost
+   * @param \Drupal\commerce_price\Price $unit_cost
    *   The unit cost.
    * @param int $order_id
    *   The order ID.
@@ -93,7 +94,7 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL);
+  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $order_id, $user_id, $message = NULL);
 
   /**
    * Move stock.
@@ -110,12 +111,12 @@ interface StockTransactionsInterface {
    *   The target zone.
    * @param float $quantity
    *   The quantity.
-   * @param float $unit_cost
+   * @param \Drupal\commerce_price\Price $unit_cost
    *   The unit cost.
    * @param string $message
    *   The message.
    */
-  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $message = NULL);
+  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, Price $unit_cost, $message = NULL);
 
   /**
    * Stock returns.
@@ -128,7 +129,7 @@ interface StockTransactionsInterface {
    *   The zone.
    * @param float $quantity
    *   The quantity.
-   * @param float $unit_cost
+   * @param \Drupal\commerce_price\Price $unit_cost
    *   The unit cost.
    * @param int $order_id
    *   The order ID.
@@ -137,6 +138,6 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL);
+  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $order_id, $user_id, $message = NULL);
 
 }

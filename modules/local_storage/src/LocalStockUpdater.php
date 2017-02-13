@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock_local;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
 use Drupal\Core\Database\Connection;
@@ -58,12 +59,15 @@ class LocalStockUpdater implements StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, Price $unit_cost, $transaction_type_id, array $metadata) {
     // Get optional fields.
     $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
     $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
     $related_uid = isset($metadata['related_uid']) ? $metadata['related_uid'] : NULL;
     $data = isset($metadata['data']) ? $metadata['data'] : NULL;
+
+    $cost_number = $unit_cost->isZero() ? NULL : $unit_cost->getNumber();
+    $cost_code = $unit_cost->isZero() ? NULL : $unit_cost->getCurrencyCode();
 
     // Create a record.
     $field_values = [
@@ -72,7 +76,8 @@ class LocalStockUpdater implements StockUpdateInterface {
       'qty' => $quantity,
       'location_id' => $location_id,
       'location_zone' => $zone,
-      'unit_cost' => $unit_cost,
+      'unit_cost' => $cost_number,
+      'unit_cost_currency_code' => $cost_code,
       'transaction_time' => time(),
       'transaction_type_id' => $transaction_type_id,
       'related_tid' => $related_tid,
