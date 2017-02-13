@@ -11,4 +11,4 @@ services:
 
   commerce_stock.local_stock_updater:
     class: Drupal\commerce_stock_local\LocalStockUpdater
-    arguments: ['@database']
+    arguments: ['@database', '@commerce_stock.local_stock_checker']

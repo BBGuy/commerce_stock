@@ -111,9 +111,9 @@ class SimpleStockLevelWidget extends WidgetBase {
       ];
     }
     else {
-      $elements['stock']['stocked_entity_id'] = [
+      $elements['stock']['stocked_entity'] = [
         '#type' => 'value',
-        '#value' => $entity->id(),
+        '#value' => $entity,
       ];
       if ($entry_system == 'simple') {
         $elements['stock']['value'] = [

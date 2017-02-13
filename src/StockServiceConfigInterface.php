@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_stock;
 
+use Drupal\commerce\PurchasableEntityInterface;
+
 interface StockServiceConfigInterface {
 
   /**
@@ -12,28 +14,28 @@ interface StockServiceConfigInterface {
    * at that time. To help support this we are including the quantity related to
    * the transaction.
    *
-   * @param int $entity_id
-   *   The purchasable entity ID.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
    * @param int $quantity
    *    The quantity.
    *
    * @return int
    *   The location ID.
    */
-  public function getPrimaryTransactionLocation($entity_id, $quantity);
+  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity);
 
   /**
-   * Get a list of location relevant for the provided product.
+   * Get a list of location relevant for the provided purchasable entity.
    *
-   * The product can be ignored. Any other contextual information like active
+   * The entity can be ignored. Any other contextual information like active
    * store/department/.. needs to be managed by the implementing class.
    *
-   * @param int $entity_id
-   *   The purchasable entity ID.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
    *
    * @return array
    *   Array of relevant location IDs.
    */
-  public function getLocationList($entity_id);
+  public function getLocationList(PurchasableEntityInterface $entity);
 
 }

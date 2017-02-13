@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldType;
 
+use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
@@ -92,10 +93,10 @@ class StockLevel extends FieldItemBase {
     if (!empty($this->getEntity())) {
       $entity = $this->getEntity();
       // @todo Figure out why sometimes this is called twice.
-      if (isset($called[$entity->id()])) {
+      if (isset($called[$entity->getEntityTypeId() . $entity->id()])) {
         return;
       }
-      $called[$entity->id()] = TRUE;
+      $called[$entity->getEntityTypeId() . $entity->id()] = TRUE;
       $transaction_qty = 0;
 
       // Supports absolute values being passed in directly, i.e. programmatically.
@@ -122,7 +123,7 @@ class StockLevel extends FieldItemBase {
       }
 
       if ($transaction_qty) {
-        $transaction_type = ($transaction_qty > 0) ? TRANSACTION_TYPE_STOCK_IN : TRANSACTION_TYPE_STOCK_OUT;
+        $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
         // @todo Add zone and location to form.
         $location_id = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $transaction_qty);
         $zone = '';

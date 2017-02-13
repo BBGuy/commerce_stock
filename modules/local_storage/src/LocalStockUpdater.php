@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_stock_local;
 
+use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
 use Drupal\Core\Database\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,13 +21,23 @@ class LocalStockUpdater implements StockUpdateInterface {
   protected $database;
 
   /**
-   * Constructs the local stock checker.
+   * The local stock checker.
+   *
+   * @var \Drupal\commerce_stock\StockCheckInterface
+   */
+  protected $checker;
+
+  /**
+   * Constructs the local stock updater.
    *
    * @param \Drupal\Core\Database\Connection $database
-   *    The database connection.
+   *   The database connection.
+   * @param \Drupal\commerce_stock\StockCheckInterface $checker
+   *   The local stock checker.
    */
-  public function __construct(Connection $database) {
+  public function __construct(Connection $database, StockCheckInterface $checker) {
     $this->database = $database;
+    $this->checker = $checker;
   }
 
   /**
@@ -38,14 +50,15 @@ class LocalStockUpdater implements StockUpdateInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('database')
+      $container->get('database'),
+      $container->get('commerce_stock.local_stock_checker')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createTransaction($entity_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
     // Get optional fields.
     $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
     $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
@@ -54,7 +67,8 @@ class LocalStockUpdater implements StockUpdateInterface {
 
     // Create a record.
     $field_values = [
-      'entity_id' => $entity_id,
+      'entity_id' => $entity->id(),
+      'entity_type' => $entity->getEntityTypeId(),
       'qty' => $quantity,
       'location_id' => $location_id,
       'location_zone' => $zone,
@@ -71,6 +85,62 @@ class LocalStockUpdater implements StockUpdateInterface {
       ->values(array_values($field_values))->execute();
 
     return $insert;
+  }
+
+  /**
+   * Updates the stock level of an entity at a specific location.
+   *
+   * @param int $location_id
+   *   The location id.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
+   */
+  public function updateLocationStockLevel($location_id, PurchasableEntityInterface $entity) {
+    $current_level = $this->checker->getLocationStockLevel($location_id, $entity);
+    $last_update = $current_level['last_transaction'];
+    $latest_txn = $this->checker->getLocationStockTransactionLatest($location_id, $entity);
+    $latest_sum = $this->checker->getLocationStockTransactionSum($location_id, $entity, $last_update, $latest_txn);
+    $new_level = $current_level['qty'] + $latest_sum;
+
+    $this->setLocationStockLevel($location_id, $entity, $new_level, $latest_txn);
+  }
+
+  /**
+   * Sets the stock level and last transaction for a given location and purchasable entity.
+   *
+   * Creates first stock level transaction record if none exists.
+   *
+   * @param int $location_id
+   *   The location id.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
+   * @param int $qty
+   *   The quantity.
+   * @param int $last_txn
+   *   The last transaction id.
+   */
+  public function setLocationStockLevel($location_id, PurchasableEntityInterface $entity, $qty, $last_txn) {
+    $existing = $this->database->select('commerce_stock_location_level', 'll')
+      ->fields('ll')
+      ->condition('location_id', $location_id)
+      ->condition('entity_id', $entity->id())
+      ->execute()->fetch();
+    if ($existing) {
+      $this->database->update('commerce_stock_location_level')
+        ->fields([
+          'qty' => $qty,
+          'last_transaction_id' => $last_txn,
+        ])
+        ->condition('location_id', $location_id, '=')
+        ->condition('entity_id', $entity->id(), '=')
+        ->execute();
+    }
+    else {
+      $this->database->insert('commerce_stock_location_level')
+        ->fields(['location_id', 'entity_id', 'qty', 'last_transaction_id'])
+        ->values([$location_id, $entity->id(), $qty, $last_txn])
+        ->execute();
+    }
   }
 
 }

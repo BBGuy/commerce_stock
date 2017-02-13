@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_stock;
 
+use Drupal\commerce\PurchasableEntityInterface;
+
 /**
  * Defines a common interface for writing stock.
  */
@@ -10,8 +12,8 @@ interface StockUpdateInterface {
   /**
    * Create a stock transaction.
    *
-   * @param int $entity_id
-   *   The purchasable entity ID.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
    * @param int $location_id
    *   The location ID.
    * @param string $zone
@@ -32,6 +34,6 @@ interface StockUpdateInterface {
    * @return int
    *   Return the ID of the transaction.
    */
-  public function createTransaction($entity_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata);
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata);
 
 }

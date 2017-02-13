@@ -2,12 +2,14 @@
 
 namespace Drupal\commerce_stock;
 
+use Drupal\commerce\PurchasableEntityInterface;
+
 class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function createTransaction($entity_id, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
     // Do nothing and return a NULL value as its N/A.
     return NULL;
   }
@@ -15,7 +17,7 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getTotalStockLevel($entity_id, array $locations) {
+  public function getTotalStockLevel(PurchasableEntityInterface $entity, array $locations) {
     // @todo this can be configurable?
     return 999;
   }
@@ -23,21 +25,21 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getIsInStock($entity_id, array $locations) {
+  public function getIsInStock(PurchasableEntityInterface $entity, array $locations) {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getIsAlwaysInStock($entity_id) {
+  public function getIsAlwaysInStock(PurchasableEntityInterface $entity) {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getIsStockManaged($entity_id) {
+  public function getIsStockManaged(PurchasableEntityInterface $entity) {
     // @todo - Not sure about this one. The result will be the same for:
     // TRUE - managed by this and will always be available.
     // FALSE - not managed so will be available.
