@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_stock_local\Plugin\QueueWorker;
 
-use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\Core\Queue\QueueWorkerBase;
 
 /**
@@ -22,20 +21,16 @@ class StockLevelUpdater extends QueueWorkerBase {
    * {@inheritdoc}
    */
   public function processItem($data) {
-    $entity_id = $data;
-    /** @var \Drupal\commerce_stock\StockUpdateInterface $updater */
-    $updater = \Drupal::service('commerce_stock.local_stock_service')->getStockUpdater();
+    $storage = \Drupal::entityTypeManager()->getStorage($data['entity_type']);
+    $entity = $storage->load($data['entity_id']);
+    $service = \Drupal::service('commerce_stock.local_stock_service');
     /** @var \Drupal\commerce_stock\StockServiceConfigInterface $config */
-    $config = \Drupal::service('commerce_stock.local_stock_service')->getConfiguration();
-
-    // @ToDo Figure out how to get the entity instead of the id? This will break.
-    $entity = ProductVariation::load($entity_id);
+    $config = $service->getConfiguration();
+    /** @var \Drupal\commerce_stock_local\LocalStockUpdater $updater */
+    $updater = $service->getStockUpdater();
     $locations = $config->getEnabledLocations($entity);
-    /** @var \Drupal\commerce_stock\StockLocationInterface $location */
     foreach ($locations as $location) {
-      // @ToDo This method is not defined in any interface.  So it is not guaranteed, that a StockUpdater has that method.
-      // @see https://www.drupal.org/node/2842583
-      $updater->updateLocationStockLevel($location->getId(), $entity_id);
+      $updater->updateLocationStockLevel($location->getId(), $entity);
     }
   }
 

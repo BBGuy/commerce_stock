@@ -56,6 +56,22 @@ function commerce_stock_local_views_data() {
       'id' => 'standard',
     ],
   ];
+  $data['commerce_stock_transaction']['entity_type'] = [
+    'title' => t('Purchasable entity type'),
+    'help' => t('The purchasable entity type.'),
+    'field' => [
+      'id' => 'standard',
+    ],
+    'filter' => [
+      'id' => 'string',
+    ],
+    'argument' => [
+      'id' => 'string',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
   $data['commerce_stock_transaction']['qty'] = [
     'title' => t('Qty'),
     'help' => t('The stock transaction quantity.'),

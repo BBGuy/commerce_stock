@@ -4,21 +4,19 @@ namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 
-// Core transaction types.
-define('TRANSACTION_TYPE_STOCK_IN', 1);
-define('TRANSACTION_TYPE_STOCK_OUT', 2);
-define('TRANSACTION_TYPE_STOCK_MOVMENT', 3);
-// Use case transaction types.
-define('TRANSACTION_TYPE_SALE', 4);
-define('TRANSACTION_TYPE_RETURN', 5);
-define('TRANSACTION_TYPE_NEW_STOCK', 6);
-define('TRANSACTION_TYPE_STOCK_MOVMENT_FROM', 7);
-define('TRANSACTION_TYPE_STOCK_MOVMENT_TO', 8);
-
 /**
  * Defines a common interface for creating stock transactions.
  */
 interface StockTransactionsInterface {
+
+  const STOCK_IN = 1;
+  const STOCK_OUT = 2;
+  const STOCK_MOVEMENT = 3;
+  const STOCK_SALE = 4;
+  const STOCK_RETURN = 5;
+  const NEW_STOCK = 6;
+  const MOVEMENT_FROM = 7;
+  const MOVEMENT_TO = 8;
 
   /**
    * Get the primary location for automatic stock allocation.
@@ -41,7 +39,7 @@ interface StockTransactionsInterface {
   /**
    * Create a transaction.
    *
-   * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $location_id
    *   The location ID.
@@ -56,12 +54,12 @@ interface StockTransactionsInterface {
    * @param array $metadata
    *   A metadata array.
    */
-  public function createTransaction(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata = []);
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata = []);
 
   /**
    * Receive stock.
    *
-   * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $location_id
    *   The location ID.
@@ -74,12 +72,12 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function receiveStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $message = NULL);
+  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $message = NULL);
 
   /**
    * Sell stock.
    *
-   * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $location_id
    *   The location ID.
@@ -96,12 +94,12 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function sellStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL);
+  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL);
 
   /**
    * Move stock.
    *
-   * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $from_location_id
    *   The source location ID.
@@ -118,12 +116,12 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function moveStock(PurchasableEntityInterface $purchasable_entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $message = NULL);
+  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $message = NULL);
 
   /**
    * Stock returns.
    *
-   * @param \Drupal\commerce\PurchasableEntityInterface $purchasable_entity
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $location_id
    *   The location ID.
@@ -140,6 +138,6 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function returnStock(PurchasableEntityInterface $purchasable_entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL);
+  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $order_id, $user_id, $message = NULL);
 
 }

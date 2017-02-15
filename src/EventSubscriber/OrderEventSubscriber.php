@@ -6,6 +6,7 @@ use Drupal\commerce_order\Event\OrderEvents;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderItemEvent;
 use Drupal\commerce_stock\StockServiceManagerInterface;
+use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -46,13 +47,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if ($checker->getIsStockManaged($entity)) {
         $quantity = -1 * $item->getQuantity();
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
-        $transaction_type = TRANSACTION_TYPE_SALE;
+        $transaction_type = StockTransactionsInterface::STOCK_SALE;
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order placed'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location->getId(), '', $quantity, NULL, $transaction_type, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $quantity, NULL, $transaction_type, $metadata);
       }
     }
   }
@@ -81,7 +82,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
             'related_uid' => $order->getCustomerId(),
             'data' => ['message' => 'order item added'],
           ];
-          $service->getStockUpdater()->createTransaction($entity->id(), $location->getId(), '', $amount, NULL, TRANSACTION_TYPE_SALE, $metadata);
+          $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $amount, NULL, StockTransactionsInterface::STOCK_SALE, $metadata);
         }
       }
     }
@@ -107,7 +108,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order canceled'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location->getId(), '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $quantity, NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
       }
     }
   }
@@ -138,7 +139,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order deleted'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location->getId(), '', $quantity, NULL, TRANSACTION_TYPE_RETURN, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $quantity, NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
       }
     }
   }
@@ -157,14 +158,14 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if ($diff) {
         $entity = $item->getPurchasedEntity();
         $service = $this->stockServiceManager->getService($entity);
-        $transaction_type = ($diff < 0) ? TRANSACTION_TYPE_SALE : TRANSACTION_TYPE_RETURN;
+        $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $diff);
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
           'data' => ['message' => 'order item quantity updated'],
         ];
-        $service->getStockUpdater()->createTransaction($entity->id(), $location->getId(), '', $diff, NULL, $transaction_type, $metadata);
+        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $diff, NULL, $transaction_type, $metadata);
       }
     }
   }
@@ -187,7 +188,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         'related_uid' => $order->getCustomerId(),
         'data' => ['message' => 'order item deleted'],
       ];
-      $service->getStockUpdater()->createTransaction($entity->id(), $location->getId(), '', $item->getQuantity(), NULL, TRANSACTION_TYPE_RETURN, $metadata);
+      $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $item->getQuantity(), NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
     }
   }
 

@@ -24,6 +24,9 @@ function commerce_stock_local_cron() {
  *
  * Adds purchasable entities from the latest unprocessed stock transactions
  * to the queue worker responsible for totaling location stock levels.
+ *
+ * @todo Support all purchasable entities - not just product variations.
+ * @see {@link https://www.drupal.org/node/2844010}
  */
 function _commerce_stock_local_update_stock_level_queue() {
   $queue = \Drupal::queue('commerce_stock_local_stock_level_updater');
@@ -47,14 +50,22 @@ function _commerce_stock_local_update_stock_level_queue() {
   $llq_batchsize = \Drupal::state()->get('commerce_stock_local.llq_batchsize');
   $llq_batchsize = !empty($llq_batchsize) ? $llq_batchsize : 50;
 
-  $result = \Drupal::entityQuery('commerce_product_variation')
+  /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('commerce_product_variation');
+
+  $result = $storage->getQuery()
     ->condition('variation_id', $level_last_id, '>')
     ->condition('status', 1, '=')
     ->sort('variation_id', 'ASC')
     ->range(0, $llq_batchsize)
     ->execute();
   foreach ($result as $pid) {
-    $queue->createItem($pid);
+    $entity = $storage->load($pid);
+    $data = [
+      'entity_id' => $entity->id(),
+      'entity_type' => $entity->getEntityTypeId(),
+    ];
+    $queue->createItem($data);
   }
   // Check if we can restrt processing products from the top.
   if ($llq_reset && (count($result) < $llq_batchsize)) {
