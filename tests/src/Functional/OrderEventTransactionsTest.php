@@ -237,7 +237,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
     $this->assertInstanceOf(StockServiceManagerInterface::class, $this->stockServiceManager);
     $this->assertInstanceOf(LocalStockChecker::class, $this->checker);
     $this->assertInstanceOf(LocalStockServiceConfig::class, $this->stockServiceConfiguration);
-    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation(), $this->locations));
+    $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
     $this->assertEquals(10, $this->checker2->getTotalStockLevel($this->variation2, $this->locations2));
     $query = \Drupal::database()->select('commerce_stock_transaction', 'txn')
       ->fields('txn')
