@@ -1,12 +1,11 @@
 <?php
 
-use Drupal\Core\Entity\EntityTypeInterface;
-
 /**
  * @file
  * Contains install and update functions for commerce stock local.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
 
 /**

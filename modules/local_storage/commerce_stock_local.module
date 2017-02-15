@@ -26,7 +26,7 @@ function commerce_stock_local_cron() {
  * to the queue worker responsible for totaling location stock levels.
  *
  * @todo Support all purchasable entities - not just product variations.
- * @see {@link https://www.drupal.org/node/2844010}
+ * @see https://www.drupal.org/node/2844010
  */
 function _commerce_stock_local_update_stock_level_queue() {
   $queue = \Drupal::queue('commerce_stock_local_stock_level_updater');
