@@ -12,3 +12,10 @@ services:
   commerce_stock.local_stock_updater:
     class: Drupal\commerce_stock_local\LocalStockUpdater
     arguments: ['@database', '@commerce_stock.local_stock_checker']
+
+  commerce_stock_local_uninstall_validator:
+    class: Drupal\commerce_stock_local\LocalStockUninstallValidator
+    tags:
+      - { name: module_install.uninstall_validator }
+    arguments: ['@entity_type.manager', '@string_translation']
+

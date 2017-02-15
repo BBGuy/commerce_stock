@@ -1,6 +1,33 @@
 <?php
 
 /**
+ * @file
+ * Commerce Stock Local module.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function commerce_stock_local_entity_base_field_info(EntityTypeInterface $entity_type) {
+  // get class of entity type.
+  if (in_array('Drupal\commerce\PurchasableEntityInterface', class_implements($entity_type->getOriginalClass()))) {
+    $fields['commerce_stock_always_in_stock'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Always in stock?'))
+      ->setDescription(t('Should this product be considered "always in stock"?'))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 5,
+      ])
+      ->setDefaultValue(FALSE);
+    return $fields;
+  }
+}
+
+/**
  * Implements hook_cron().
  */
 function commerce_stock_local_cron() {

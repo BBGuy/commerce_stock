@@ -175,8 +175,7 @@ class LocalStockChecker implements StockCheckInterface {
    * {@inheritdoc}
    */
   public function getIsAlwaysInStock(PurchasableEntityInterface $entity) {
-    // @todo - not yet implamanted.
-    return FALSE;
+    return $entity->get('commerce_stock_always_in_stock') && $entity->get('commerce_stock_always_in_stock')->value == TRUE;
   }
 
   /**
