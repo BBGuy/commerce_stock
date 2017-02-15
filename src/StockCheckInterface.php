@@ -54,15 +54,4 @@ interface StockCheckInterface {
    */
   public function getIsStockManaged(PurchasableEntityInterface $entity);
 
-  /**
-   * Get list of locations.
-   *
-   * @param bool $return_active_only
-   *   Whether or not only return active locations.
-   *
-   * @return array
-   *   List of locations keyed by ID.
-   */
-  public function getLocationList($return_active_only = TRUE);
-
 }
