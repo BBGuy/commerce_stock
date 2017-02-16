@@ -33,13 +33,13 @@ interface StockCheckInterface {
   public function getIsInStock(PurchasableEntityInterface $entity, array $locations);
 
   /**
-   * Check if purchasable entity is always in stock.
+   * Check if entity is always in stock.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    *
    * @return bool
-   *    TRUE if the entity is in stock, FALSE otherwise.
+   *    TRUE if the entity is always in stock, FALSE otherwise.
    */
   public function getIsAlwaysInStock(PurchasableEntityInterface $entity);
 

@@ -45,6 +45,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          return;
+        }
         $quantity = -1 * $item->getQuantity();
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
         $transaction_type = StockTransactionsInterface::STOCK_SALE;
@@ -75,6 +79,11 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
           $entity = $item->getPurchasedEntity();
           $service = $this->stockServiceManager->getService($entity);
+          $checker = $service->getStockChecker();
+          // If always in stock then no need to create a transaction.
+          if ($checker->getIsAlwaysInStock($entity)) {
+            return;
+          }
           $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
           $amount = -1 * $item->getQuantity();
           $metadata = [
@@ -101,6 +110,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          return;
+        }
         $quantity = $item->getQuantity();
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
         $metadata = [
@@ -132,6 +145,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          return;
+        }
         $quantity = $item->getQuantity();
         $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
         $metadata = [
@@ -158,14 +175,22 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if ($diff) {
         $entity = $item->getPurchasedEntity();
         $service = $this->stockServiceManager->getService($entity);
-        $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
-        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $diff);
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order item quantity updated'],
-        ];
-        $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $diff, NULL, $transaction_type, $metadata);
+        $checker = $service->getStockChecker();
+        if ($checker->getIsStockManaged($entity)) {
+          // If always in stock then no need to create a transaction.
+          if ($checker->getIsAlwaysInStock($entity)) {
+            return;
+          }
+          $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
+          $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $diff);
+          $metadata = [
+            'related_oid' => $order->id(),
+            'related_uid' => $order->getCustomerId(),
+            'data' => ['message' => 'order item quantity updated'],
+          ];
+          $service->getStockUpdater()
+            ->createTransaction($entity, $location->getId(), '', $diff, NULL, $transaction_type, $metadata);
+        }
       }
     }
   }
@@ -182,13 +207,21 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
       $entity = $item->getPurchasedEntity();
       $service = $this->stockServiceManager->getService($entity);
-      $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
-      $metadata = [
-        'related_oid' => $order->id(),
-        'related_uid' => $order->getCustomerId(),
-        'data' => ['message' => 'order item deleted'],
-      ];
-      $service->getStockUpdater()->createTransaction($entity, $location->getId(), '', $item->getQuantity(), NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
+      $checker = $service->getStockChecker();
+      if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          return;
+        }
+        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
+        $metadata = [
+          'related_oid' => $order->id(),
+          'related_uid' => $order->getCustomerId(),
+          'data' => ['message' => 'order item deleted'],
+        ];
+        $service->getStockUpdater()
+          ->createTransaction($entity, $location->getId(), '', $item->getQuantity(), NULL, StockTransactionsInterface::STOCK_RETURN, $metadata);
+      }
     }
   }
 
