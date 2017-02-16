@@ -12,7 +12,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * Implements hook_entity_base_field_info().
  */
 function commerce_stock_local_entity_base_field_info(EntityTypeInterface $entity_type) {
-  // get class of entity type.
+  // Get class of entity type.
   if (in_array('Drupal\commerce\PurchasableEntityInterface', class_implements($entity_type->getOriginalClass()))) {
     $fields['commerce_stock_always_in_stock'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Always in stock?'))
