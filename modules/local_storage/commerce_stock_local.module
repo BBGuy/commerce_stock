@@ -142,7 +142,7 @@ function template_preprocess_commerce_stock_location(array &$variables) {
   $variables['commerce_stock_location_url'] = $commerce_stock_location->toUrl();
   $variables['commerce_stock_location'] = [];
   // Helpful $content variable for templates.
-  foreach (Element::children($variables['elements']) as $key) {
+  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
     $variables['commerce_stock_location'][$key] = $variables['elements'][$key];
   }
 
