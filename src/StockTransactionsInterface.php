@@ -11,7 +11,6 @@ interface StockTransactionsInterface {
 
   const STOCK_IN = 1;
   const STOCK_OUT = 2;
-  const STOCK_MOVEMENT = 3;
   const STOCK_SALE = 4;
   const STOCK_RETURN = 5;
   const NEW_STOCK = 6;
