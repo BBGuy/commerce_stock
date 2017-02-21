@@ -5,6 +5,7 @@ namespace Drupal\commerce_stock\EventSubscriber;
 use Drupal\commerce_order\Event\OrderEvents;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderItemEvent;
+use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
@@ -63,38 +64,52 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Acts on the order update event to create transactions for new items.
+   * Responds to order update events.
    *
-   * The reason this isn't handled by OrderEvents::ORDER_ITEM_INSERT is because
-   * that event never has the correct values.
+   * While we do not care about order updates per-se, we use the ORDER_UPDATE
+   * event to create transactions for NEW order items because it is only during
+   * this order update event--after Order::postSave() has run--that we have
+   * 'order_id' back-references set on each order item.
    *
    * @param \Drupal\commerce_order\Event\OrderEvent $event
    *   The order event.
+   *
+   * @see https://www.drupal.org/node/2853277
    */
   public function onOrderUpdate(OrderEvent $event) {
     $order = $event->getOrder();
-    $original_order = $order->original;
     foreach ($order->getItems() as $item) {
-      if (!$original_order->hasItem($item)) {
-        if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
-          $entity = $item->getPurchasedEntity();
-          $service = $this->stockServiceManager->getService($entity);
-          $checker = $service->getStockChecker();
-          // If always in stock then no need to create a transaction.
-          if ($checker->getIsAlwaysInStock($entity)) {
-            return;
-          }
-          $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
-          $amount = -1 * $item->getQuantity();
-          $metadata = [
-            'related_oid' => $order->id(),
-            'related_uid' => $order->getCustomerId(),
-            'data' => ['message' => 'order item added'],
-          ];
-          $service->getStockUpdater()->createTransaction($entity, $location, '', $amount, NULL, StockTransactionsInterface::STOCK_SALE, $metadata);
-        }
+      // Handle new order items added to placed orders.
+      if (!in_array($order->getState()->value, ['draft', 'canceled'])
+          && !$order->original->hasItem($item)) {
+        $this->handleOrderItemInsert($item);
       }
     }
+  }
+
+  /**
+   * Handles new order items being added to an order.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderItemInterface $item
+   *   The new order item.
+   */
+  protected function handleOrderItemInsert(OrderItemInterface $item) {
+    $order = $item->getOrder();
+    $entity = $item->getPurchasedEntity();
+    $service = $this->stockServiceManager->getService($entity);
+    $checker = $service->getStockChecker();
+    // If always in stock then no need to create a transaction.
+    if ($checker->getIsAlwaysInStock($entity)) {
+      return;
+    }
+    $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
+    $amount = -1 * $item->getQuantity();
+    $metadata = [
+      'related_oid' => $order->id(),
+      'related_uid' => $order->getCustomerId(),
+      'data' => ['message' => 'order item added'],
+    ];
+    $service->getStockUpdater()->createTransaction($entity, $location, '', $amount, NULL, StockTransactionsInterface::STOCK_SALE, $metadata);
   }
 
   /**
@@ -230,11 +245,12 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [
-      // State change events fired on workflow transitions from state_machine.
+      // Workflow transition events.
+      // @see commerce_order.workflows.yml
       'commerce_order.place.post_transition' => ['onOrderPlace', -100],
       'commerce_order.cancel.post_transition' => ['onOrderCancel', -100],
-      // Order storage events dispatched during entity operations in CommerceContentEntityStorage.
-      // ORDER_UPDATE handles new order items since ORDER_ITEM_INSERT doesn't.
+      // Entity storage events.
+      // @see CommerceContentEntityStorage::invokeHook()
       OrderEvents::ORDER_UPDATE => ['onOrderUpdate', -100],
       OrderEvents::ORDER_PREDELETE => ['onOrderDelete', -100],
       OrderEvents::ORDER_ITEM_UPDATE => ['onOrderItemUpdate', -100],
