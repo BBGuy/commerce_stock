@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_stock_local\Form;
 
-use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
@@ -95,7 +94,7 @@ class PrepareUninstallForm extends ConfirmFormBase {
 
     foreach ($tables_to_update as $table) {
       if ($table && $db_connection->schema()
-          ->fieldExists($table, 'commerce_stock_always_in_stock')
+        ->fieldExists($table, 'commerce_stock_always_in_stock')
       ) {
         $db_connection->update($table)
           ->fields(['commerce_stock_always_in_stock' => NULL])

@@ -149,7 +149,9 @@ class LocalStockChecker implements StockCheckInterface {
    */
   public function getLocationsStockLevels(PurchasableEntityInterface $entity, array $locations) {
     $location_levels = [];
-    foreach ($locations as $location_id) {
+    /** @var \Drupal\commerce_stock\StockLocationInterface $location */
+    foreach ($locations as $location) {
+      $location_id = $location->id();
       $location_level = $this->getLocationStockLevel($location_id, $entity);
 
       $latest_txn = $this->getLocationStockTransactionLatest($location_id, $entity);
@@ -186,29 +188,6 @@ class LocalStockChecker implements StockCheckInterface {
     // Also we have the "always in stock" function so unless we have cascading s
     // service functionality this is not needed and can just return TRUE.
     return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLocationList($return_active_only = TRUE) {
-    $query = $this->database->select('commerce_stock_location', 'loc')
-      ->fields('loc');
-    if ($return_active_only) {
-      $query->condition('status', 1);
-    }
-    $result = $query->execute()->fetchAll();
-    $location_info = [];
-    if ($result) {
-      foreach ($result as $record) {
-        $location_info[$record->id] = [
-          'name' => $record->name,
-          'status' => $record->status,
-        ];
-      }
-    }
-
-    return $location_info;
   }
 
 }

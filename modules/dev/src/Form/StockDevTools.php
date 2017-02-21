@@ -294,17 +294,20 @@ class StockDevTools extends FormBase {
   public function submitCheckStockForm(array &$form, FormStateInterface $form_state) {
     $prod_id = $form_state->getValue('prod_vid');
     $location_ids = explode(',', $form_state->getValue('location_ids'));
-    $stock_level = $this->localStockChecker->getTotalStockLevel($prod_id, $location_ids);
+    $storage = \Drupal::entityTypeManager()->getStorage('commerce_stock_location');
+    $locations = $storage->loadMultiple($location_ids);
+    $stock_level = $this->localStockChecker->getTotalStockLevel($prod_id, $locations);
     drupal_set_message($this->t('Stock level is: @stock_level', ['@stock_level' => $stock_level]));
   }
 
   /**
    * Submit handler for getting list of stock locations.
+   *
+   * This one is broken, as soon as location as entity patch
+   * gets applied. Will be removed anyway. No need to fix.
    */
   public function submitGetLocations(array &$form, FormStateInterface $form_state) {
-    $active_only = $form_state->getValue('active_only');
-    $locations = $this->localStockChecker->getLocationList($active_only);
-    drupal_set_message($this->t('Locations: @locations', ['@locations' => print_r($locations, TRUE)]));
+    drupal_set_message('Broken. Better write some tests for it :P');
   }
 
   /**

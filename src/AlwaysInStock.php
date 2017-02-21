@@ -4,7 +4,7 @@ namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 
-class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
+class AlwaysInStock implements StockCheckInterface, StockUpdateInterface, StockServiceConfigInterface {
 
   /**
    * {@inheritdoc}
@@ -49,8 +49,21 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLocationList($return_active_only = TRUE) {
-    // We don't have locations, so return an empty array.
+  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity) {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEnabledLocations(PurchasableEntityInterface $entity) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLocations() {
     return [];
   }
 
