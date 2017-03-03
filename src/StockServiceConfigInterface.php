@@ -17,15 +17,15 @@ interface StockServiceConfigInterface {
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    * @param int $quantity
-   *    The quantity.
+   *   The quantity.
    *
-   * @return int
-   *   The location ID.
+   * @return \Drupal\commerce_stock\StockLocationInterface
+   *   The stock location.
    */
   public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity);
 
   /**
-   * Get a list of location relevant for the provided purchasable entity.
+   * Get locations relevant for the provided purchasable entity.
    *
    * The entity can be ignored. Any other contextual information like active
    * store/department/.. needs to be managed by the implementing class.
@@ -33,8 +33,8 @@ interface StockServiceConfigInterface {
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    *
-   * @return array
-   *   Array of relevant location IDs.
+   * @return \Drupal\commerce_stock\StockLocationInterface[]
+   *   List of relevant locations.
    */
   public function getLocationList(PurchasableEntityInterface $entity);
 

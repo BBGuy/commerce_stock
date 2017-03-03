@@ -30,8 +30,6 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    $this->installSchema('commerce_stock_local', ['commerce_stock_location']);
     $this->installConfig(['commerce_stock']);
     $this->installConfig(['commerce_stock_local']);
   }
@@ -48,12 +46,17 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
 
     // Check if we get back, what we passed to the stock service.
     $prophecy = $this->prophesize(StockCheckInterface::class);
-    $prophecy->getLocationList(Argument::any())->willReturn([1 => 'main']);
     $stockChecker = $prophecy->reveal();
     $stockUpdater = $this->prophesize(StockUpdateInterface::class)->reveal();
-    $localStockService = new LocalStockService($stockChecker, $stockUpdater);
+    $prophecy = $this->prophesize(StockServiceConfigInterface::class);
+    $prophecy->getLocations(Argument::any())->willReturn([1 => 'main']);
+    $stockServiceConfig = $prophecy->reveal();
+
+    $localStockService = new LocalStockService($stockChecker, $stockUpdater, $stockServiceConfig);
     self::assertEquals($stockChecker, $localStockService->getStockChecker());
     self::assertEquals($stockUpdater, $localStockService->getStockUpdater());
+    self::assertEquals($stockServiceConfig, $localStockService->getConfiguration());
+
     self::assertEquals('local_stock', $localStockService->getId());
     self::assertEquals('Local stock', $localStockService->getName());
 

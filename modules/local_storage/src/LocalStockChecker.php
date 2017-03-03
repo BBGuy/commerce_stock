@@ -5,6 +5,7 @@ namespace Drupal\commerce_stock_local;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LocalStockChecker implements StockCheckInterface {
@@ -17,26 +18,37 @@ class LocalStockChecker implements StockCheckInterface {
   protected $database;
 
   /**
+   * The location storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $locationStorage;
+
+  /**
    * Constructs the local stock checker.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity manager.
    */
-  public function __construct(Connection $database) {
+  public function __construct(Connection $database, EntityTypeManagerInterface $entity_type_manager) {
     $this->database = $database;
+    $this->locationStorage = $entity_type_manager->getStorage('commerce_stock_location');
   }
 
   /**
    * Creates an instance of the local stock checker.
    *
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The DI container.
    *
    * @return static
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('database')
+      $container->get('database'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -149,7 +161,8 @@ class LocalStockChecker implements StockCheckInterface {
    */
   public function getLocationsStockLevels(PurchasableEntityInterface $entity, array $locations) {
     $location_levels = [];
-    foreach ($locations as $location_id) {
+    foreach ($locations as $location) {
+      $location_id = $location->getId();
       $location_level = $this->getLocationStockLevel($location_id, $entity);
 
       $latest_txn = $this->getLocationStockTransactionLatest($location_id, $entity);
@@ -192,23 +205,21 @@ class LocalStockChecker implements StockCheckInterface {
    * {@inheritdoc}
    */
   public function getLocationList($return_active_only = TRUE) {
-    $query = $this->database->select('commerce_stock_location', 'loc')
-      ->fields('loc');
+
+    $locations = $this->locationStorage->loadMultiple();
+
     if ($return_active_only) {
-      $query->condition('status', 1);
-    }
-    $result = $query->execute()->fetchAll();
-    $location_info = [];
-    if ($result) {
-      foreach ($result as $record) {
-        $location_info[$record->id] = [
-          'name' => $record->name,
-          'status' => $record->status,
-        ];
+      $active = [];
+      /** @var StockLocationInterface $location */
+      foreach ($locations as $location) {
+        if ($location->isActive()) {
+          $active[] = $location;
+        }
       }
+      return $active;
     }
 
-    return $location_info;
+    return $locations;
   }
 
 }
