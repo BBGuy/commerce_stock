@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_stock_local;
 
-use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;

@@ -52,8 +52,9 @@ class StockTransactions2 extends FormBase {
     $stockService = $this->stockServiceManager->getService($product_variation);
     $locations = $stockService->getStockChecker()->getLocationList(TRUE);
     $location_options = [];
-    foreach ($locations as $location_id => $location) {
-      $location_options[$location_id] = $location['name'];
+    /** @var \Drupal\commerce_stock\StockLocationInterface $location */
+    foreach ($locations as $location) {
+      $location_options[$location->getId()] = $location->getName();
     }
 
     $form['transaction_type'] = [

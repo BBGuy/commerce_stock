@@ -7,4 +7,3 @@ commerce_stock_dev.stock_dev_tools:
     _permission: 'access administration pages'
   options:
     _admin_route: TRUE
-

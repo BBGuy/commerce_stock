@@ -1,37 +1,17 @@
 <?php
 
+/**
+ * @file
+ * Contains install and update functions for commerce stock local.
+ */
+
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\commerce_stock_local\Entity\StockLocation;
 
 /**
  * Implements hook_schema().
  */
 function commerce_stock_local_schema() {
-
-  $schema['commerce_stock_location'] = [
-    'description' => 'Commerce stock locations',
-    'fields' => [
-      'id' => [
-        'description' => 'Location ID',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'name' => [
-        'description' => 'Location name',
-        'type' => 'varchar_ascii',
-        'not null' => TRUE,
-        'default' => '',
-        'length' => 128,
-      ],
-      'status' => [
-        'description' => 'Location active flag',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-    ],
-    'primary key' => ['id'],
-  ];
 
   $schema['commerce_stock_transaction_type'] = [
     'description' => 'Commerce Stock transaction types',
@@ -241,13 +221,6 @@ function commerce_stock_local_schema() {
  */
 function commerce_stock_local_install() {
   $db = \Drupal::database();
-  // Add primary stock location.
-  $db->insert('commerce_stock_location')
-    ->fields([
-      'name' => 'Main',
-      'status' => 1,
-    ])
-    ->execute();
 
   // Add core transaction types.
   $db->insert('commerce_stock_transaction_type')
@@ -300,6 +273,14 @@ function commerce_stock_local_install() {
       'parent_id' => 1,
     ])
     ->execute();
+
+  $defaultStockLocation = StockLocation::create(array(
+    'name' => 'Main',
+    'status' => TRUE,
+    'type' => "default",
+  ));
+  $defaultStockLocation->save();
+
 }
 
 /**

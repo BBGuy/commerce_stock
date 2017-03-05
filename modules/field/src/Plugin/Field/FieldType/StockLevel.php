@@ -125,13 +125,15 @@ class StockLevel extends FieldItemBase {
       if ($transaction_qty) {
         $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
         // @todo Add zone and location to form.
-        $location_id = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $transaction_qty);
+        /** @var \Drupal\commerce_stock\StockLocationInterface $location */
+        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;
+        // @ToDo Make this hardcoded note translatable or remove it at all.
         $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field';
         $metadata = ['data' => ['message' => $transaction_note]];
-        $this->stockServiceManager->createTransaction($entity, $location_id, $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+        $this->stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
       }
     }
   }
