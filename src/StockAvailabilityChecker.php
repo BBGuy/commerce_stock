@@ -51,15 +51,17 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     }
     $stock_service = $this->stockServiceManager->getService($entity);
     $stock_checker = $stock_service->getStockChecker();
-    $stock_config = $stock_service->getConfiguration();
-
-    // Get locations.
-    $locations = $stock_config->getLocationList($entity);
 
     if ($stock_checker->getIsAlwaysInStock($entity)) {
       return TRUE;
     }
-    $stock_level = $stock_checker->getTotalStockLevel($entity, $locations);
+
+    $stock_config = $stock_service->getConfiguration();
+    $stock_level = $stock_checker->getTotalStockLevel(
+      $entity,
+      $stock_config->getLocationList($entity)
+    );
+
     return ($stock_level >= $quantity);
   }
 

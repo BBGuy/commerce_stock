@@ -43,7 +43,7 @@ class LocalStockUpdater implements StockUpdateInterface {
   /**
    * Creates an instance of the local stock checker.
    *
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The DI container.
    *
    * @return static
