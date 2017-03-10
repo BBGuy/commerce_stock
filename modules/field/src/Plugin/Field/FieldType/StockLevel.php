@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\commerce\Context;
 
 /**
  * Plugin implementation of the 'commerce_stock_field' field type.
@@ -124,9 +125,10 @@ class StockLevel extends FieldItemBase {
 
       if ($transaction_qty) {
         $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
+        // Create an empty context as this is not against a specific store.
         // @todo Add zone and location to form.
         /** @var \Drupal\commerce_stock\StockLocationInterface $location */
-        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $transaction_qty);
+        $location = $this->stockServiceManager->getTransactionLocation($this->stockServiceManager->getContext(), $entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;

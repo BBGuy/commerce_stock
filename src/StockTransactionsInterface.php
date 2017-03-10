@@ -3,6 +3,8 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce\Context;
+
 
 /**
  * Defines a common interface for creating stock transactions.
@@ -17,14 +19,26 @@ interface StockTransactionsInterface {
   const MOVEMENT_FROM = 7;
   const MOVEMENT_TO = 8;
 
+
   /**
-   * Get the primary location for automatic stock allocation.
+   * Returns the active context.
    *
-   * This is normally a designated location to act as the main warehouse.
-   * However this can also be code working out in realtime the location relevant
-   * at that time. To help support this we are including the quantity related to
-   * the transaction.
+   * This is to suport UI calls. All events will hold their own context.
    *
+   * @return \Drupal\commerce\Context
+   *   The context containing the customer & store.
+   */
+  public function getContext();
+
+  /**
+   * Get the location to be used for automatic stock allocation.
+   *
+   * This is normaly done by calling the stock service
+   * StockServiceConfigInterface getTransactionLocation() and is provided as a
+   * util function.
+   *
+   * @param \Drupal\commerce\Context $context
+   *   The context containing the customer & store.
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
    * @param int $quantity
@@ -33,7 +47,7 @@ interface StockTransactionsInterface {
    * @return \Drupal\commerce_stock\StockLocationInterface
    *   The stock location.
    */
-  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity);
+  public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity, $quantity);
 
   /**
    * Create a transaction.
