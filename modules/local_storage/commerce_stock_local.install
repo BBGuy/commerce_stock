@@ -296,3 +296,33 @@ function commerce_stock_local_update_8001() {
   $schema = \Drupal::database()->schema();
   $schema->addField('commerce_stock_transaction', 'entity_type', $spec);
 }
+
+/**
+ * Installs new Location entity type.
+ */
+function commerce_stock_local_update_8002() {
+  $entity_type_id = 'commerce_stock_location';
+
+  // Remove old Location (non-entity) table.
+  $db = \Drupal::database();
+  while ($db->schema()->tableExists($entity_type_id)) {
+    $db->schema()->dropTable($entity_type_id);
+  }
+
+  // Create new default Location type entity type.
+  \Drupal::service('config.installer')->installDefaultConfig('module', 'commerce_stock_local');
+
+  // Create new Location (entity) tables.
+  /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+  $entity_manager = \Drupal::service('entity.manager');
+  $entity_type = $entity_manager->getDefinition($entity_type_id);
+  $entity_manager->onEntityTypeCreate($entity_type);
+
+  // Create new default Location entity.
+  $defaultStockLocation = StockLocation::create(array(
+    'name' => 'Main',
+    'status' => TRUE,
+    'type' => "default",
+  ));
+  $defaultStockLocation->save();
+}
