@@ -13,6 +13,15 @@ use Drupal\commerce_product\Entity\ProductVariation;
 class ProductAdminTest extends StockBrowserTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = [
+    'commerce_stock_local',
+  ];
+
+  /**
    * Test the create form.
    */
   public function testCreateProductForm() {
