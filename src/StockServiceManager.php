@@ -4,6 +4,7 @@ namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\commerce\Context;
 
 /**
  * The stock service manager, responsible for handling services and transactions.
@@ -29,6 +30,21 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   protected $configFactory;
 
   /**
+   * The current store.
+   *
+   * @var \Drupal\commerce_store\Entity\Store
+   */
+  protected $currentStore;
+
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * Constructs a StockServiceManager object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -36,6 +52,8 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
+    $this->currentStore = \Drupal::service('commerce_store.store_context')->getStore();
+    $this->currentUser =   \Drupal::currentUser();
   }
 
   /**
@@ -85,9 +103,16 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity) {
+  public function getContext() {
+    return new Context($this->currentUser, $this->currentStore);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTransactionLocation(Context $context = NULL, PurchasableEntityInterface $entity, $quantity) {
     $stock_config = $this->getService($entity)->getConfiguration();
-    return $stock_config->getPrimaryTransactionLocation($entity, $quantity);
+    return $stock_config->getTransactionLocation($context, $entity, $quantity);
   }
 
   /**
@@ -182,6 +207,9 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * Gets the total stock level for a given purchasable entity.
    *
+   * @todo - we should make the methode more abscure as it does not suport
+   * the context. Only useful for single store sites.
+   *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity to get the stock level for.
    *
@@ -194,7 +222,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     }
     $stock_config = $this->getService($entity)->getConfiguration();
     $stock_checker = $this->getService($entity)->getStockChecker();
-    $locations = $stock_config->getLocationList($entity);
+    $locations = $stock_config->getAvailabilityLocations($this->getContext(), $entity);
 
     return $stock_checker->getTotalStockLevel($entity, $locations);
   }

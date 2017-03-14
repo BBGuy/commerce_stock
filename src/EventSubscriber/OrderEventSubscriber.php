@@ -7,8 +7,10 @@ use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderItemEvent;
 use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\commerce_stock\StockTransactionsInterface;
+use Drupal\commerce\Context;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 
 /**
  * Performs stock transactions on order and order item events.
@@ -50,7 +52,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           return;
         }
         $quantity = -1 * $item->getQuantity();
-        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
         $transaction_type = StockTransactionsInterface::STOCK_SALE;
         $metadata = [
           'related_oid' => $order->id(),
@@ -84,7 +87,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           if ($checker->getIsAlwaysInStock($entity)) {
             return;
           }
-          $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
+          $context = new Context($order->getCustomer(), $order->getStore());
+          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
           $amount = -1 * $item->getQuantity();
           $metadata = [
             'related_oid' => $order->id(),
@@ -115,7 +119,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           return;
         }
         $quantity = $item->getQuantity();
-        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
@@ -150,7 +155,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           return;
         }
         $quantity = $item->getQuantity();
-        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $quantity);
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
@@ -170,6 +176,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public function onOrderItemUpdate(OrderItemEvent $event) {
     $item = $event->getOrderItem();
     $order = $item->getOrder();
+
     if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
       $diff = $item->original->getQuantity() - $item->getQuantity();
       if ($diff) {
@@ -182,7 +189,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
             return;
           }
           $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
-          $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $diff);
+          $context = new Context($order->getCustomer(), $order->getStore());
+          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $diff);
           $metadata = [
             'related_oid' => $order->id(),
             'related_uid' => $order->getCustomerId(),
@@ -213,7 +221,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         if ($checker->getIsAlwaysInStock($entity)) {
           return;
         }
-        $location = $this->stockServiceManager->getPrimaryTransactionLocation($entity, $item->getQuantity());
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
         $metadata = [
           'related_oid' => $order->id(),
           'related_uid' => $order->getCustomerId(),
