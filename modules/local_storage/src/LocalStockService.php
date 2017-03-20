@@ -25,26 +25,16 @@ class LocalStockService implements StockServiceInterface {
   protected $stockUpdater;
 
   /**
-   * The stock configuration.
-   *
-   * @var \Drupal\commerce_stock\StockServiceConfigInterface
-   */
-  protected $stockServiceConfig;
-
-  /**
    * Constructs a new LocalStockService object.
    *
    * @param \Drupal\commerce_stock\StockCheckInterface $stock_checker
    *   The stock checker.
    * @param \Drupal\commerce_stock\StockUpdateInterface $stock_updater
    *   The stock updater.
-   * @param \Drupal\commerce_stock\StockServiceConfigInterface $stock_service_config
-   *   The stock configuration.
    */
-  public function __construct(StockCheckInterface $stock_checker, StockUpdateInterface $stock_updater, StockServiceConfigInterface $stock_service_config) {
+  public function __construct(StockCheckInterface $stock_checker, StockUpdateInterface $stock_updater) {
     $this->stockChecker = $stock_checker;
     $this->stockUpdater = $stock_updater;
-    $this->stockServiceConfig = $stock_service_config;
   }
 
   /**
@@ -56,8 +46,7 @@ class LocalStockService implements StockServiceInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('commerce_stock.local_stock_checker'),
-      $container->get('commerce_stock.local_stock_updater'),
-      $container->get('commerce_stock.local_stock_service_config')
+      $container->get('commerce_stock.local_stock_updater')
     );
   }
 
@@ -93,16 +82,6 @@ class LocalStockService implements StockServiceInterface {
    */
   public function getStockUpdater() {
     return $this->stockUpdater;
-  }
-
-  /**
-   * Gets the stock Configuration.
-   *
-   * @return \Drupal\commerce_stock\StockServiceConfigInterface
-   *   The stock Configuration.
-   */
-  public function getConfiguration() {
-    return $this->stockServiceConfig;
   }
 
 }
