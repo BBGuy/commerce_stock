@@ -1,0 +1,6 @@
+id: default
+label: Default
+weight: 0
+services:
+  -
+    service: always_in_stock

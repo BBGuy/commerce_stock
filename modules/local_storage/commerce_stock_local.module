@@ -13,7 +13,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * Implements hook_entity_base_field_info().
  */
 function commerce_stock_local_entity_base_field_info(EntityTypeInterface $entity_type) {
-  // Get class of entity type.
+  // Add 'always in stock' field to purchasable entities.
   if (in_array('Drupal\commerce\PurchasableEntityInterface', class_implements($entity_type->getOriginalClass()))) {
     $fields['commerce_stock_always_in_stock'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Always in stock?'))
@@ -23,6 +23,21 @@ function commerce_stock_local_entity_base_field_info(EntityTypeInterface $entity
         'type' => 'boolean_checkbox',
         'weight' => 5,
       ])
+      ->setDefaultValue(FALSE);
+    return $fields;
+  }
+  // Adds 'primary transaction location' field to store entities.
+  if (in_array('Drupal\commerce_store\Entity\StoreInterface', class_implements($entity_type->getOriginalClass()))) {
+    $fields['commerce_stock_txn_location'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Local stock: Primary transaction location'))
+      ->setDescription(t('The primary transaction location for this store. If none is set, the first active availability location will be used.'))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 10,
+      ])
+      ->setSetting('target_type', 'commerce_stock_location')
+      ->setSetting('handler', 'default')
       ->setDefaultValue(FALSE);
     return $fields;
   }

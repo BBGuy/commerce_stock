@@ -1,20 +1,28 @@
 services:
+  commerce_stock.chain_stock_service_resolver:
+    class: Drupal\commerce_stock\Resolver\ChainStockServiceResolver
+    tags:
+      - { name: service_collector, call: addResolver, tag: commerce_stock.stock_service_resolver }
+
+  commerce_stock.default_stock_service_resolver:
+    class: Drupal\commerce_stock\Resolver\DefaultStockServiceResolver
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: commerce_stock.stock_service_resolver, priority: -100 }
+
+  commerce_stock.stock_service_manager:
+    class: Drupal\commerce_stock\StockServiceManager
+    arguments: ['@entity_type.manager', '@commerce_stock.chain_stock_service_resolver']
+
   commerce_stock.availability_checker:
     class: Drupal\commerce_stock\StockAvailabilityChecker
     arguments: ['@commerce_stock.service_manager']
     tags:
       - { name: commerce.availability_checker, priority: 0 }
 
-  commerce_stock.service_manager:
-    class: Drupal\commerce_stock\StockServiceManager
-    tags:
-      - { name: service_collector, tag: commerce_stock.stock_service, call: addService }
-    arguments: [ '@config.factory' ]
-
-  commerce_stock.always_in_stock_service:
-    class: Drupal\commerce_stock\AlwaysInStockService
-    tags:
-      - { name: commerce_stock.stock_service, priority: 0 }
+  plugin.manager.commerce_stock_service:
+    class: Drupal\commerce_stock\StockServicePluginManager
+    parent: default_plugin_manager
 
   commerce_stock.order_event_subscriber:
     class: Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber

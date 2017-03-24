@@ -17,6 +17,12 @@ services:
     class: Drupal\commerce_stock_local\LocalStockServiceConfig
     arguments: ['@entity_type.manager']
 
+  commerce_stock.local_transaction_location_resolver:
+    class: Drupal\commerce_stock_local\Resolver\LocalTransactionLocationResolver
+    arguments: ['@entity_type.manager', '@commerce_stock.local_availability_location_resolver']
+    tags:
+      - { name: commerce_stock.transaction_location_resolver, priority: -100 }
+
   commerce_stock_local_uninstall_validator:
       class: Drupal\commerce_stock_local\LocalStockUninstallValidator
       tags:

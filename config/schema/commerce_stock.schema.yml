@@ -1,6 +1,37 @@
-commerce_stock.service_manager:
-  type: config_object
+commerce_stock.stock_service_config.*:
+  type: config_entity
+  label: 'Stock service configuration'
   mapping:
-    default_service_id:
+    id:
       type: string
-      label: 'Default service ID'
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    weight:
+      type: integer
+      label: 'Weight'
+    service:
+      type: string
+      label: 'Service'
+    configuration:
+      type: commerce_stock_service_configuration
+
+commerce_stock_service_configuration:
+  type: mapping
+  mapping:
+    entity_types:
+      type: sequence
+      label: 'Entity types'
+      sequence:
+        type: string
+    order_types:
+      type: sequence
+      label: 'Order types'
+      sequence:
+        type: string
+    stores:
+      type: sequence
+      label: 'Stores'
+      sequence:
+        type: uuid

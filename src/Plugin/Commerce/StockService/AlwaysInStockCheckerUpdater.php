@@ -1,10 +1,12 @@
 <?php
 
-namespace Drupal\commerce_stock;
+namespace Drupal\commerce_stock\Plugin\Commerce\StockService;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_stock\StockCheckInterface;
+use Drupal\commerce_stock\StockUpdateInterface;
 
-class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
+class AlwaysInStockCheckerUpdater implements StockCheckInterface, StockUpdateInterface {
 
   /**
    * {@inheritdoc}

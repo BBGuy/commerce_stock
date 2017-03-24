@@ -1,0 +1,45 @@
+<?php
+
+namespace Drupal\commerce_stock;
+
+use Drupal\commerce\PurchasableEntityInterface;
+
+interface StockServiceManagerInterface_Old {
+
+  /**
+   * Adds a Stock service.
+   *
+   * @param \Drupal\commerce_stock\StockServiceInterface $stock_service
+   *   The stock service.
+   */
+  public function addService(StockServiceInterface $stock_service);
+
+  /**
+   * Get a stock service by id.
+   *
+   * @param string $service_id
+   *   The stock service id.
+   *
+   * @return \Drupal\commerce_stock\StockServiceInterface|null
+   *   The stock service or NULL if it does not exist.
+   */
+  public function getService($service_id);
+
+  /**
+   * Returns an array of all registered stock services.
+   *
+   * @return \Drupal\commerce_stock\StockServiceInterface[]
+   *   All registered stock services keyed by service ID.
+   */
+  public function listServices();
+
+  /**
+   * Returns an array of the IDs of all registered stock services.
+   *
+   * @return array
+   *   Array of the IDs of all registered stock services.
+   *   Format is: array('service key' => 'service name')
+   */
+  public function listServiceIds();
+
+}

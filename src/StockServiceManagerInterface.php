@@ -2,44 +2,34 @@
 
 namespace Drupal\commerce_stock;
 
+use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 
 interface StockServiceManagerInterface {
 
   /**
-   * Adds a Stock service.
-   *
-   * @param \Drupal\commerce_stock\StockServiceInterface $stock_service
-   *   The stock service.
-   */
-  public function addService(StockServiceInterface $stock_service);
-
-  /**
-   * Get a service relevant for the entity.
+   * Checks if a purchasable entity is stock managed.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity (most likely a product variation entity).
+   *   The purchasable entity.
    *
-   * @return \Drupal\commerce_stock\StockServiceInterface
-   *   The appropriate stock service for the given purchasable entity.
+   * @return bool TRUE if stock is managed, FALSE if not.
    */
-  public function getService(PurchasableEntityInterface $entity);
+  public function isStockManaged(PurchasableEntityInterface $entity);
 
   /**
-   * Returns an array of all registered stock services.
+   * Gets the resolved service for a given entity, context and quantity.
    *
-   * @return \Drupal\commerce_stock\StockServiceInterface[]
-   *   All registered stock services keyed by service ID.
-   */
-  public function listServices();
-
-  /**
-   * Returns an array of the IDs of all registered stock services.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
+   * @param \Drupal\commerce\Context $context
+   *   The context.
+   * @param int $quantity
+   *   The quantity.
    *
-   * @return array
-   *   Array of the IDs of all registered stock services.
-   *   Format is: array('service key' => 'service name')
+   * @return \Drupal\commerce_stock\Entity\StockServiceInterface|null
+   *   The stock service if resolved, or NULL if none available.
    */
-  public function listServiceIds();
+  public function getService(PurchasableEntityInterface $entity, Context $context, $quantity);
 
 }
