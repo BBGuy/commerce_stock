@@ -55,11 +55,7 @@ class StockServiceConfig implements StockServiceConfigInterface {
    */
   public function loadConfiguration() {
     // For now we will use all active locations for all products.
-    $locations = $this->stockChecker->getLocationList(TRUE);
-    $this->stockLocations = [];
-    foreach ($locations as $key => $value) {
-      $this->stockLocations[$key] = $key;
-    }
+    $this->stockLocations = $this->stockChecker->getLocationList(TRUE);
   }
 
 }
