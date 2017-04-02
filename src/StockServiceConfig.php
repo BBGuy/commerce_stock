@@ -63,7 +63,7 @@ class StockServiceConfig implements StockServiceConfigInterface {
     $locations = $this->stockChecker->getLocationList(TRUE);
     $this->stockLocations = [];
     foreach ($locations as $key => $value) {
-      $this->stockLocations[$key] = $key;
+      $this->stockLocations[$key] = $value;
     }
   }
 
