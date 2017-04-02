@@ -157,8 +157,8 @@ class LocalStockChecker implements StockCheckInterface {
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
-   * @param array $locations
-   *   Array of locations ids.
+   * @param \Drupal\commerce_stock\StockLocationInterface[] $locations
+   *   The stock locations.
    *
    * @return array
    *   Stock level information indexed by location id with these values:
@@ -167,6 +167,7 @@ class LocalStockChecker implements StockCheckInterface {
    */
   public function getLocationsStockLevels(PurchasableEntityInterface $entity, array $locations) {
     $location_levels = [];
+    /** @var \Drupal\commerce_stock\StockLocationInterface $location */
     foreach ($locations as $location) {
       $location_id = $location->getId();
       $location_level = $this->getLocationStockLevel($location_id, $entity);
