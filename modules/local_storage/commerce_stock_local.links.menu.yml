@@ -9,8 +9,8 @@ entity.commerce_stock_location.collection:
 
 # Stock Location type menu items definition
 entity.commerce_stock_location_type.collection:
-  title: 'List Stock location types'
+  title: 'Stock location types'
   route_name: entity.commerce_stock_location_type.collection
-  description: 'List stock location type (bundles)'
+  description: 'Manage your stock location types.'
   parent: 'commerce.configuration'
   weight: 99
