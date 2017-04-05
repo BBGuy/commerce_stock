@@ -29,8 +29,8 @@ class StockLevelUpdater extends QueueWorkerBase {
     /** @var \Drupal\commerce_stock_local\LocalStockUpdater $updater */
     $updater = $service->getStockUpdater();
     $locations = $checker->getLocationList(TRUE);
-    foreach ($locations as $location_id => $location) {
-      $updater->updateLocationStockLevel($location_id, $entity);
+    foreach ($locations as $location) {
+      $updater->updateLocationStockLevel($location->getId(), $entity);
     }
   }
 

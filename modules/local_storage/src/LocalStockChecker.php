@@ -91,9 +91,10 @@ class LocalStockChecker implements StockCheckInterface {
   public function getLocationStockTransactionLatest($location_id, PurchasableEntityInterface $entity) {
     $query = $this->database->select('commerce_stock_transaction')
       ->condition('location_id', $location_id)
-      ->condition('entity_id', $entity->id());
+      ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId());
     $query->addExpression('MAX(id)', 'max_id');
-    $query->groupBy('location_id');
+
     $result = $query
       ->execute()
       ->fetch();
@@ -121,6 +122,7 @@ class LocalStockChecker implements StockCheckInterface {
       ->fields('txn', ['location_id'])
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
       ->condition('id', $min, '>');
     if ($max) {
       $query->condition('id', $max, '<=');
