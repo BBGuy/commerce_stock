@@ -106,8 +106,10 @@ class LocalStockUpdater implements StockUpdateInterface {
   }
 
   /**
-   * Sets the stock level and last transaction for a given location and purchasable entity.
+   * Set the location stock level.
    *
+   * Sets the stock level and last transaction for a given location and
+   * purchasable entity.
    * Creates first stock level transaction record if none exists.
    *
    * @param int $location_id

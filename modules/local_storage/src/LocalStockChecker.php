@@ -8,6 +8,9 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The stock checker implementation for the local stock module.
+ */
 class LocalStockChecker implements StockCheckInterface {
 
   /**
@@ -115,7 +118,8 @@ class LocalStockChecker implements StockCheckInterface {
    *   The maximum transaction number.
    *
    * @return int
-   *   The sum of stock transactions for a given location and purchasable entity.
+   *   The sum of stock transactions for a given location and purchasable
+   *   entity.
    */
   public function getLocationStockTransactionSum($location_id, PurchasableEntityInterface $entity, $min, $max) {
     $query = $this->database->select('commerce_stock_transaction', 'txn')

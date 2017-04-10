@@ -4,6 +4,9 @@ namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 
+/**
+ * The stock service configuration interface.
+ */
 interface StockServiceConfigInterface {
 
   /**

@@ -6,7 +6,9 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
- * The stock service manager, responsible for handling services and transactions.
+ * The stock service manager.
+ *
+ * Responsible for handling services and transactions.
  *
  * @see StockAvailabilityChecker.
  *

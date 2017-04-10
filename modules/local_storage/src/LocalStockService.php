@@ -8,6 +8,9 @@ use Drupal\commerce_stock\StockServiceInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The Local stock Service class.
+ */
 class LocalStockService implements StockServiceInterface {
 
   /**
@@ -48,6 +51,8 @@ class LocalStockService implements StockServiceInterface {
   }
 
   /**
+   * Creates a new Local stock service.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The DI container.
    *

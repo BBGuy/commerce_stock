@@ -5,8 +5,7 @@ namespace Drupal\Tests\commerce_stock\Functional;
 use Drupal\commerce_product\Entity\ProductVariation;
 
 /**
- * Test that the product creation form contains the stock
- * settings fields.
+ * Test that the product creation form contains the stock settings fields.
  *
  * @group commerce_stock
  */

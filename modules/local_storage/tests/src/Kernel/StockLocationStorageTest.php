@@ -5,6 +5,9 @@ namespace Drupal\Tests\commerce_product_local\Kernel\Entity;
 use Drupal\commerce_stock_local\Entity\StockLocation;
 use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 
+/**
+ * Test the stock location storage.
+ */
 class StockLocationStorageTest extends CommerceStockKernelTestBase {
 
   /**

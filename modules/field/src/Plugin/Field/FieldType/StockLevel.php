@@ -99,7 +99,8 @@ class StockLevel extends FieldItemBase {
       $called[$entity->getEntityTypeId() . $entity->id()] = TRUE;
       $transaction_qty = 0;
 
-      // Supports absolute values being passed in directly, i.e. programmatically.
+      // Supports absolute values being passed in directly, i.e.
+      // programmatically.
       if (!is_array($values)) {
         $values = ['stock' => ['value' => $values]];
       }

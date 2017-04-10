@@ -233,7 +233,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       // State change events fired on workflow transitions from state_machine.
       'commerce_order.place.post_transition' => ['onOrderPlace', -100],
       'commerce_order.cancel.post_transition' => ['onOrderCancel', -100],
-      // Order storage events dispatched during entity operations in CommerceContentEntityStorage.
+      // Order storage events dispatched during entity operations in
+      // CommerceContentEntityStorage.
       // ORDER_UPDATE handles new order items since ORDER_ITEM_INSERT doesn't.
       OrderEvents::ORDER_UPDATE => ['onOrderUpdate', -100],
       OrderEvents::ORDER_PREDELETE => ['onOrderDelete', -100],

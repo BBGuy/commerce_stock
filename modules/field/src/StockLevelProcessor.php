@@ -4,6 +4,9 @@ namespace Drupal\commerce_stock_field;
 
 use Drupal\Core\TypedData\TypedData;
 
+/**
+ * Processor used by the StockLevel field.
+ */
 class StockLevelProcessor extends TypedData {
 
   /**

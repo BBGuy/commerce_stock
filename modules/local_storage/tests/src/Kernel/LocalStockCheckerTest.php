@@ -54,6 +54,8 @@ class LocalStockCheckerTest extends CommerceStockKernelTestBase {
   }
 
   /**
+   * Get location list.
+   *
    * @covers ::getLocationList
    */
   public function testGetLocationList() {

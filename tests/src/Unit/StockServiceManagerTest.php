@@ -29,6 +29,8 @@ class StockServiceManagerTest extends UnitTestCase {
   }
 
   /**
+   * Test the stock service manager.
+   *
    * ::covers addService
    * ::covers listServices
    * ::covers listServiceIds.

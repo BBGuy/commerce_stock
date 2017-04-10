@@ -296,7 +296,10 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
   }
 
   /**
-   * Tests that transactions are created for all other order and order item events.
+   * Test order events.
+   *
+   * Tests that transactions are created for all other order and order item
+   * events.
    */
   public function testOrderEvents() {
     // Tests the order item creation event.

@@ -44,6 +44,8 @@ class StockLocationTest extends CommerceStockKernelTestBase {
   }
 
   /**
+   * Test stock location.
+   *
    * @covers ::getName
    * @covers ::setName
    * @covers ::isActive
