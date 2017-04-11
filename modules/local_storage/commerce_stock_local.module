@@ -108,9 +108,9 @@ function _commerce_stock_local_update_stock_level_queue() {
  */
 function commerce_stock_local_theme() {
   $theme = [];
-  $theme['commerce_stock_location'] = array(
+  $theme['commerce_stock_location'] = [
     'render element' => 'elements',
-  );
+  ];
   $theme['commerce_stock_location_content_add_list'] = [
     'render element' => 'content',
     'variables' => ['content' => NULL],
