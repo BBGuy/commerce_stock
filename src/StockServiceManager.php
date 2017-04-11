@@ -7,7 +7,9 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\commerce\Context;
 
 /**
- * The stock service manager, responsible for handling services and transactions.
+ * The stock service manager.
+ *
+ * Responsible for handling services and transactions.
  *
  * @see StockAvailabilityChecker.
  *

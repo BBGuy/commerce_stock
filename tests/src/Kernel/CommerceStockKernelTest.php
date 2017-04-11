@@ -4,6 +4,9 @@ namespace Drupal\Tests\commerce_stock\Kernel;
 
 use Drupal\commerce_product\Entity\ProductVariation;
 
+/**
+ * Commerce stock kernel test.
+ */
 class CommerceStockKernelTest extends CommerceStockKernelTestBase {
 
   /**
@@ -33,6 +36,8 @@ class CommerceStockKernelTest extends CommerceStockKernelTestBase {
   }
 
   /**
+   * Test field is added to purchasable entities.
+   *
    * Test that a commerce_stock_always_in_stock base field
    * is added to purchasable entities.
    */

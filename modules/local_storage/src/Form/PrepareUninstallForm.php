@@ -10,7 +10,10 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a form removing commerce_stock_always_in_stock field data before uninstallation.
+ * The always in stock field uninstall form.
+ *
+ * Provides a form removing commerce_stock_always_in_stock field data before
+ * uninstallation.
  */
 class PrepareUninstallForm extends ConfirmFormBase {
 

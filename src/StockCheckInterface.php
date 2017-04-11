@@ -4,6 +4,9 @@ namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 
+/**
+ * The stock checker interface.
+ */
 interface StockCheckInterface {
 
   /**

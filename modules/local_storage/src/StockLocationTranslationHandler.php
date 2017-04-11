@@ -26,7 +26,8 @@ class StockLocationTranslationHandler extends ContentTranslationHandler {
         ],
       ];
       $form['content_translation']['#weight'] = 100;
-      // The basic stock location values will be used, no need for specific elements.
+      // The basic stock location values will be used, no need for specific
+      // elements.
       $form['content_translation']['status']['#access'] = FALSE;
       $form['content_translation']['name']['#access'] = FALSE;
     }

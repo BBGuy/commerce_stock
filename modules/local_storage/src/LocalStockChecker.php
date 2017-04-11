@@ -8,6 +8,9 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The stock checker implementation for the local stock module.
+ */
 class LocalStockChecker implements StockCheckInterface {
 
   /**
@@ -91,9 +94,10 @@ class LocalStockChecker implements StockCheckInterface {
   public function getLocationStockTransactionLatest($location_id, PurchasableEntityInterface $entity) {
     $query = $this->database->select('commerce_stock_transaction')
       ->condition('location_id', $location_id)
-      ->condition('entity_id', $entity->id());
+      ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId());
     $query->addExpression('MAX(id)', 'max_id');
-    $query->groupBy('location_id');
+
     $result = $query
       ->execute()
       ->fetch();
@@ -114,13 +118,15 @@ class LocalStockChecker implements StockCheckInterface {
    *   The maximum transaction number.
    *
    * @return int
-   *   The sum of stock transactions for a given location and purchasable entity.
+   *   The sum of stock transactions for a given location and purchasable
+   *   entity.
    */
   public function getLocationStockTransactionSum($location_id, PurchasableEntityInterface $entity, $min, $max) {
     $query = $this->database->select('commerce_stock_transaction', 'txn')
       ->fields('txn', ['location_id'])
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
       ->condition('id', $min, '>');
     if ($max) {
       $query->condition('id', $max, '<=');

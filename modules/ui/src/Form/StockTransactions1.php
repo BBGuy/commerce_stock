@@ -6,7 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class StockTransactions.
+ * The first part of a two part create stock transaction form.
  *
  * @package Drupal\stock_ui\Form
  */

@@ -35,6 +35,8 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
   }
 
   /**
+   * Test the local stock service.
+   *
    * @covers ::create
    * @covers ::getStockChecker
    * @covers ::getStockUpdater

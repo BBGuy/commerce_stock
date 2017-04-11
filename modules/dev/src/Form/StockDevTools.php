@@ -6,6 +6,9 @@ use Drupal\commerce\Context;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * A form for running tests.
+ */
 class StockDevTools extends FormBase {
 
   /**

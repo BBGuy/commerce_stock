@@ -5,6 +5,9 @@ namespace Drupal\commerce_stock_ui\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * The second part of a two part create stock transaction form.
+ */
 class StockTransactions2 extends FormBase {
 
   /**

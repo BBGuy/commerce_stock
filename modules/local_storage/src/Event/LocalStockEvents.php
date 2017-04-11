@@ -2,6 +2,9 @@
 
 namespace Drupal\commerce_stock_local\Event;
 
+/**
+ * List of stock location events.
+ */
 final class LocalStockEvents {
 
   /**

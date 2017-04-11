@@ -5,6 +5,11 @@ namespace Drupal\commerce_stock;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Context;
 
+/**
+ * The default stock service configuration class.
+ *
+ * Implementing modules are likely to create their own version of this class.
+ */
 class StockServiceConfig implements StockServiceConfigInterface {
 
   /**

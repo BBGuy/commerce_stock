@@ -4,6 +4,9 @@ namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
 
+/**
+ * The Checker and updater implementation for the always in stock service.
+ */
 class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
 
   /**
