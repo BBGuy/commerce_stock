@@ -274,11 +274,11 @@ function commerce_stock_local_install() {
     ])
     ->execute();
 
-  $defaultStockLocation = StockLocation::create(array(
+  $defaultStockLocation = StockLocation::create([
     'name' => 'Main',
     'status' => TRUE,
     'type' => "default",
-  ));
+  ]);
   $defaultStockLocation->save();
 
 }
@@ -287,12 +287,12 @@ function commerce_stock_local_install() {
  * Adds 'entity_type' column to commerce_stock_transaction table.
  */
 function commerce_stock_local_update_8001() {
-  $spec = array(
+  $spec = [
     'description' => 'Purchasable entity type',
     'type'        => 'varchar_ascii',
     'length'      => EntityTypeInterface::ID_MAX_LENGTH,
     'not null'    => FALSE,
-  );
+  ];
   $schema = \Drupal::database()->schema();
   $schema->addField('commerce_stock_transaction', 'entity_type', $spec);
 }
