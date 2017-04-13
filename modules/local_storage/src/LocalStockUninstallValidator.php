@@ -60,13 +60,13 @@ class LocalStockUninstallValidator implements ModuleUninstallValidatorInterface 
             ) {
               $reasons[] = $this->t(
                 '<a href=":url">Remove field values</a>: @field-name on entity type @entity_type.',
-                array(
+                [
                   '@field-name' => $storage_definition->getName(),
                   '@entity_type' => $entity_type->getLabel(),
                   ':url' => Url::fromRoute(
                     'commerce_stock_local.prepare_module_uninstall'
                   )->toString(),
-                )
+                ]
               );
             }
           }
