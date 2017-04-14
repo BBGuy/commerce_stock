@@ -34,15 +34,15 @@ class StockServiceConfigTest extends CommerceStockKernelTestBase {
 
     $locations = [];
 
-    for($i = 1; $i < 4; $i++){
+    for ($i = 1; $i < 4; $i++) {
       $prophecy = $this->prophesize(StockLocationInterface::class);
       $prophecy->getId()->willReturn($i);
-      $prophecy->isActive()->willReturn(true);
-      $locations[] =  $prophecy->reveal();
+      $prophecy->isActive()->willReturn(TRUE);
+      $locations[] = $prophecy->reveal();
     }
 
     $prophecy = $this->prophesize(StockCheckInterface::class);
-    $prophecy->getLocationList(Argument::is(true))->willReturn($locations);
+    $prophecy->getLocationList(Argument::is(TRUE))->willReturn($locations);
     $stockChecker = $prophecy->reveal();
 
     $stockServiceConfig = new StockServiceConfig($stockChecker);
@@ -53,7 +53,7 @@ class StockServiceConfigTest extends CommerceStockKernelTestBase {
     // Test that getLocationList() returns active location entities.
     $locations = $stockServiceConfig->getLocationList($entity);
     self::assertEquals(3, count($locations));
-    foreach($locations as $location){
+    foreach ($locations as $location) {
       self::assertInstanceOf('Drupal\commerce_stock\StockLocationInterface', $location);
       self::assertTrue($location->isActive());
     }
