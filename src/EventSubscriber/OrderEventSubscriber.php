@@ -42,6 +42,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order = $event->getEntity();
     foreach ($order->getItems() as $item) {
       $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        continue;
+      }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
@@ -78,6 +81,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if (!$original_order->hasItem($item)) {
         if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
           $entity = $item->getPurchasedEntity();
+          if (!$entity) {
+            continue;
+          }
           $service = $this->stockServiceManager->getService($entity);
           $checker = $service->getStockChecker();
           // If always in stock then no need to create a transaction.
@@ -107,6 +113,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order = $event->getEntity();
     foreach ($order->getItems() as $item) {
       $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        continue;
+      }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
@@ -142,6 +151,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $items = $order->getItems();
     foreach ($items as $item) {
       $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        continue;
+      }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
@@ -174,6 +186,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $diff = $item->original->getQuantity() - $item->getQuantity();
       if ($diff) {
         $entity = $item->getPurchasedEntity();
+        if (!$entity) {
+          return;
+        }
         $service = $this->stockServiceManager->getService($entity);
         $checker = $service->getStockChecker();
         if ($checker->getIsStockManaged($entity)) {
@@ -206,6 +221,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order = $item->getOrder();
     if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
       $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        return;
+      }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
