@@ -142,7 +142,7 @@ class StockTransactions2 extends FormBase {
     ];
     $form['transaction_qty'] = [
       '#type' => 'number',
-      '#title' => $this->t('Quentity'),
+      '#title' => $this->t('Quantity'),
       '#default_value' => '1',
       '#step' => '0.01',
       '#required' => TRUE,
