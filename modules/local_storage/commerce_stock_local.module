@@ -8,6 +8,43 @@
 use Drupal\Core\Render\Element;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\commerce_product\Entity\ProductVariation;
+
+/**
+ * Implements hook_form_alter().
+ */
+function commerce_stock_local_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (strpos($form_id, 'commerce_order_item_add_to_cart_form') === 0) {
+    /** @var \Drupal\commerce_cart\Form\AddToCartForm $form_object */
+    $form_object = $form_state->getBuildInfo()['callback_object'];
+
+    $storage = $form_state->getStorage();
+    if (isset($storage['selected_variation'])) {
+      $variation = ProductVariation::load($storage['selected_variation']);
+    } else {
+      $order_item = $form_object->getEntity();
+      $variation = $order_item->getPurchasedEntity();
+    }
+
+    if (empty($variation)) return;
+
+    $stores = $variation->getStores();
+    if (count($stores) === 0) {
+      throw new \Exception('The given entity is not assigned to any store.');
+    }
+    $store = reset($stores);
+    $context = new Context($form_object->getCurrentUser(), $store);
+    /** @var \Drupal\commerce\AvailabilityResponse $availability */
+    $availability = $form_object->getAvailabilityManager()->check($variation, 1, $context);
+
+    if ($availability->isUnavailable()) {
+      $form['actions']['submit']['#value'] = t('Unavailable');
+      $form['actions']['submit']['#attributes'] = [
+        'disabled' => 'disabled',
+      ];
+    }
+  }
+}
 
 /**
  * Implements hook_entity_base_field_info().
