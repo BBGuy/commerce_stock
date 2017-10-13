@@ -9,11 +9,13 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\Core\Form\FormState;
+use Drupal\commerce\Context;
 
 /**
  * Implements hook_form_alter().
  */
-function commerce_stock_local_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function commerce_stock_local_form_alter(&$form, FormState $form_state, $form_id) {
   if (strpos($form_id, 'commerce_order_item_add_to_cart_form') === 0) {
     /** @var \Drupal\commerce_cart\Form\AddToCartForm $form_object */
     $form_object = $form_state->getBuildInfo()['callback_object'];
