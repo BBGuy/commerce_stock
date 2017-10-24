@@ -82,6 +82,15 @@ class SimpleStockLevelWidget extends WidgetBase {
     $field = $items->first();
     $entity = $items->getEntity();
 
+    // We currently only support the Local stock service.
+    $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
+    $stock_service_name = $stockServiceManager->getService($entity)->getName();
+    // @todo - service should be able can determine if it needs an interface.
+    if ($stock_service_name != 'Local stock' ) {
+      // return an empty array if service is not suported.
+      return array();
+    }
+
     if (!($entity instanceof PurchasableEntityInterface)) {
       // No stock if this is not a purchasable entity.
       return [];
