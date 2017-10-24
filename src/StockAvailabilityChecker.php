@@ -4,6 +4,7 @@ namespace Drupal\commerce_stock;
 
 use Drupal\commerce\AvailabilityCheckerInterface;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce\AvailabilityResponse;
 use Drupal\commerce\Context;
 
 /**
@@ -53,7 +54,7 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     $stock_checker = $stock_service->getStockChecker();
 
     if ($stock_checker->getIsAlwaysInStock($entity)) {
-      return TRUE;
+      return AvailabilityResponse::available(0, PHP_INT_MAX);
     }
 
     $stock_config = $stock_service->getConfiguration();
@@ -62,7 +63,13 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
       $stock_config->getLocationList($entity)
     );
 
-    return ($stock_level >= $quantity);
+    if ($stock_level >= $quantity) {
+      return AvailabilityResponse::available(0, $stock_level);
+    }
+    else {
+      return AvailabilityResponse::unavailable(0, $stock_level, 'has Insufficient stock');
+    }
+
   }
 
 }
