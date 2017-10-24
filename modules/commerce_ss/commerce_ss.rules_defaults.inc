@@ -31,7 +31,7 @@ function commerce_ss_default_rules_configuration() {
 
   $rules['rules_decrement_stock_completing_order'] = rules_import($rules_export);
 
-  $rules_export ='{ "rules_increment_stock_canceling_order" : {
+  $rules_export = '{ "rules_increment_stock_canceling_order" : {
       "LABEL" : "Stock: Increase when canceling the order process",
       "PLUGIN" : "reaction rule",
       "ACTIVE" : false,

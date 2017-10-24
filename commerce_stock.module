@@ -2,8 +2,10 @@
 
 /**
  * @file
+ * Commerce Stock module.
+ *
  * Provides an rules based api for implementing order quantity
- * and stock validation
+ * and stock validation.
  *
  * This module provides the events to trigger the stock checks and
  * configurable actions to take if the check fails "out of stock:
@@ -54,7 +56,6 @@ function commerce_stock_permission() {
 
   );
 }
-
 
 /**
  * Implements hook_form_alter().
@@ -160,6 +161,7 @@ function commerce_stock_cart_state_validate_options($form_id, &$form, &$form_sta
   $form['#attributes']['class']['stock'] = 'in-stock';
 
   // Set global form for stock actions.
+  // @codingStandardsIgnoreLine
   global $stock_cart_check_data;
   $stock_cart_check_data = array(
     'form' => &$form,
@@ -167,7 +169,7 @@ function commerce_stock_cart_state_validate_options($form_id, &$form, &$form_sta
 
   // Integration with rules_form_alter().
   if (module_exists('rules_form_alter')) {
-    // make sure rules_form_alter actions work from the stock event.
+    // Make sure rules_form_alter actions work from the stock event.
     $rules_form_alter_data = &drupal_static('rules_form_alter_data', array());
     // Set the form data that will be used by rules.
     $rules_form_alter_data['id'] = $form_id;
@@ -281,6 +283,7 @@ function commerce_stock_cart_state_validate($form_id, &$form, &$form_state) {
   $form['submit']['#disabled'] = FALSE;
   $form['#attributes']['class']['stock'] = 'in-stock';
 
+  // @codingStandardsIgnoreLine
   global $stock_cart_check_data;
   $stock_cart_check_data = array(
     'form' => &$form,
@@ -288,7 +291,7 @@ function commerce_stock_cart_state_validate($form_id, &$form, &$form_state) {
 
   // Integration with rules_form_alter().
   if (module_exists('rules_form_alter')) {
-    // make sure rules_form_alter actions work from the stock event.
+    // Make sure rules_form_alter actions work from the stock event.
     $rules_form_alter_data = &drupal_static('rules_form_alter_data', array());
     // Set the form data that will be used by rules.
     $rules_form_alter_data['id'] = $form_id;
@@ -310,7 +313,6 @@ function commerce_stock_token_info() {
   );
   return $info;
 }
-
 
 /**
  * Implements hook_tokens().
@@ -344,7 +346,8 @@ function commerce_stock_check_cart_product_level($product_id) {
   }
 
   // First let other modules attempt to provide a valid quantity for the given
-  // product id. Instead of invoking hook_commerce_stock_check_cart_product_level()
+  // product id. Instead of invoking
+  // hook_commerce_stock_check_cart_product_level()
   // directly, we invoke it in each module implementing the hook and return the
   // first valid quantity returned (if any).
   foreach (module_implements('commerce_stock_check_cart_product_level') as $module) {
@@ -376,7 +379,7 @@ function commerce_stock_check_cart_product_level($product_id) {
     // Cycle throw each line item ID.
     foreach ($order_wrapper->commerce_line_items as $index => $line_item_wrapper) {
       if (in_array($line_item_wrapper->getBundle(), commerce_product_line_item_types())) {
-        if ($line_item_wrapper->commerce_product->product_id->value() == $product_id){
+        if ($line_item_wrapper->commerce_product->product_id->value() == $product_id) {
           $cart_qty += $line_item_wrapper->quantity->value();
         }
       }
@@ -393,11 +396,12 @@ function commerce_stock_check_cart_product_level($product_id) {
  */
 function commerce_stock_check_product_rule($product, &$qty, $qty_ordered, &$stock_state, &$message) {
   // Set defaults to the global stock check array.
+  // @codingStandardsIgnoreLine
   global $stock_check_data;
   $stock_check_data = array(
     'state' => '0',
     'message' => '',
-    'qty' => $qty
+    'qty' => $qty,
   );
 
   // Invoke the stock check event.
@@ -418,11 +422,12 @@ function commerce_stock_check_product_rule($product, &$qty, $qty_ordered, &$stoc
  */
 function commerce_stock_check_product_checkout_rule($product, $qty_ordered, &$stock_state, &$message) {
   // Set defaults to the global stock check array.
+  // @codingStandardsIgnoreLine
   global $stock_check_data;
   $stock_check_data = array(
     'state' => '0',
     'message' => '',
-    'qty' => $qty_ordered
+    'qty' => $qty_ordered,
   );
 
   // Invoke the stock check event.
@@ -522,7 +527,8 @@ function commerce_stock_test_cart_action($form, &$form_state) {
   $product_id = $form_state['values']['product_id'];
   $product = commerce_product_load($product_id);
   drupal_set_message(t('%title was not added to your cart as this is a test action only.', array('%title' => $product->title)), 'error');
-  // Ensure that page redirects back to its original URL without losing query parameters, such as pagers.
+  // Ensure that page redirects back to its original URL without losing query
+  // parameters, such as pagers.
   // @todo Remove when http://drupal.org/node/171267 is fixed.
   $form_state['redirect'] = array(current_path(), array('query' => drupal_get_query_parameters()));
 }

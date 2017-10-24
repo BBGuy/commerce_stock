@@ -114,7 +114,7 @@ function commerce_stock_rules_order_has_out_of_stock($order) {
 }
 
 /**
- * Implementation of hook_rules_action_info().
+ * Implements hook_rules_action_info().
  */
 function commerce_stock_rules_action_info() {
   $actions = array();
@@ -285,7 +285,7 @@ function commerce_stock_rules_access() {
 /**
  * Rules action: updates an order's status.
  *
- * updates an order's status to the default status of the given order state.
+ * Updates an order's status to the default status of the given order state.
  */
 function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $approved_quantity) {
   if ($approved_quantity < 0) {
@@ -295,6 +295,7 @@ function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $ap
     $stock_action = 1;
   }
   // Set the global stock check array.
+  // @codingStandardsIgnoreLine
   global $stock_check_data;
   $stock_check_data['state'] = $stock_action;
   $stock_check_data['message'] = $message;
@@ -302,10 +303,12 @@ function commerce_stock_rules_add_to_cart_set_state($stock_action, $message, $ap
 }
 
 /**
- * Rules action:
+ * Rules action:.
+ *
  * @todo: Define this function.
  */
 function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $class_name) {
+  // @codingStandardsIgnoreLine
   global $stock_cart_check_data;
   $stock_cart_check_data['form']['submit']['#value'] = $text;
   $stock_cart_check_data['form']['submit']['#disabled'] = $disabled;
@@ -313,20 +316,32 @@ function commerce_stock_rules_set_add_to_cart_form_state($disabled, $text, $clas
 }
 
 /**
+ * Custom cart form state.
+ *
  * @todo: Define this function.
  */
-function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
-          $action_prefix, $action_suffix, $stock_action, $disabled_cart,
-          $custom_submit, $custom_submit_clear, $custom_validate,
-          $custom_validate_clear, $custom_url, $custom_html) {
+function commerce_stock_custom_cart_form_state($hide_qty,
+ $text,
+ $class_name,
+          $action_prefix,
+ $action_suffix,
+ $stock_action,
+ $disabled_cart,
+          $custom_submit,
+ $custom_submit_clear,
+ $custom_validate,
+          $custom_validate_clear,
+ $custom_url,
+ $custom_html) {
+  // @codingStandardsIgnoreLine
   global $stock_cart_check_data;
 
   // Read form values.
   $form_action = $stock_cart_check_data['form']['#action'];
-  if (isset ($stock_cart_check_data['form']['product_id']['#value'])) {
+  if (isset($stock_cart_check_data['form']['product_id']['#value'])) {
     $prod_id = $stock_cart_check_data['form']['product_id']['#value'];
   }
-  elseif (isset ($stock_cart_check_data['form']['product_id']['#default_value'])) {
+  elseif (isset($stock_cart_check_data['form']['product_id']['#default_value'])) {
     $prod_id = $stock_cart_check_data['form']['product_id']['#default_value'];
   }
 
@@ -400,7 +415,10 @@ function commerce_stock_custom_cart_form_state($hide_qty, $text, $class_name,
 }
 
 /**
- * Rules action: Set the state of the checkout process (called once per an item).
+ * Function to set checkout state.
+ *
+ * Rules action: Set the state of the checkout
+ * process (called once per an item).
  */
 function commerce_stock_rules_set_checkout_state($stock_action, $message, $approved_quantity) {
   if ($approved_quantity < 0) {
@@ -410,6 +428,7 @@ function commerce_stock_rules_set_checkout_state($stock_action, $message, $appro
     $stock_action = 1;
   }
   // Set the global stock check array.
+  // @codingStandardsIgnoreLine
   global $stock_check_data;
   $stock_check_data['state'] = $stock_action;
   $stock_check_data['message'] = $message;
@@ -423,7 +442,8 @@ function commerce_stock_check_state_options_list() {
   return array(
     0 => 'do nothing' ,
     1 => 'block transaction',
-    2 => 'display message only');
+    2 => 'display message only',
+  );
 }
 
 /**
@@ -434,5 +454,6 @@ function commerce_stock_custom_cart_form_state_action_options_list() {
     0 => 'Normal Submit' ,
     1 => 'Custom Submit',
     2 => 'URL Action',
-    3 => 'Custom HTML');
+    3 => 'Custom HTML',
+  );
 }

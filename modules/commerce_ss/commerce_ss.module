@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Allow commerce products to have stock levels associated with their SKU
+ * Allow commerce products to have stock levels associated with their SKU.
  *
  * Commerce Stock enables Commerce to manage stock for products. Store admins
  * can set the stock levels on a product edit page.
@@ -91,8 +91,6 @@ function commerce_ss_tokens($type, $tokens, array $data = array(), array $option
   return $replacements;
 }
 
-
-
 /**
  * Implements hook_form_ID_alter().
  *
@@ -105,10 +103,10 @@ function commerce_ss_form_commerce_product_ui_product_type_form_alter(&$form, &$
   // Check if stock enabled for the type.
   if (commerce_ss_product_type_enabled($type)) {
     $form['product_type']['decimal_admin'] = array(
-      // Provide a configuration option for decimal stock
+      // Provide a configuration option for decimal stock.
       '#type' => 'checkbox',
       '#title' => t('Allow decimal quantities for stock administration'),
-      '#default_value' => variable_get('commerce_stock_decimal_backend_'.$type, FALSE),
+      '#default_value' => variable_get('commerce_stock_decimal_backend_' . $type, FALSE),
       '#description' => t('Check this box if you want to allow the users to set decimal stock levels on product edit forms.'),
       '#element_validate' => array('commerce_ss_checkbox_validate'),
     );
@@ -124,10 +122,9 @@ function commerce_ss_checkbox_validate($element, &$form_state, $form) {
   // Check if stock enabled for the type.
   if (commerce_ss_product_type_enabled($type)) {
     // Set the configuration option for decimal stock.
-    variable_set('commerce_stock_decimal_backend_' . $type, $form_state['values']['product_type']['decimal_admin'] );
+    variable_set('commerce_stock_decimal_backend_' . $type, $form_state['values']['product_type']['decimal_admin']);
   }
 }
-
 
 /**
  * Implements hook_form_ID_alter().
@@ -139,7 +136,7 @@ function commerce_ss_form_commerce_product_ui_product_form_alter(&$form, &$form_
   $type = $form_state['commerce_product']->type;
   // Check if stock enabled for the type.
   if (commerce_ss_product_type_enabled($type)) {
-    $decimal = variable_get('commerce_stock_decimal_backend_'.$type, FALSE);
+    $decimal = variable_get('commerce_stock_decimal_backend_' . $type, FALSE);
     if (!$decimal) {
       // Get the fields language.
       $language = $form['commerce_stock']['#language'];
@@ -162,7 +159,7 @@ function commerce_ss_inline_entity_form_entity_form_alter(&$entity_form, &$form_
     $type = $entity_form['#bundle'];
     // Check if stock enabled for the type.
     if (commerce_ss_product_type_enabled($type)) {
-      $decimal = variable_get('commerce_stock_decimal_backend_'.$type, FALSE);
+      $decimal = variable_get('commerce_stock_decimal_backend_' . $type, FALSE);
       if (!$decimal) {
         // Get the fields language.
         $language = $entity_form['commerce_stock']['#language'];
@@ -178,7 +175,7 @@ function commerce_ss_inline_entity_form_entity_form_alter(&$entity_form, &$form_
 /**
  * Determines whether stock management is enabled on a product type.
  *
- * @param $type
+ * @param string $type
  *   The product type.
  *
  * @return bool
@@ -192,7 +189,7 @@ function commerce_ss_product_type_enabled($type) {
 /**
  * Determines whether stock management override is enabled on a product type.
  *
- * @param $type
+ * @param string $type
  *   The product type.
  *
  * @return bool
@@ -206,7 +203,7 @@ function commerce_ss_product_type_override_enabled($type) {
 /**
  * Determines whether stock management is enabled for a product.
  *
- * @param $product
+ * @param object $product
  *   The product to check.
  *
  * @return bool
@@ -219,27 +216,30 @@ function commerce_ss_product_enabled($product) {
 /**
  * For a given a line item, determine whether stock management is enabled.
  *
- * @param $line_item
+ * @param array $line_item
  *   The line item to check.
  *
- * @return
+ * @return bool
  *   Boolean: TRUE if stock management is enabled on the product's product type.
  */
 function commerce_ss_line_item_product_enabled($line_item) {
   return commerce_ss_product_type_enabled($line_item->product->type);
 }
 
-
 /**
  * This function makes sure stock is enabled for product.
- * if true is return stock checking is enabled
- * if false stock checking is disabled
+ *
+ * If true is return stock checking is enabled
+ * if false stock checking is disabled.
  *
  * @todo rename function confusing name it's not product that's not disabled
  * its the stock check for the product that's disabled.
  *
- * @param type $product
- * @return boolean
+ * @param mixed $product
+ *   The product object.
+ *
+ * @return bool
+ *   Return bool with flag: $stock_check_enabled.
  */
 function commerce_ss_product_not_disabled_by_override($product) {
   $stock_check_enabled = TRUE;

@@ -83,7 +83,6 @@ function commerce_stock_admin_event_rules() {
   return $content;
 }
 
-
 /**
  * Builds the stock control rules page.
  */

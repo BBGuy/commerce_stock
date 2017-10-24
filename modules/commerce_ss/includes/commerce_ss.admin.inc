@@ -11,7 +11,6 @@
 function commerce_ss_admin_form($form, &$form_state) {
   // Find out what our status is. Use both the state of existing fields
   // and the state of variables to determine what's right.
-
   $field_name = 'commerce_stock';
   $field = field_info_field($field_name);
 
@@ -20,13 +19,13 @@ function commerce_ss_admin_form($form, &$form_state) {
   $form['product_types'] = array(
     '#type' => 'fieldset',
     '#title' => t('Enable stock management for these product types'),
-    '#description' => t('Note that disabling stock management removes the Stock field from the product type, deleting any existing stock data for that product type.')
+    '#description' => t('Note that disabling stock management removes the Stock field from the product type, deleting any existing stock data for that product type.'),
   );
 
   $form['product_types_override'] = array(
     '#type' => 'fieldset',
     '#title' => t('Enable stock management override for these product types'),
-    '#description' => t('Note that disabling stock management override removes the Stock override field from the product type, deleting any existing stock override data for that product type.')
+    '#description' => t('Note that disabling stock management override removes the Stock override field from the product type, deleting any existing stock override data for that product type.'),
   );
 
   // Create a checkbox for each product type, set with the current stock-
@@ -85,7 +84,9 @@ function commerce_ss_admin_form($form, &$form_state) {
 }
 
 /**
- * Form validator. If they are deleting and have not checked the confirmation
+ * Form validator.
+ *
+ * If they are deleting and have not checked the confirmation
  * checkbox, make them do so.
  */
 function commerce_ss_admin_form_validate($form, &$form_state) {
@@ -123,11 +124,17 @@ function commerce_ss_admin_form_submit($form, &$form_state) {
       commerce_ss_admin_create_instance('commerce_stock', 'number_decimal', TRUE, 'commerce_product', $type, t('Stock'));
       drupal_set_message(t('Stock field has been added to the %type product type.', array('%type' => $type)));
       // Add the operation to process this type to the batch.
-      $batch['operations'][] = array('commerce_ss_batch_product_type_init_process', array($type, 0));
+      $batch['operations'][] = array(
+        'commerce_ss_batch_product_type_init_process',
+        array(
+          $type,
+          0,
+        ),
+      );
     }
     // Conversely, if they *don't* want it and it's currently enabled,
     // warn them about the consequences or do it.
-    else if (!$enable && $currently_enabled) {
+    elseif (!$enable && $currently_enabled) {
       // If they haven't clicked the "confirm" checkbox, rebuild and get them
       // to do it.
       if (empty($form_state['values']['confirmation'])) {
@@ -139,7 +146,7 @@ function commerce_ss_admin_form_submit($form, &$form_state) {
         // Remove the instance.
         field_delete_instance($instance);
 
-        // Remove override if enabled
+        // Remove override if enabled.
         if (commerce_ss_product_type_override_enabled($type)) {
           $override = field_info_instance('commerce_product', 'commerce_stock_override', $type);
           field_delete_instance($override);
@@ -156,14 +163,15 @@ function commerce_ss_admin_form_submit($form, &$form_state) {
 
       $currently_enabled = commerce_ss_product_type_override_enabled($type);
       $stock_enabled = commerce_ss_product_type_enabled($type);
-      // If they want us to enable it and it doesn't currently exist, do the work.
+      // If they want us to enable it and it doesn't currently exist,
+      // do the work.
       if ($enable && $stock_enabled && !$currently_enabled) {
         commerce_ss_admin_create_instance('commerce_stock_override', 'list_boolean', FALSE, 'commerce_product', $type, t('Disable stock for this product'));
         drupal_set_message(t('Stock management override has been enabled on the %type product type', array('%type' => $type)));
       }
       // Conversely, if they *don't* want it and it's currently enabled,
       // warn them about the consequences or do it.
-      else if (!$enable && $currently_enabled) {
+      elseif (!$enable && $currently_enabled) {
         // If they haven't clicked the "confirm" checkbox, rebuild and get them
         // to do it.
         if (empty($form_state['values']['confirmation'])) {
@@ -189,10 +197,10 @@ function commerce_ss_admin_form_submit($form, &$form_state) {
 /**
  * Batch Operation Callback.
  *
- * @param $type
- *  The product type to process.
- * @param $init_stock_value
- *  The initial value to give to the stock field.
+ * @param string $type
+ *   The product type to process.
+ * @param int $init_stock_value
+ *   The initial value to give to the stock field.
  */
 function commerce_ss_batch_product_type_init_process($type, $init_stock_value, &$context) {
   if (!isset($context['sandbox']['progress'])) {
@@ -215,18 +223,20 @@ function commerce_ss_batch_product_type_init_process($type, $init_stock_value, &
     $current_count++;
     $context['sandbox']['progress']++;
 
-    //ddl("$current_count < $limit, progress: " . $context['sandbox']['progress']);
+    // ddl("$current_count < $limit, progress: "
+    // . $context['sandbox']['progress']);
     // Load the product and get its wrapper.
     $product_data = array_shift($context['sandbox']['product_data']);
     $product = commerce_product_load($product_data->product_id);
 
     $wrapper = entity_metadata_wrapper('commerce_product', $product);
-    $wrapper->commerce_stock = $init_stock_value; //@todo: the name of the stock field should probably be a variable for commerce_stock v2
+    // @todo: the name of the stock field should probably be a variable for commerce_stock v2
+    $wrapper->commerce_stock = $init_stock_value;
     $wrapper->save();
 
     $context['message'] = t('Processing product type %type %progress% complete.', array(
       '%type' => $type,
-      '%progress' => intval( $context['sandbox']['progress'] / $context['sandbox']['max'] * 100 ),
+      '%progress' => intval($context['sandbox']['progress'] / $context['sandbox']['max'] * 100),
     ));
   } // product processing loop
 
@@ -245,20 +255,25 @@ function commerce_ss_batch_product_type_init_finished($success, $results, $opera
     // We display the number of things we processed...
     drupal_set_message(t('All stock levels have been initialized to zero'));
 
+    // @codingStandardsIgnoreStart
     // @todo: get the batch process to provide more meaningfull information
     // using $context['results']
-//    drupal_set_message(t('@count results processed.', array(
-//      '@count' => count($results),
-//    )));
-//    foreach ($results as $result) {
-//      drupal_set_message($result);
-//    }
+    //    drupal_set_message(t('@count results processed.', array(
+    //      '@count' => count($results),
+    //    )));
+    //    foreach ($results as $result) {
+    //      drupal_set_message($result);
+    //    }
+    // @codingStandardsIgnoreEnd
   }
   else {
     // An error occurred.
     // $operations contains the operations that remained unprocessed.
     $error_operation = reset($operations);
-    drupal_set_message(t('An error occurred while processing @operation with arguments : @args', array('@operation' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE))));
+    drupal_set_message(t('An error occurred while processing @operation with arguments : @args', array(
+      '@operation' => $error_operation[0],
+      '@args' => print_r($error_operation[0], TRUE),
+    )));
   }
 }
 
@@ -272,24 +287,27 @@ function commerce_ss_admin_configure_product_type($type) {
 /**
  * Creates a required instance of a stock field on the specified bundle.
  *
- * @param $field_name
+ * @param string $field_name
  *   The name of the field; if it already exists, a new instance of the existing
  *   field will be created. For fields governed by the Commerce modules, this
  *   should begin with commerce_.
- * @param $entity_type
+ * @param string $entity_type
  *   The type of entity the field instance will be attached to.
- * @param $bundle
+ * @param string $bundle
  *   The bundle name of the entity the field instance will be attached to.
- * @param $label
+ * @param string $label
  *   The label of the field instance.
- * @param $weight
+ * @param int $weight
  *   The default weight of the field instance widget and display.
  */
 function commerce_ss_admin_create_instance($field_name, $field_type, $required, $entity_type, $bundle, $label, $description = NULL, $weight = 0) {
+
+  // @codingStandardsIgnoreStart
   // If a field type we know should exist isn't found, clear the Field cache.
-//  if (!field_info_field_types('commerce_stock')) {
-//    field_cache_clear();
-//  }
+  //  if (!field_info_field_types('commerce_stock')) {
+  //    field_cache_clear();
+  //  }
+  // @codingStandardsIgnoreEnd
 
   // Look for or add the specified stock field to the requested entity bundle.
   $field = field_info_field($field_name);
@@ -330,9 +348,9 @@ function commerce_ss_admin_create_instance($field_name, $field_type, $required, 
       $instance['widget'] = array(
         'type' => 'options_onoff',
         'settings' => array(
-        'display_label' => TRUE,
-       ),
-     );
+          'display_label' => TRUE,
+        ),
+      );
     }
 
     $entity_info = entity_get_info($entity_type);

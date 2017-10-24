@@ -47,10 +47,12 @@ function commerce_sdf_field_formatter_settings_summary($field, $instance, $view_
     foreach ($settings['display'] as $row => $seuilstr) {
       $seuil = $seuilstr['seuil'];
       if ($seuil !== '') {
+        // @codingStandardsIgnoreStart
         $summary .= t('Print @message when stock is <= @seuil.', array(
           '@seuil' => $settings['display'][$row]['seuil'],
           '@message' => $settings['display'][$row]['message'],
         )) . "<br />";
+        // @codingStandardsIgnoreEnd
       }
     }
     return $summary;
@@ -87,7 +89,7 @@ function commerce_sdf_field_formatter_settings_form($field, $instance, $view_mod
       </thead>',
     );
 
-    for ($i=0;$i<5;$i++) {
+    for ($i = 0; $i < 5; $i++) {
       $element['display'][$i] = array(
         '#prefix' => '<tr>',
         '#suffix' => '</tr>',
@@ -138,9 +140,11 @@ function commerce_sdf_field_formatter_view($entity_type, $entity, $field, $insta
     if (is_numeric($seuil)) {
       if ($stock > $anc_seuil && $stock <= $seuil) {
         if (isset($seuilstr['classname'])) {
+          // @codingStandardsIgnoreLine
           $element[0]['#markup'] = "<span class='" . $seuilstr['classname'] . "'>" . t($settings['display'][$row]['message'], array("@stock" => $stock)) . "</span>";
         }
         else {
+          // @codingStandardsIgnoreLine
           $element[0]['#markup'] = "<span>" . t($settings['display'][$row]['message'], array("@stock" => $stock)) . "</span>";
         }
         break;

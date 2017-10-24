@@ -84,7 +84,6 @@ function commerce_stock_ui_menu() {
   return $items;
 }
 
-
 /**
  * Implements hook_menu_local_tasks_alter().
  */
@@ -125,7 +124,6 @@ function commerce_stock_ui_menu_local_tasks_alter(&$data, $router_item, $root_pa
     }
   }
 }
-
 
 /**
  * Implements hook_forms().
@@ -178,7 +176,6 @@ function commerce_stock_ui_form_commerce_stock_ui_add_checkout_rule_form_alter(&
   $form['settings']['event']['#value'] = 'commerce_stock_check_product_checkout';
   $form['submit']['#suffix'] = l(t('Cancel'), 'admin/commerce/config/stock/validation');
 }
-
 
 /**
  * Implements hook_form_FORM_ID_alter().

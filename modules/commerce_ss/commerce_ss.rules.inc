@@ -77,11 +77,10 @@ function commerce_ss_rules_action_info() {
   return $actions;
 }
 
-
 /**
  * Subtracts from stock the sold amount in a line item.
  *
- * @param $line_item
+ * @param array $line_item
  *   A line item object.
  */
 function commerce_ss_decrease_by_line_item($line_item) {
@@ -101,14 +100,13 @@ function commerce_ss_decrease_by_line_item($line_item) {
   }
 }
 
-
 /**
  * Adds the sold amount in a line item to stock.
  *
  * Typically used when a line item is removed from an order (as when items are
  * added to and removed from cart).
  *
- * @param $line_item
+ * @param array $line_item
  *   A line item object.
  */
 function commerce_ss_increase_by_line_item($line_item) {
@@ -134,9 +132,9 @@ function commerce_ss_increase_by_line_item($line_item) {
  * A positive number will add to stock, a negative number will remove from
  * stock. Somewhat the equivalent of uc_stock_adjust().
  *
- * @param $product
+ * @param object $product
  *   The product for which to change the stock level.
- * @param $qty
+ * @param int $qty
  *   The quantity to add to the stock level.
  */
 function commerce_ss_stock_adjust($product, $qty) {
@@ -162,10 +160,10 @@ function commerce_ss_stock_adjust($product, $qty) {
 /**
  * Helper function to get product SKU from line item.
  *
- * @param $line_item
+ * @param array $line_item
  *   The cart line item for which to return a product SKU.
  */
 function commerce_ss_line_item_sku($line_item) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-  return($line_item_wrapper->commerce_product->sku->value());
+  return ($line_item_wrapper->commerce_product->sku->value());
 }
