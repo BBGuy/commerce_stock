@@ -65,7 +65,7 @@ class StockDevTools extends FormBase {
    */
   public function __construct() {
     $this->availabilityManager = \Drupal::service('commerce.availability_manager');
-    $this->currentStore = \Drupal::service('commerce_store.store_context')->getStore();
+    $this->currentStore = \Drupal::service('commerce_store.current_store')->getStore();
     $this->stockAvailabilityChecker = \Drupal::service('commerce_stock.availability_checker');
     $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
     $this->localStockChecker = \Drupal::service('commerce_stock.local_stock_service')->getStockChecker();

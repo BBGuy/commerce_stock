@@ -54,7 +54,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
-    $this->currentStore = \Drupal::service('commerce_store.store_context')->getStore();
+    $this->currentStore = \Drupal::service('commerce_store.current_store')->getStore();
     $this->currentUser =   \Drupal::currentUser();
   }
 
