@@ -129,7 +129,7 @@ class StockLevel extends FieldItemBase {
         // Create an empty context as this is not against a specific store.
         // @todo Add zone and location to form.
         /** @var \Drupal\commerce_stock\StockLocationInterface $location */
-        $location = $this->stockServiceManager->getTransactionLocation($this->stockServiceManager->getContext(), $entity, $transaction_qty);
+        $location = $this->stockServiceManager->getTransactionLocation($this->stockServiceManager->getContext($entity), $entity, $transaction_qty);
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;

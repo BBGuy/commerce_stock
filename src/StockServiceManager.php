@@ -105,8 +105,23 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
-    return new Context($this->currentUser, $this->currentStore);
+  public function getContext(PurchasableEntityInterface $entity) {
+    $store_to_use = $this->currentStore;
+    // Make sure the current store is in the entity stores.
+    $stores = $entity->getStores();
+    $found = FALSE;
+    foreach ($stores as $store) {
+      if ($store->id() == $store_to_use->id()) {
+        $found = TRUE;
+        break;
+      }
+    }
+    // If not.
+    if (!$found) {
+      // Get the first store the product is assigned to.
+      $store_to_use = array_shift($stores);
+    }
+    return new Context($this->currentUser, $store_to_use);
   }
 
   /**
@@ -224,7 +239,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     }
     $stock_config = $this->getService($entity)->getConfiguration();
     $stock_checker = $this->getService($entity)->getStockChecker();
-    $locations = $stock_config->getAvailabilityLocations($this->getContext(), $entity);
+    $locations = $stock_config->getAvailabilityLocations($this->getContext($entity), $entity);
 
     return $stock_checker->getTotalStockLevel($entity, $locations);
   }

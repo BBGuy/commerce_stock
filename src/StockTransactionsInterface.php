@@ -23,12 +23,15 @@ interface StockTransactionsInterface {
   /**
    * Returns the active context.
    *
-   * This is to suport UI calls. All events will hold their own context.
+   * This is to support UI calls.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity (most likely a product variation entity).
    *
    * @return \Drupal\commerce\Context
    *   The context containing the customer & store.
    */
-  public function getContext();
+  public function getContext(PurchasableEntityInterface $entity);
 
   /**
    * Get the location to be used for automatic stock allocation.
