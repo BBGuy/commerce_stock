@@ -41,6 +41,11 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
     if ($store->hasField('field_available_stock_locations')) {
       // Get the available locations.
       $locations = $store->field_available_stock_locations->getValue();
+      // If no store locations.
+      if (empty($locations)) {
+        // Return the enabled locations.
+        return $this->loadEnabled($entity);
+      }
       // Load them.
       $store_locations = array();
       foreach ($locations as $location) {
@@ -53,9 +58,16 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
           unset($store_locations[$id]);
         }
       }
+      // If no active store locations.
+      if (empty($locations)) {
+        // Return the enabled locations.
+        return $this->loadEnabled($entity);
+      }
       return $store_locations;
     }
+    // If store locations has not been enabled.
     else {
+      // Return the enabled locations.
       return $this->loadEnabled($entity);
     }
   }
@@ -67,11 +79,19 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
     if ($store->hasField('field_stock_allocation_location')) {
       // Get the available locations.
       $locations = $store->field_stock_allocation_location->getValue();
-      $location_id = array_shift($locations)['target_id'];
-      $store_location = $this->load($location_id);
-      return $store_location;
+      if (empty($locations)) {
+        // Allocation field is empty.
+        $locations =  $this->loadInContext($context,$entity);
+        return empty($locations) ? NULL : array_shift($locations);
+      }
+      else {
+        $location_id = array_shift($locations)['target_id'];
+        $store_location = $this->load($location_id);
+        return $store_location;
+      }
     }
     else {
+      // No stock allocation field.
       $locations =  $this->loadInContext($context,$entity);
       return empty($locations) ? NULL : array_shift($locations);
     }
