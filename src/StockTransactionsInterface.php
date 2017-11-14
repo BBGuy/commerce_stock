@@ -33,6 +33,20 @@ interface StockTransactionsInterface {
    */
   public function getContext(PurchasableEntityInterface $entity);
 
+
+  /**
+   * checks that the context returned is valid for $entity.
+   *
+   * This is to support UI calls.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity (most likely a product variation entity).
+   *
+   * @return bool
+   *   True if valid, False if not..
+   */
+  public function isValidContext(PurchasableEntityInterface $entity);
+
   /**
    * Get the location to be used for automatic stock allocation.
    *

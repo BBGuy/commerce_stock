@@ -27,8 +27,9 @@ class SimpleStockLevelWidget extends WidgetBase {
    */
   public static function defaultSettings() {
     return [
-      'transaction_note' => FALSE,
-      'entry_system' => 'simple',
+        'transaction_note' => FALSE,
+        'entry_system' => 'simple',
+        'context_fallback' => FALSE,
     ] + parent::defaultSettings();
   }
 
@@ -40,6 +41,7 @@ class SimpleStockLevelWidget extends WidgetBase {
     $summary[] = $this->t('Entry system: @entry_system', ['@entry_system' => $this->getSetting('entry_system')]);
     if ($this->getSetting('entry_system') != 'transactions') {
       $summary[] = $this->t('Transaction note: @transaction_note', ['@transaction_note' => $this->getSetting('transaction_note') ? 'Yes' : 'No']);
+      $summary[] = $this->t('context fallback: @context_fallback', ['@context_fallback' => $this->getSetting('context_fallback') ? 'Yes' : 'No']);
     }
     return $summary;
   }
@@ -71,6 +73,12 @@ class SimpleStockLevelWidget extends WidgetBase {
         ],
       ],
     ];
+    $element['context_fallback'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Context fallback'),
+      '#default_value' => $this->getSetting('context_fallback'),
+      '#description' => $this->t('If set and the current store is not valid, the first valid store will be selected.'),
+    ];
 
     return $element;
   }
@@ -85,6 +93,17 @@ class SimpleStockLevelWidget extends WidgetBase {
     if (!($entity instanceof PurchasableEntityInterface)) {
       // No stock if this is not a purchasable entity.
       return [];
+    }
+
+    // Get the Stock service manager
+    $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
+    // If not a valid context.
+    if (!$stockServiceManager->isValidContext($entity)) {
+      // If context fallback is not set
+      if (!$this->getSetting('context_fallback')) {
+        // Return an empty form.
+        return [];
+      }
     }
 
     // Get the available stock level.

@@ -124,6 +124,20 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     return new Context($this->currentUser, $store_to_use);
   }
 
+  public function isValidContext(PurchasableEntityInterface $entity) {
+    $store_to_use = $this->currentStore;
+    // Make sure the current store is in the entity stores.
+    $stores = $entity->getStores();
+    $found = FALSE;
+    foreach ($stores as $store) {
+      if ($store->id() == $store_to_use->id()) {
+        $found = TRUE;
+        break;
+      }
+    }
+    return $found;
+  }
+
   /**
    * {@inheritdoc}
    */
