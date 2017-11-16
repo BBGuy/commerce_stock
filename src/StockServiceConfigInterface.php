@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce\Context;
 
 /**
  * The stock service configuration interface.
@@ -10,13 +11,14 @@ use Drupal\commerce\PurchasableEntityInterface;
 interface StockServiceConfigInterface {
 
   /**
-   * Get the primary location for automatic stock allocation.
+   * Get the location for automatic stock allocation.
    *
    * This is normally a designated location to act as the main warehouse.
-   * However this can also be code working out in realtime the location relevant
-   * at that time. To help support this we are including the quantity related to
-   * the transaction.
+   * This can also be a location worked out in realtime using the provided
+   * context (order & customer), entity and the quantity requested.
    *
+   * @param \Drupal\commerce\Context $context
+   *   The context containing the customer & store.
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    * @param int $quantity
@@ -25,20 +27,22 @@ interface StockServiceConfigInterface {
    * @return \Drupal\commerce_stock\StockLocationInterface
    *   The stock location.
    */
-  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity);
+  public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity, $quantity);
 
   /**
-   * Get locations relevant for the provided purchasable entity.
+   * Get locations holding stock.
    *
-   * The entity can be ignored. Any other contextual information like active
-   * store/department/.. needs to be managed by the implementing class.
+   * The locations should be filtered for the provided context and purchasable
+   * entity.
    *
+   * @param \Drupal\commerce\Context $context
+   *   The context containing the customer & store.
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    *
    * @return \Drupal\commerce_stock\StockLocationInterface[]
    *   List of relevant locations.
    */
-  public function getLocationList(PurchasableEntityInterface $entity);
+  public function getAvailabilityLocations(Context $context, PurchasableEntityInterface $entity);
 
 }

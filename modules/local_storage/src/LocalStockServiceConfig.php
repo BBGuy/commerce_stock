@@ -5,6 +5,7 @@ namespace Drupal\commerce_stock_local;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_stock\StockServiceConfigInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\commerce\Context;
 
 /**
  * The local stock service configuration class.
@@ -39,18 +40,16 @@ class LocalStockServiceConfig implements StockServiceConfigInterface {
   /**
    * {@inheritdoc}
    *
-   * @ToDo Do we really need a primary transaction location. If so users need a way to set this.
    */
-  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity) {
-    $locations = $this->getLocationList($entity);
-    return empty($locations) ? NULL : array_shift($locations);
+  public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity, $quantity) {
+    return $this->storage->getTransactionLocation($context, $entity);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getLocationList(PurchasableEntityInterface $entity) {
-    return $this->storage->loadEnabled($entity);
+  public function getAvailabilityLocations(Context $context, PurchasableEntityInterface $entity) {
+    return $this->storage->loadInContext($context, $entity);
   }
 
 }

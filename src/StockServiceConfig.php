@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce\Context;
 
 /**
  * The default stock service configuration class.
@@ -42,14 +43,14 @@ class StockServiceConfig implements StockServiceConfigInterface {
   /**
    * {@inheritdoc}
    */
-  public function getLocationList(PurchasableEntityInterface $entity) {
+  public function getAvailabilityLocations(Context $context, PurchasableEntityInterface $entity) {
     return $this->stockLocations;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPrimaryTransactionLocation(PurchasableEntityInterface $entity, $quantity) {
+  public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity, $quantity) {
     $locations = $this->getLocationList($entity);
     // @todo - we need a better way of managing this.
     return array_shift($locations);
@@ -60,6 +61,8 @@ class StockServiceConfig implements StockServiceConfigInterface {
    */
   public function loadConfiguration() {
     // For now we will use all active locations for all products.
+    // @todo - the loaction information is going to be held by the store
+    // entities. We can load it all in advance or query on request.
     $locations = $this->stockChecker->getLocationList(TRUE);
     $this->stockLocations = [];
     foreach ($locations as $key => $value) {
