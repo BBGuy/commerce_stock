@@ -106,14 +106,28 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * {@inheritdoc}
    */
   public function getContext(PurchasableEntityInterface $entity) {
+    $found = FALSE;
+    return $this->getContextDetails($entity, $found);
+  }
+
+  public function isValidContext(PurchasableEntityInterface $entity) {
+    $found = FALSE;
+    $this->getContextDetails($entity, $found);
+    return $found;
+  }
+
+
+  private function getContextDetails(PurchasableEntityInterface $entity, &$found) {
     $store_to_use = $this->currentStore;
     // Make sure the current store is in the entity stores.
     $stores = $entity->getStores();
     $found = FALSE;
-    foreach ($stores as $store) {
-      if ($store->id() == $store_to_use->id()) {
-        $found = TRUE;
-        break;
+    if ($store_to_use) {
+      foreach ($stores as $store) {
+        if ($store->id() == $store_to_use->id()) {
+          $found = TRUE;
+          break;
+        }
       }
     }
     // If not.
@@ -122,20 +136,6 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
       $store_to_use = array_shift($stores);
     }
     return new Context($this->currentUser, $store_to_use);
-  }
-
-  public function isValidContext(PurchasableEntityInterface $entity) {
-    $store_to_use = $this->currentStore;
-    // Make sure the current store is in the entity stores.
-    $stores = $entity->getStores();
-    $found = FALSE;
-    foreach ($stores as $store) {
-      if ($store->id() == $store_to_use->id()) {
-        $found = TRUE;
-        break;
-      }
-    }
-    return $found;
   }
 
   /**
