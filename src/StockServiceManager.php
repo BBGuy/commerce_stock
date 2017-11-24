@@ -132,8 +132,10 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     }
     // If not.
     if (!$found) {
-      // Get the first store the product is assigned to.
-      $store_to_use = array_shift($stores);
+      if (!empty($stores)) {
+        // Get the first store the product is assigned to.
+        $store_to_use = array_shift($stores);
+      }
     }
     return new Context($this->currentUser, $store_to_use);
   }

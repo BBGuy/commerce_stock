@@ -90,6 +90,15 @@ class SimpleStockLevelWidget extends WidgetBase {
     $field = $items->first();
     $entity = $items->getEntity();
 
+    if (!($entity instanceof PurchasableEntityInterface)) {
+      // No stock if this is not a purchasable entity.
+      return [];
+    }
+    if ($entity->isNew()) {
+      // We can not work with entities before they are fully created.
+      return [];
+    }
+
     // We currently only support the Local stock service.
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
     $stock_service_name = $stockServiceManager->getService($entity)->getName();
@@ -99,10 +108,6 @@ class SimpleStockLevelWidget extends WidgetBase {
       return array();
     }
 
-    if (!($entity instanceof PurchasableEntityInterface)) {
-      // No stock if this is not a purchasable entity.
-      return [];
-    }
 
     // Get the Stock service manager
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
