@@ -93,6 +93,9 @@ class StockLevel extends FieldItemBase {
     static $called = [];
     if (!empty($this->getEntity())) {
       $entity = $this->getEntity();
+      if (empty($entity->id())) {
+        return;
+      }
       // @todo Figure out why sometimes this is called twice.
       if (isset($called[$entity->getEntityTypeId() . $entity->id()])) {
         return;
