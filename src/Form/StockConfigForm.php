@@ -106,6 +106,54 @@ class StockConfigForm extends ConfigFormBase {
       }
     }
 
+    // Event manager
+    // Get the default event plugin.
+    $selected_plugin_id = $config->get('stock_events_plugin_id') ?: 'core_stock_events';
+
+    // Get the list of available plugins.
+    $type = \Drupal::service('plugin.manager.stock_events');
+    $plugin_definitions = $type->getDefinitions();
+    $plugin_list = [];
+    foreach ($plugin_definitions as $plugin_definition) {
+      $id = $plugin_definition['id'];
+      $description = $plugin_definition['description']->render();
+      $plugin_list[$id] = $description;
+    }
+    // Select the stock event plugin.
+    $form['event_manager'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Event Handler'),
+    ];
+    $form['event_manager']['selected_event_plugin'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Selected plugin'),
+      '#options' => $plugin_list,
+      '#default_value' => $selected_plugin_id,
+    ];
+
+
+    // Plugin options to be displayed in a field group.
+    $form['event_manager']['options'] = [
+      '#type' => 'vertical_tabs',
+      '#default_tab' => 'edit-publication'
+    ];
+    // cycle the plugins
+    foreach ($plugin_definitions as $plugin_definition) {
+      $id = $plugin_definition['id'];
+      $description = $plugin_definition['description']->render();
+      $plugin_list[$id] = $description;
+      // Create the form elements for each one.
+      $form[$id] = [
+        '#type' => 'details',
+        '#title' => $description,
+        '#group' => 'options',
+      ];
+
+      $plugin = $type->createInstance($id);
+      $event_option = $plugin->configFormOptions();
+
+      $form[$id]['config'] = $event_option;
+    }
     return parent::buildForm($form, $form_state);
   }
 
@@ -135,7 +183,20 @@ class StockConfigForm extends ConfigFormBase {
         }
       }
     }
+    // Events manager.
+    $config->set('stock_events_plugin_id', $values['selected_event_plugin']);
+
     $config->save();
+
+    // Update all plugin options
+    $type = \Drupal::service('plugin.manager.stock_events');
+    $plugin_definitions = $type->getDefinitions();
+    $plugin_list = [];
+    foreach ($plugin_definitions as $plugin_definition) {
+      $id = $plugin_definition['id'];
+      $plugin = $type->createInstance($id);
+      $plugin->SaveconfigFormOptions($form, $form_state);
+    }
 
     drupal_set_message($this->t('Stock configuration updated.'));
   }
