@@ -38,14 +38,13 @@ class SimpleStockLevelFormatter extends FormatterBase {
       $level = 0;
     }
     $elements = [];
-    // It only makes sense for one item, so we will treat all the same.
-    foreach ($items as $delta => $item) {
-      $elements[$delta] = [
-        '#type' => 'html_tag',
-        '#tag' => 'p',
-        '#value' => $level,
-      ];
-    }
+    // Return a single item.
+    $elements[0] = [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => $level,
+    ];
+
     return $elements;
   }
 
