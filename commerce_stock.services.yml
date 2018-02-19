@@ -21,6 +21,7 @@ services:
     arguments: ['@commerce_stock.service_manager']
     tags:
       - { name: 'event_subscriber' }
+
   plugin.manager.stock_events:
     class: Drupal\commerce_stock\Plugin\StockEventsManager
     parent: default_plugin_manager
