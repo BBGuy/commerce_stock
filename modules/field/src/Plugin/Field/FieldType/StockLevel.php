@@ -91,6 +91,13 @@ class StockLevel extends FieldItemBase {
    */
   public function setValue($values, $notify = TRUE) {
     static $called = [];
+
+    // If no stock data.
+    if (!isset($values['stock'])) {
+      // Nothing to do.
+      return;
+    }
+
     if (!empty($this->getEntity())) {
       $entity = $this->getEntity();
       if (empty($entity->id())) {
