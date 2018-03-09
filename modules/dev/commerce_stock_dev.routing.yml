@@ -1,9 +1,0 @@
-commerce_stock_dev.stock_dev_tools:
-  path: '/admin/commerce/config/stock/dev-tools'
-  defaults:
-    _form: '\Drupal\commerce_stock_dev\Form\StockDevTools'
-    _title: 'Stock development tools'
-  requirements:
-    _permission: 'access administration pages'
-  options:
-    _admin_route: TRUE
