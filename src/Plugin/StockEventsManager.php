@@ -11,7 +11,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
  */
 class StockEventsManager extends DefaultPluginManager {
 
-
   /**
    * Constructs a new StockEventsManager object.
    *

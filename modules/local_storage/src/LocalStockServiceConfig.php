@@ -39,7 +39,6 @@ class LocalStockServiceConfig implements StockServiceConfigInterface {
 
   /**
    * {@inheritdoc}
-   *
    */
   public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity, $quantity) {
     return $this->storage->getTransactionLocation($context, $entity);

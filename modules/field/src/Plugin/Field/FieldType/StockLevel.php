@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\commerce\Context;
 
 /**
  * Plugin implementation of the 'commerce_stock_field' field type.
@@ -62,14 +61,6 @@ class StockLevel extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function isEmpty() {
-    $value = $this->get('value')->getValue();
-    return $value === NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     // @todo What's the difference/utility between both fields?
     $properties['value'] = DataDefinition::create('float')
@@ -82,6 +73,14 @@ class StockLevel extends FieldItemBase {
       ->setSetting('stock level', 'summary');
 
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEmpty() {
+    $value = $this->get('value')->getValue();
+    return $value === NULL;
   }
 
   /**************************  TESTING *********************************/

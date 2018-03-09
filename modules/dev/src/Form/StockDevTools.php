@@ -395,7 +395,7 @@ class StockDevTools extends FormBase {
     $unit_cost = NULL;
     $product_variation = $this->variationStorage->load($variation_id);
     $this->stockServiceManager->receiveStock($product_variation, $location_id, $zone, $quantity, $unit_cost, $message);
-    drupal_set_message('Received stock!');
+    drupal_set_message($this->t('Received stock!'));
   }
 
   /**

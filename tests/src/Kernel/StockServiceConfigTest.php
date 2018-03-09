@@ -58,7 +58,8 @@ class StockServiceConfigTest extends CommerceStockKernelTestBase {
       self::assertTrue($location->isActive());
     }
 
-    // Test that getPrimaryTransactionLocation() returns one active location entity.
+    // Test that getPrimaryTransactionLocation() returns one active location
+    // entity.
     $primary = $stockServiceConfig->getPrimaryTransactionLocation($entity, 1);
     self::assertInstanceOf('Drupal\commerce_stock\StockLocationInterface', $primary);
     self::assertTrue($primary->isActive());

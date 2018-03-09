@@ -5,7 +5,6 @@ namespace Drupal\commerce_stock;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Context;
 
-
 /**
  * Defines a common interface for creating stock transactions.
  */
@@ -18,7 +17,6 @@ interface StockTransactionsInterface {
   const NEW_STOCK = 6;
   const MOVEMENT_FROM = 7;
   const MOVEMENT_TO = 8;
-
 
   /**
    * Returns the active context.
@@ -33,9 +31,8 @@ interface StockTransactionsInterface {
    */
   public function getContext(PurchasableEntityInterface $entity);
 
-
   /**
-   * checks that the context returned is valid for $entity.
+   * Checks that the context returned is valid for $entity.
    *
    * This is to support UI calls.
    *

@@ -2,15 +2,15 @@
 
 namespace Drupal\commerce_stock\Plugin\StockEvents;
 
-use Drupal\Component\Plugin\PluginBase;
-use Drupal\commerce_stock\Plugin\StockEventsInterface;
+use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
-
-
+use Drupal\commerce_stock\Plugin\StockEventsInterface;
+use Drupal\commerce_stock\StockLocationInterface;
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Core Stock Events.
- *
  *
  * @StockEvents(
  *   id = "disabled_stock_events",
@@ -22,14 +22,10 @@ class DisabledStockEvents extends PluginBase implements StockEventsInterface {
   /**
    * {@inheritdoc}
    */
-  public function stockEvent($context, PurchasableEntityInterface $entity,
-                             $stockEvent, $quantity, $location,
-                             $transaction_type, $metadata) {
-
+  public function stockEvent(Context $context, PurchasableEntityInterface $entity, $stockEvent, $quantity, StockLocationInterface $location, $transaction_type, array $metadata) {
     // This does nothing.
     return NULL;
   }
-
 
   /**
    * {@inheritdoc}
@@ -46,10 +42,9 @@ class DisabledStockEvents extends PluginBase implements StockEventsInterface {
   /**
    * {@inheritdoc}
    */
-  public function SaveconfigFormOptions($from, $form_state) {
+  public function saveConfigFormOptions(array $form, FormStateInterface $form_state) {
     // Nothing to do.
     return FALSE;
   }
-
 
 }

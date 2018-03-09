@@ -131,13 +131,12 @@ class StockConfigForm extends ConfigFormBase {
       '#default_value' => $selected_plugin_id,
     ];
 
-
     // Plugin options to be displayed in a field group.
     $form['event_manager']['options'] = [
       '#type' => 'vertical_tabs',
-      '#default_tab' => 'edit-publication'
+      '#default_tab' => 'edit-publication',
     ];
-    // cycle the plugins
+    // Cycle the plugins.
     foreach ($plugin_definitions as $plugin_definition) {
       $id = $plugin_definition['id'];
       $description = $plugin_definition['description']->render();
@@ -155,13 +154,6 @@ class StockConfigForm extends ConfigFormBase {
       $form[$id]['config'] = $event_option;
     }
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
   }
 
   /**
@@ -188,10 +180,10 @@ class StockConfigForm extends ConfigFormBase {
 
     $config->save();
 
-    // Update all plugin options
+    // Update all plugin options.
     $type = \Drupal::service('plugin.manager.stock_events');
     $plugin_definitions = $type->getDefinitions();
-    $plugin_list = [];
+
     foreach ($plugin_definitions as $plugin_definition) {
       $id = $plugin_definition['id'];
       $plugin = $type->createInstance($id);

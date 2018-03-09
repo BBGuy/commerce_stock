@@ -45,8 +45,6 @@ class StockLocationStorageTest extends CommerceStockKernelTestBase {
    * Tests loadEnabled() function.
    */
   public function testLoadEnabled() {
-
-    $locations = [];
     for ($i = 1; $i <= 3; $i++) {
       $location = StockLocation::create([
         'type' => 'default',
@@ -54,7 +52,6 @@ class StockLocationStorageTest extends CommerceStockKernelTestBase {
         'status' => $i % 2,
       ]);
       $location->save();
-      $locations[] = $location;
     }
 
     $dummyPurchasable = $this->prophesize('Drupal\commerce\PurchasableEntityInterface');

@@ -5,6 +5,7 @@ namespace Drupal\commerce_stock\EventSubscriber;
 use Drupal\commerce_order\Event\OrderEvents;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderItemEvent;
+use Drupal\commerce_stock\StockLocationInterface;
 use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce\Context;
@@ -12,7 +13,6 @@ use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_stock\Plugin\StockEventsInterface;
-
 
 /**
  * Performs stock transactions on order and order item events.
@@ -297,7 +297,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    *   The purchasable entity.
    * @param int $quantity
    *   The quantity.
-   * @param \Drupal\commerce_stock\StockLocationInterface
+   * @param \Drupal\commerce_stock\StockLocationInterface $location
    *   The stock location.
    * @param int $transaction_type_id
    *   The transaction type ID.
@@ -310,7 +310,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * @return int
    *   Return the ID of the transaction or FALSE if no transaction created.
    */
-  private function runTransactionEvent($orderEvent, $context, PurchasableEntityInterface $entity, $quantity, $location, $transaction_type_id, array $metadata) {
+  private function runTransactionEvent($orderEvent, Context $context, PurchasableEntityInterface $entity, $quantity, StockLocationInterface $location, $transaction_type_id, array $metadata) {
 
     $type = \Drupal::service('plugin.manager.stock_events');
     $plugin = $type->createInstance('core_stock_events');

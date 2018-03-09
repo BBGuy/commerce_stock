@@ -2,9 +2,11 @@
 
 namespace Drupal\commerce_stock\Plugin;
 
+use Drupal\commerce\Context;
+use Drupal\commerce_stock\StockLocationInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\commerce\PurchasableEntityInterface;
-
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines an interface for Stock events plugins.
@@ -35,7 +37,7 @@ interface StockEventsInterface extends PluginInspectionInterface {
    *   The event ID that's responsible for the transaction.
    * @param int $quantity
    *   The quantity.
-   * @param \Drupal\commerce_stock\StockLocationInterface
+   * @param \Drupal\commerce_stock\StockLocationInterface $location
    *   The stock location.
    * @param int $transaction_type
    *   The transaction type ID.
@@ -48,9 +50,7 @@ interface StockEventsInterface extends PluginInspectionInterface {
    * @return int
    *   Return the ID of the transaction or FALSE if no transaction created.
    */
-  public function stockEvent($context, PurchasableEntityInterface $entity,
-                             $stockEvent, $quantity, $location,
-                             $transaction_type, $metadata);
+  public function stockEvent(Context $context, PurchasableEntityInterface $entity, $stockEvent, $quantity, StockLocationInterface $location, $transaction_type, array $metadata);
 
   /**
    * Return form elements holding the configuration options.
@@ -60,11 +60,11 @@ interface StockEventsInterface extends PluginInspectionInterface {
   /**
    * Save the configuration options.
    *
-   * @param $from
+   * @param array $form
    *   The stock manager configuration form holding the option elements.
-   * @param  $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The stock manager configuration form state.
    */
-  public function SaveconfigFormOptions($from, $form_state);
+  public function saveConfigFormOptions(array $form, FormStateInterface $form_state);
 
 }

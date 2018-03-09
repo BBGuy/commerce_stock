@@ -25,39 +25,33 @@ interface StockLocationStorageInterface extends SqlEntityStorageInterface {
    */
   public function loadEnabled(PurchasableEntityInterface $entity);
 
-
-
   /**
    * Loads the relevant locations for the given Purchasable Entity and context.
    *
    * Relevant locations are active and available for fulfillment for the product
    * and context provided.
    *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity.
-   *
    * @param \Drupal\commerce\Context $context
    *   The context.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
    *
    * @return \Drupal\commerce_stock_local\Entity\StockLocation[]
    *   The enabled stock locations.
    */
   public function loadInContext(Context $context, PurchasableEntityInterface $entity);
 
-
   /**
    * Get the transaction location for the given product and context.
    *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity.
-   *
    * @param \Drupal\commerce\Context $context
    *   The context.
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
    *
    * @return \Drupal\commerce_stock_local\Entity\StockLocation[]
    *   The enabled stock locations.
    */
   public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity);
-
 
 }
