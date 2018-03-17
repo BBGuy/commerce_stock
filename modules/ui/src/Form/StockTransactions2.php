@@ -2,8 +2,12 @@
 
 namespace Drupal\commerce_stock_ui\Form;
 
+use Drupal\commerce_stock\StockServiceManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * The second part of a two part create stock transaction form.
@@ -25,11 +29,36 @@ class StockTransactions2 extends FormBase {
   protected $stockServiceManager;
 
   /**
-   * Constructs a StockTransactions2 object.
+   * The current request.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
    */
-  public function __construct() {
-    $this->productVariationStorage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation');
-    $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
+  protected $request;
+
+  /**
+   * Constructs a StockTransactions2 object.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   */
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    StockServiceManager $simple_stock_manager,
+    Request $request
+  ) {
+    $this->productVariationStorage = $entity_type_manager->getStorage('commerce_product_variation');
+    $this->stockServiceManager = $simple_stock_manager;
+    $this->request = $request->getCurrentRequest();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('commerce_stock.service_manager'),
+      $container->get('request_stack')
+    );
   }
 
   /**
@@ -43,7 +72,7 @@ class StockTransactions2 extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $request = \Drupal::request();
+    $request = $this->request;
     if ($request->query->has('commerce_product_v_id')) {
       $variation_id = $request->query->get('commerce_product_v_id');
     }
