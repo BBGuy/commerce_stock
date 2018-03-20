@@ -77,7 +77,7 @@ class StockLevel extends FieldItemBase {
     // Supports absolute values being passed in directly, i.e.
     // programmatically.
     if (!is_array($values)) {
-      $value = filter_var($values, FILTER_VALIDATE_INT);
+      $value = filter_var($values, FILTER_VALIDATE_FLOAT);
       if ($value) {
         $values = ['stock' => ['value' => $value]];
       }
