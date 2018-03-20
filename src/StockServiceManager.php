@@ -55,7 +55,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
     $this->currentStore = \Drupal::service('commerce_store.current_store')->getStore();
-    $this->currentUser =   \Drupal::currentUser();
+    $this->currentUser = \Drupal::currentUser();
   }
 
   /**
@@ -110,13 +110,28 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     return $this->getContextDetails($entity, $found);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function isValidContext(PurchasableEntityInterface $entity) {
     $found = FALSE;
     $this->getContextDetails($entity, $found);
     return $found;
   }
 
-
+  /**
+   * Get context details.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchaseable entity.
+   * @param bool $found
+   *   Whether the store was found.
+   *
+   * @return \Drupal\commerce\Context
+   *   The Stock service context.
+   *
+   * @todo: Why is the found passed in?
+   */
   private function getContextDetails(PurchasableEntityInterface $entity, &$found) {
     $store_to_use = $this->currentStore;
     // Make sure the current store is in the entity stores.

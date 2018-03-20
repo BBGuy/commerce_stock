@@ -27,10 +27,18 @@ class SimpleStockLevelWidget extends WidgetBase {
    */
   public static function defaultSettings() {
     return [
-        'transaction_note' => FALSE,
-        'entry_system' => 'simple',
-        'context_fallback' => FALSE,
+      'transaction_note' => FALSE,
+      'entry_system' => 'simple',
+      'context_fallback' => FALSE,
     ] + parent::defaultSettings();
+  }
+
+  /**
+   * Submits the form.
+   */
+  public static function closeForm($form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+    drupal_set_message(t('updated STOCK'));
   }
 
   /**
@@ -103,17 +111,16 @@ class SimpleStockLevelWidget extends WidgetBase {
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
     $stock_service_name = $stockServiceManager->getService($entity)->getName();
     // @todo - service should be able can determine if it needs an interface.
-    if ($stock_service_name != 'Local stock' ) {
-      // return an empty array if service is not suported.
-      return array();
+    if ($stock_service_name != 'Local stock') {
+      // Return an empty array if service is not supported.
+      return [];
     }
 
-
-    // Get the Stock service manager
+    // Get the Stock service manager.
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
     // If not a valid context.
     if (!$stockServiceManager->isValidContext($entity)) {
-      // If context fallback is not set
+      // If context fallback is not set.
       if (!$this->getSetting('context_fallback')) {
         // Return an empty form.
         return [];
@@ -228,16 +235,8 @@ class SimpleStockLevelWidget extends WidgetBase {
   /**
    * Submits the form.
    */
-  public static function closeForm($form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
-    drupal_set_message('updated STOCK');
-  }
-
-  /**
-   * Submits the form.
-   */
   public function submitAll(array &$form, FormStateInterface $form_state) {
-    drupal_set_message('updated STOCK!!');
+    drupal_set_message(t('updated STOCK!!'));
   }
 
 }

@@ -62,4 +62,5 @@ class StockEventsManager extends DefaultPluginManager implements StockEventsMana
       throw new PluginException(sprintf('plugin property (%s) definition "is" is required.', $plugin_id));
     }
   }
+
 }

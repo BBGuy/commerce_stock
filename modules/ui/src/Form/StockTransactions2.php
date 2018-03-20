@@ -162,11 +162,9 @@ class StockTransactions2 extends FormBase {
     return $form;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
+    // @todo - We need to check the product is managed by a stock service.
   }
 
   /**

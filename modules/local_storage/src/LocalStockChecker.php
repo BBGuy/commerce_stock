@@ -102,7 +102,7 @@ class LocalStockChecker implements StockCheckInterface {
       ->execute()
       ->fetch();
 
-    return $result ? $result->max_id : 0;
+    return $result && $result->max_id ? $result->max_id : 0;
   }
 
   /**

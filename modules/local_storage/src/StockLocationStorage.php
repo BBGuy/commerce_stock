@@ -34,6 +34,9 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
     return $enabled_locations;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function loadInContext(Context $context, PurchasableEntityInterface $entity) {
 
     $store = $context->getStore();
@@ -70,9 +73,12 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
       // Return the enabled locations.
       return $this->loadEnabled($entity);
     }
+
   }
 
-
+  /**
+   * {@inheritdoc}
+   */
   public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity) {
     $store = $context->getStore();
     // Make sure we have the availability field for the location.
@@ -81,7 +87,7 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
       $locations = $store->field_stock_allocation_location->getValue();
       if (empty($locations)) {
         // Allocation field is empty.
-        $locations =  $this->loadInContext($context,$entity);
+        $locations = $this->loadInContext($context, $entity);
         return empty($locations) ? NULL : array_shift($locations);
       }
       else {
@@ -92,10 +98,9 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
     }
     else {
       // No stock allocation field.
-      $locations =  $this->loadInContext($context,$entity);
+      $locations = $this->loadInContext($context, $entity);
       return empty($locations) ? NULL : array_shift($locations);
     }
   }
-
 
 }
