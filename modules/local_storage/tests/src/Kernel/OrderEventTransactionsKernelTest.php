@@ -151,77 +151,78 @@ class OrderEventTransactionsKernelTest extends CommerceStockKernelTestBase {
         'commerce_stock_transaction',
         'commerce_stock_transaction_type',
         'commerce_stock_location_level',
-      ]);
+      ]
+    );
 
-      $configFactory = $this->container->get('config.factory');
-      $config = $configFactory->getEditable('commerce_stock.service_manager');
-      $config->set('default_service_id', 'local_stock');
-      $config->save();
-      $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
+    $configFactory = $this->container->get('config.factory');
+    $config = $configFactory->getEditable('commerce_stock.service_manager');
+    $config->set('default_service_id', 'local_stock');
+    $config->save();
+    $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
 
-      $location = StockLocation::create([
-        'type' => 'default',
-        'name' => $this->randomString(),
-        'status' => 1,
-      ]);
-      $location->save();
+    $location = StockLocation::create([
+      'type' => 'default',
+      'name' => $this->randomString(),
+      'status' => 1,
+    ]);
+    $location->save();
 
-      $this->variation = ProductVariation::create([
-        'type' => 'default',
-        'sku' => 'TEST_' . strtolower($this->randomMachineName()),
-        'status' => 1,
-        'price' => [
-          'number' => '12.00',
-          'currency_code' => 'USD',
-        ],
-      ]);
-      $this->variation->save();
+    $this->variation = ProductVariation::create([
+      'type' => 'default',
+      'sku' => 'TEST_' . strtolower($this->randomMachineName()),
+      'status' => 1,
+      'price' => [
+        'number' => '12.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $this->variation->save();
 
-      $this->variation2 = ProductVariation::create([
-        'type' => 'default',
-        'sku' => 'TEST_' . strtolower($this->randomMachineName()),
-        'status' => 1,
-        'price' => [
-          'number' => '11.00',
-          'currency_code' => 'USD',
-        ],
-      ]);
-      $this->variation2->save();
+    $this->variation2 = ProductVariation::create([
+      'type' => 'default',
+      'sku' => 'TEST_' . strtolower($this->randomMachineName()),
+      'status' => 1,
+      'price' => [
+        'number' => '11.00',
+        'currency_code' => 'USD',
+      ],
+    ]);
+    $this->variation2->save();
 
-      $this->product = Product::create([
-        'type' => 'default',
-        'title' => $this->randomMachineName(),
-        'stores' => [$this->store],
-        'variations' => [$this->variation, $this->variation2],
-      ]);
-      $this->product->save();
+    $this->product = Product::create([
+      'type' => 'default',
+      'title' => $this->randomMachineName(),
+      'stores' => [$this->store],
+      'variations' => [$this->variation, $this->variation2],
+    ]);
+    $this->product->save();
 
-      $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
-      $this->user = $user;
+    $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
+    $this->user = $user;
 
-      // Set some initial stock.
-      $this->stockServiceManager->createTransaction($this->variation, 1, '', 100, 0, StockTransactionsInterface::STOCK_IN);
-      $this->stockServiceManager->createTransaction($this->variation2, 1, '', 200, 0, StockTransactionsInterface::STOCK_IN);
+    // Set some initial stock.
+    $this->stockServiceManager->createTransaction($this->variation, 1, '', 100, 0, StockTransactionsInterface::STOCK_IN);
+    $this->stockServiceManager->createTransaction($this->variation2, 1, '', 200, 0, StockTransactionsInterface::STOCK_IN);
 
-      $this->checker = $this->stockServiceManager->getService($this->variation)
-        ->getStockChecker();
-      $this->checker2 = $this->stockServiceManager->getService($this->variation2)
-        ->getStockChecker();
-      $this->stockServiceConfiguration = $this->stockServiceManager->getService($this->variation)
-        ->getConfiguration();
-      $this->stockServiceConfiguration2 = $this->stockServiceManager->getService($this->variation2)
-        ->getConfiguration();
+    $this->checker = $this->stockServiceManager->getService($this->variation)
+      ->getStockChecker();
+    $this->checker2 = $this->stockServiceManager->getService($this->variation2)
+      ->getStockChecker();
+    $this->stockServiceConfiguration = $this->stockServiceManager->getService($this->variation)
+      ->getConfiguration();
+    $this->stockServiceConfiguration2 = $this->stockServiceManager->getService($this->variation2)
+      ->getConfiguration();
 
-      $context = new Context($user, $this->store);
-      $this->locations = $this->stockServiceConfiguration->getAvailabilityLocations($context, $this->variation);
-      $this->locations2 = $this->stockServiceConfiguration2->getAvailabilityLocations($context, $this->variation2);
+    $context = new Context($user, $this->store);
+    $this->locations = $this->stockServiceConfiguration->getAvailabilityLocations($context, $this->variation);
+    $this->locations2 = $this->stockServiceConfiguration2->getAvailabilityLocations($context, $this->variation2);
 
-      $profile = Profile::create([
-        'type' => 'customer',
-        'uid' => $user->id(),
-      ]);
-      $profile->save();
-      $this->profile = $profile;
+    $profile = Profile::create([
+      'type' => 'customer',
+      'uid' => $user->id(),
+    ]);
+    $profile->save();
+    $this->profile = $profile;
   }
 
   /**
