@@ -12,6 +12,8 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
  */
 abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
 
+  protected $profile = 'testing';
+
   use EntityReferenceTestTrait;
 
   /**

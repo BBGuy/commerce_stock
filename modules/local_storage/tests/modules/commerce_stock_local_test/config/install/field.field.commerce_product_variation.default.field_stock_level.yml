@@ -4,8 +4,9 @@ dependencies:
   config:
     - commerce_product.commerce_product_variation_type.default
     - field.storage.commerce_product_variation.field_stock_level
-  module:
-    - commerce_stock_field
+  enforced:
+    module:
+      - commerce_stock_field
 id: commerce_product_variation.default.field_stock_level
 field_name: field_stock_level
 entity_type: commerce_product_variation
