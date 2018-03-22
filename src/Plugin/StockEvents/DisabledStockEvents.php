@@ -4,6 +4,8 @@ namespace Drupal\commerce_stock\Plugin\StockEvents;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_stock\Plugin\Commerce\StockEventType\StockEventTypeInterface;
 use Drupal\commerce_stock\Plugin\StockEventsInterface;
 use Drupal\commerce_stock\StockLocationInterface;
 use Drupal\Component\Plugin\PluginBase;
@@ -22,7 +24,15 @@ class DisabledStockEvents extends PluginBase implements StockEventsInterface {
   /**
    * {@inheritdoc}
    */
-  public function stockEvent(Context $context, PurchasableEntityInterface $entity, $stockEvent, $quantity, StockLocationInterface $location, $transaction_type, array $metadata) {
+  public function stockEvent(
+    Context $context,
+    PurchasableEntityInterface $entity,
+    StockEventTypeInterface $stock_event_type,
+    $quantity,
+    StockLocationInterface $location,
+    $transaction_type,
+    Order $order
+  ) {
     // This does nothing.
     return NULL;
   }

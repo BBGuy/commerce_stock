@@ -2,17 +2,19 @@
 
 namespace Drupal\commerce_stock\EventSubscriber;
 
-use Drupal\commerce\Context;
-use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_order\Event\OrderEvent;
+use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Event\OrderEvents;
+use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderItemEvent;
-use Drupal\commerce_stock\Plugin\StockEventsInterface;
+use Drupal\commerce_stock\Plugin\Commerce\StockEventType\StockEventTypeInterface;
 use Drupal\commerce_stock\StockLocationInterface;
 use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\commerce_stock\StockTransactionsInterface;
+use Drupal\commerce\Context;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Drupal\commerce\PurchasableEntityInterface;
 
 /**
  * Performs stock transactions on order and order item events.
@@ -27,13 +29,245 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   protected $stockServiceManager;
 
   /**
+   * The stock event types.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $eventTypeManager;
+
+  /**
    * Constructs a new OrderReceiptSubscriber object.
    *
    * @param \Drupal\commerce_stock\StockServiceManagerInterface $stock_service_manager
    *   The stock service manager.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager
+   *   The stock event type manager.
    */
-  public function __construct(StockServiceManagerInterface $stock_service_manager) {
+  public function __construct(StockServiceManagerInterface $stock_service_manager, PluginManagerInterface $plugin_manager) {
     $this->stockServiceManager = $stock_service_manager;
+    $this->eventTypeManager = $plugin_manager;
+  }
+
+  /**
+   * Creates a stock transaction when an order is placed.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The order workflow event.
+   */
+  public function onOrderPlace(WorkflowTransitionEvent $event) {
+    $eventType = $this->getEventType('commerce_stock_order_place');
+    $order = $event->getEntity();
+    foreach ($order->getItems() as $item) {
+      $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        continue;
+      }
+      $service = $this->stockServiceManager->getService($entity);
+      $checker = $service->getStockChecker();
+      if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          continue;
+        }
+        $quantity = -1 * $item->getQuantity();
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+        $transaction_type = StockTransactionsInterface::STOCK_SALE;
+
+        $this->runTransactionEvent($eventType, $context,
+          $entity, $quantity, $location, $transaction_type, $order);
+      }
+    }
+  }
+
+  /**
+   * Acts on the order update event to create transactions for new items.
+   *
+   * The reason this isn't handled by OrderEvents::ORDER_ITEM_INSERT is because
+   * that event never has the correct values.
+   *
+   * @param \Drupal\commerce_order\Event\OrderEvent $event
+   *   The order event.
+   */
+  public function onOrderUpdate(OrderEvent $event) {
+    $eventType = $this->getEventType('commerce_stock_order_update');
+    $order = $event->getOrder();
+    $original_order = $order->original;
+
+    // In certain cases we have no original order object. If loading from
+    // storage fails, we bailout.
+    // @ToDo Consider how this may change due to: ToDo https://www.drupal.org/project/drupal/issues/2839195
+    if (!$original_order) {
+      $original_order = $this->entity->getStorage('commerce_order')->loadUnchanged($order->id());
+      if (!$original_order) {
+        return;
+      }
+    }
+
+    foreach ($order->getItems() as $item) {
+      if (!$original_order->hasItem($item)) {
+        if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
+          $entity = $item->getPurchasedEntity();
+          if (!$entity) {
+            continue;
+          }
+          $service = $this->stockServiceManager->getService($entity);
+          $checker = $service->getStockChecker();
+          // If always in stock then no need to create a transaction.
+          if ($checker->getIsAlwaysInStock($entity)) {
+            continue;
+          }
+          $context = new Context($order->getCustomer(), $order->getStore());
+          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
+          $transaction_type = StockTransactionsInterface::STOCK_SALE;
+          $quantity = -1 * $item->getQuantity();
+
+          $this->runTransactionEvent($eventType, $context,
+            $entity, $quantity, $location, $transaction_type, $order);
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs a stock transaction for an order Cancel event.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The order workflow event.
+   */
+  public function onOrderCancel(WorkflowTransitionEvent $event) {
+    $eventType = $this->getEventType('commerce_stock_order_cancel');
+    $order = $event->getEntity();
+    if ($order->original && $order->original->getState()->value === 'draft') {
+      return;
+    }
+    foreach ($order->getItems() as $item) {
+      $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        continue;
+      }
+      $service = $this->stockServiceManager->getService($entity);
+      $checker = $service->getStockChecker();
+      if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          continue;
+        }
+        $quantity = $item->getQuantity();
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
+
+        $this->runTransactionEvent($eventType, $context,
+          $entity, $quantity, $location, $transaction_type, $order);
+      }
+    }
+  }
+
+  /**
+   * Performs a stock transaction on an order delete event.
+   *
+   * This happens on PREDELETE since the items are not available after DELETE.
+   *
+   * @param \Drupal\commerce_order\Event\OrderEvent $event
+   *   The order event.
+   */
+  public function onOrderDelete(OrderEvent $event) {
+    $eventType = $this->getEventType('commerce_stock_order_delete');
+    $order = $event->getOrder();
+    if (in_array($order->getState()->value, ['draft', 'canceled'])) {
+      return;
+    }
+    $items = $order->getItems();
+    foreach ($items as $item) {
+      $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        continue;
+      }
+      $service = $this->stockServiceManager->getService($entity);
+      $checker = $service->getStockChecker();
+      if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          continue;
+        }
+        $quantity = $item->getQuantity();
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
+
+        $this->runTransactionEvent($eventType, $context,
+          $entity, $quantity, $location, $transaction_type, $order);
+      }
+    }
+  }
+
+  /**
+   * Performs a stock transaction on an order item update.
+   *
+   * @param \Drupal\commerce_order\Event\OrderItemEvent $event
+   *   The order item event.
+   */
+  public function onOrderItemUpdate(OrderItemEvent $event) {
+    $eventType = $this->getEventType('commerce_stock_order_item_update');
+    $item = $event->getOrderItem();
+    $order = $item->getOrder();
+
+    if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
+      $diff = $item->original->getQuantity() - $item->getQuantity();
+      if ($diff) {
+        $entity = $item->getPurchasedEntity();
+        if (!$entity) {
+          return;
+        }
+        $service = $this->stockServiceManager->getService($entity);
+        $checker = $service->getStockChecker();
+        if ($checker->getIsStockManaged($entity)) {
+          // If always in stock then no need to create a transaction.
+          if ($checker->getIsAlwaysInStock($entity)) {
+            return;
+          }
+          $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
+          $context = new Context($order->getCustomer(), $order->getStore());
+          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $diff);
+
+          $this->runTransactionEvent($eventType, $context,
+            $entity, $diff, $location, $transaction_type, $order);
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs a stock transaction when an order item is deleted.
+   *
+   * @param \Drupal\commerce_order\Event\OrderItemEvent $event
+   *   The order item event.
+   */
+  public function onOrderItemDelete(OrderItemEvent $event) {
+    $eventType = $this->getEventType('commerce_stock_order_item_delete');
+    $item = $event->getOrderItem();
+    $order = $item->getOrder();
+    if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
+      $entity = $item->getPurchasedEntity();
+      if (!$entity) {
+        return;
+      }
+      $service = $this->stockServiceManager->getService($entity);
+      $checker = $service->getStockChecker();
+      if ($checker->getIsStockManaged($entity)) {
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          return;
+        }
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
+        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
+
+        $this->runTransactionEvent($eventType, $context,
+          $entity, $item->getQuantity(), $location, $transaction_type, $order);
+      }
+    }
   }
 
   /**
@@ -56,46 +290,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Creates a stock transaction when an order is placed.
+   * Run the transaction event.
    *
-   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
-   *   The order workflow event.
-   */
-  public function onOrderPlace(WorkflowTransitionEvent $event) {
-    $order = $event->getEntity();
-    foreach ($order->getItems() as $item) {
-      $entity = $item->getPurchasedEntity();
-      if (!$entity) {
-        continue;
-      }
-      $service = $this->stockServiceManager->getService($entity);
-      $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          continue;
-        }
-        $quantity = -1 * $item->getQuantity();
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
-        $transaction_type = StockTransactionsInterface::STOCK_SALE;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order placed'],
-        ];
-
-        $this->runTransactionEvent(StockEventsInterface::ORDER_PLACE_EVENT, $context,
-          $entity, $quantity, $location, $transaction_type, $metadata);
-      }
-    }
-  }
-
-  /**
-   * Run the stock event.
-   *
-   * @param int $orderEvent
-   *   The order event ID as defined by the OrderEvents class.
+   * @param \Drupal\commerce_stock\Plugin\Commerce\StockEventType\StockEventTypeInterface $event_type
+   *   The stock event type.
    * @param \Drupal\commerce\Context $context
    *   The context containing the customer & store.
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
@@ -106,233 +304,33 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    *   The stock location.
    * @param int $transaction_type_id
    *   The transaction type ID.
-   * @param array $metadata
-   *   Holds all the optional values those are:
-   *     - related_oid: related order.
-   *     - related_uid: related user.
-   *     - data: Serialized data array holding a message.
+   * @param \Drupal\commerce_order\Entity\Order $order
+   *   The original order the transaction belongs to.
    *
    * @return int
    *   Return the ID of the transaction or FALSE if no transaction created.
    */
-  private function runTransactionEvent($orderEvent, Context $context, PurchasableEntityInterface $entity, $quantity, StockLocationInterface $location, $transaction_type_id, array $metadata) {
+  private function runTransactionEvent(StockEventTypeInterface $event_type, Context $context, PurchasableEntityInterface $entity, $quantity, StockLocationInterface $location, $transaction_type_id, Order $order) {
 
     $type = \Drupal::service('plugin.manager.stock_events');
     $plugin = $type->createInstance('core_stock_events');
-    return $plugin->stockEvent($context, $entity, $orderEvent, $quantity, $location,
-      $transaction_type_id, $metadata);
+    return $plugin->stockEvent($context, $entity, $event_type, $quantity, $location,
+      $transaction_type_id, $order);
   }
 
   /**
-   * Acts on the order update event to create transactions for new items.
+   * Creates a stock event type object.
    *
-   * The reason this isn't handled by OrderEvents::ORDER_ITEM_INSERT is because
-   * that event never has the correct values.
+   * @param string $plugin_id
+   *   The id of the stock event type.
    *
-   * @param \Drupal\commerce_order\Event\OrderEvent $event
-   *   The order event.
+   * @return \Drupal\commerce_stock\Plugin\Commerce\StockEventType\StockEventTypeInterface
+   *   The stock event type.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function onOrderUpdate(OrderEvent $event) {
-    $order = $event->getOrder();
-    $original_order = $order->original;
-
-    // In certain cases we have no original order object. If loading from
-    // storage fails, we bailout.
-    // @ToDo Consider how this may change due to: ToDo https://www.drupal.org/project/drupal/issues/2839195
-    if (!$original_order) {
-      $original_order = \Drupal::entityTypeManager()->getStorage('commerce_order')->loadUnchanged($order->id());
-      if (!$original_order) {
-        return;
-      }
-    }
-
-    foreach ($order->getItems() as $item) {
-      if (!$original_order->hasItem($item)) {
-        if ($order && !in_array($order->getState()->value, [
-          'draft',
-          'canceled',
-        ])) {
-          if (!$item->hasPurchasedEntity()) {
-            continue;
-          }
-          $entity = $item->getPurchasedEntity();
-          $service = $this->stockServiceManager->getService($entity);
-          $checker = $service->getStockChecker();
-          // If always in stock then no need to create a transaction.
-          if ($checker->getIsAlwaysInStock($entity)) {
-            continue;
-          }
-          $context = new Context($order->getCustomer(), $order->getStore());
-          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
-          $transaction_type = StockTransactionsInterface::STOCK_SALE;
-          $quantity = -1 * $item->getQuantity();
-          $metadata = [
-            'related_oid' => $order->id(),
-            'related_uid' => $order->getCustomerId(),
-            'data' => ['message' => 'order item added'],
-          ];
-
-          $this->runTransactionEvent(StockEventsInterface::ORDER_UPDATE_EVENT, $context,
-            $entity, $quantity, $location, $transaction_type, $metadata);
-        }
-      }
-    }
-  }
-
-  /**
-   * Performs a stock transaction for an order Cancel event.
-   *
-   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
-   *   The order workflow event.
-   */
-  public function onOrderCancel(WorkflowTransitionEvent $event) {
-    $order = $event->getEntity();
-    if ($order->original && $order->original->getState()->value === 'draft') {
-      return;
-    }
-    foreach ($order->getItems() as $item) {
-      $entity = $item->getPurchasedEntity();
-      if (!$entity) {
-        continue;
-      }
-      $service = $this->stockServiceManager->getService($entity);
-      $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          continue;
-        }
-        $quantity = $item->getQuantity();
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
-        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order canceled'],
-        ];
-
-        $this->runTransactionEvent(StockEventsInterface::ORDER_CANCEL_EVENT, $context,
-          $entity, $quantity, $location, $transaction_type, $metadata);
-      }
-    }
-  }
-
-  /**
-   * Performs a stock transaction on an order delete event.
-   *
-   * This happens on PREDELETE since the items are not available after DELETE.
-   *
-   * @param \Drupal\commerce_order\Event\OrderEvent $event
-   *   The order event.
-   */
-  public function onOrderDelete(OrderEvent $event) {
-    $order = $event->getOrder();
-    if (in_array($order->getState()->value, ['draft', 'canceled'])) {
-      return;
-    }
-    $items = $order->getItems();
-    foreach ($items as $item) {
-      $entity = $item->getPurchasedEntity();
-      if (!$entity) {
-        continue;
-      }
-      $service = $this->stockServiceManager->getService($entity);
-      $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          continue;
-        }
-        $quantity = $item->getQuantity();
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
-        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order deleted'],
-        ];
-        $this->runTransactionEvent(StockEventsInterface::ORDER_DELET_EVENT, $context,
-          $entity, $quantity, $location, $transaction_type, $metadata);
-      }
-    }
-  }
-
-  /**
-   * Performs a stock transaction on an order item update.
-   *
-   * @param \Drupal\commerce_order\Event\OrderItemEvent $event
-   *   The order item event.
-   */
-  public function onOrderItemUpdate(OrderItemEvent $event) {
-    $item = $event->getOrderItem();
-    $order = $item->getOrder();
-
-    if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
-      $diff = $item->original->getQuantity() - $item->getQuantity();
-      if ($diff) {
-        $entity = $item->getPurchasedEntity();
-        if (!$entity) {
-          return;
-        }
-        $service = $this->stockServiceManager->getService($entity);
-        $checker = $service->getStockChecker();
-        if ($checker->getIsStockManaged($entity)) {
-          // If always in stock then no need to create a transaction.
-          if ($checker->getIsAlwaysInStock($entity)) {
-            return;
-          }
-          $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
-          $context = new Context($order->getCustomer(), $order->getStore());
-          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $diff);
-          $metadata = [
-            'related_oid' => $order->id(),
-            'related_uid' => $order->getCustomerId(),
-            'data' => ['message' => 'order item quantity updated'],
-          ];
-
-          $this->runTransactionEvent(StockEventsInterface::ORDER_ITEM_UPDATE_EVENT, $context,
-            $entity, $diff, $location, $transaction_type, $metadata);
-        }
-      }
-    }
-  }
-
-  /**
-   * Performs a stock transaction when an order item is deleted.
-   *
-   * @param \Drupal\commerce_order\Event\OrderItemEvent $event
-   *   The order item event.
-   */
-  public function onOrderItemDelete(OrderItemEvent $event) {
-    $item = $event->getOrderItem();
-    $order = $item->getOrder();
-    if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
-      $entity = $item->getPurchasedEntity();
-      if (!$entity) {
-        return;
-      }
-      $service = $this->stockServiceManager->getService($entity);
-      $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          return;
-        }
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
-        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order item deleted'],
-        ];
-
-        $this->runTransactionEvent(StockEventsInterface::ORDER_ITEM_DELETE_EVENT, $context,
-          $entity, $item->getQuantity(), $location, $transaction_type, $metadata);
-      }
-    }
+  private function getEventType($plugin_id) {
+    return $this->eventTypeManager->createInstance($plugin_id);
   }
 
 }
