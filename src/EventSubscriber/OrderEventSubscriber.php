@@ -122,9 +122,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public function onOrderCancel(WorkflowTransitionEvent $event) {
     $order = $event->getEntity();
-     if ($order->original && $order->original->getState()->value === 'draft') {
-       return;
-     }
+    if ($order->original && $order->original->getState()->value === 'draft') {
+      return;
+    }
     foreach ($order->getItems() as $item) {
       $entity = $item->getPurchasedEntity();
       if (!$entity) {
