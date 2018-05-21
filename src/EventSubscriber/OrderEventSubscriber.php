@@ -163,7 +163,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public function onOrderDelete(OrderEvent $event) {
     $order = $event->getOrder();
-    if ($order->getState()->value == 'canceled') {
+    if (in_array($order->getState()->value, ['draft', 'canceled'])) {
       return;
     }
     $items = $order->getItems();
