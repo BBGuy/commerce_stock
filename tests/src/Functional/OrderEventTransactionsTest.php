@@ -223,7 +223,7 @@ class OrderEventTransactionsTest extends StockBrowserTestBase {
   }
 
   /**
-   *
+   * Test order save event.
    */
   public function testOrderSaveEvent() {
     // Tests initial stock level transactions set by the field values.

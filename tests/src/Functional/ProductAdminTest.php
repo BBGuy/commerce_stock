@@ -95,7 +95,8 @@ class ProductAdminTest extends StockBrowserTestBase {
     if ($checkbox) {
       $checkbox->check();
     }
-    // Don't ask why, but the test don't pass, if we only set the stock field. I guess it's because it's a checkbox.
+    // Don't ask why, but the test don't pass, if we only set the stock field.
+    // I guess it's because it's a checkbox.
     $variations_edit = [
       'variations[form][inline_entity_form][entities][0][form][price][0][number]' => '11.11',
     ];

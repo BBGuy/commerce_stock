@@ -217,7 +217,7 @@ class StockConfigForm extends ConfigFormBase {
 
     drupal_set_message($this->t('Stock configuration updated.'));
   }
-  
+
   /**
    * {@inheritdoc}
    */
