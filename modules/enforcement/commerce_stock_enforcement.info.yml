@@ -1,0 +1,8 @@
+name: Commerce Stock Enforcement
+type: module
+description: Provides a stock enforcement functionality.
+package: Commerce Stock
+dependencies:
+  - commerce_product
+  - commerce_stock
+core: 8.x
