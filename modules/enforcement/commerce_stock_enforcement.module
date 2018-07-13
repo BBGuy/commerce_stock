@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\Core\Url;
 use Drupal\commerce\Response\NeedsRedirectException;
+use Drupal\commerce_product\Entity\ProductVariation;
 
 
 
@@ -21,15 +22,21 @@ use Drupal\commerce\Response\NeedsRedirectException;
  */
 function commerce_stock_enforcement_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
 
-
   // Add to crt form.
   if (strpos($form_id, "commerce_order_item_add_to_cart_form") !== false) {
   //if ( isset( $form[ "#attributes" ][ "class" ] ) && in_array( "commerce-order-item-add-to-cart-form", $form[ "#attributes" ][ "class" ] ) ) {
 
-    // Get the context.
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
+    // Get the product variation.
     $selected_variation_id = $form_state->get('selected_variation');
-    $selected_variation = \Drupal\commerce_product\Entity\ProductVariation::load($selected_variation_id);
+    if (!empty($selected_variation_id)) {
+      $selected_variation = ProductVariation::load($selected_variation_id);
+    }
+    else {
+      $selected_variation = $product->getDefaultVariation();
+    }
+    // Get the context.
     $context = commerce_stock_enforcement_get_context($selected_variation);
 
     // Add a form validate needed for the add to cart action.
@@ -121,7 +128,7 @@ function commerce_stock_enforcement_add_to_cart_form_validate($form, FormStateIn
 
     $form_state->setError(
       $form,
-      t('Sorry we only have %qty in stock and you already ordered %qty_o.', array('%qty' => $stock_level, '%qty_o' => $already_ordered))
+      t('Sorry we only have %qty in stock and you already added %qty_o to your cart.', array('%qty' => $stock_level, '%qty_o' => $already_ordered))
     );
   }
 }
@@ -264,6 +271,9 @@ function commerce_stock_enforcement_is_order_in_stock(OrderInterface $order, $sh
   $order_in_stock = TRUE;
   foreach ($order->getItems() as $id =>  $order_item) {
     $purchased_entity = $order_item->getPurchasedEntity();
+    if (!$purchased_entity) {
+      continue;
+    }
     $name = $purchased_entity->getTitle();
     $qty = $order_item->getQuantity();
     $stock_level = commerce_stock_enforcement_get_stock_level($purchased_entity, $order_context);
