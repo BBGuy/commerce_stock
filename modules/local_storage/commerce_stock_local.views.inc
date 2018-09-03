@@ -225,6 +225,22 @@ function commerce_stock_local_views_data() {
       'id' => 'standard',
     ],
   ];
+  $data['commerce_stock_transaction']['unit_currency'] = [
+    'title' => t('Unit currency'),
+    'help' => t('The currency of a single unit.'),
+    'field' => [
+      'id' => 'standard',
+    ],
+    'filter' => [
+      'id' => 'string',
+    ],
+    'argument' => [
+      'id' => 'string',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
   $data['commerce_stock_transaction']['transaction_time'] = [
     'title' => t('Time'),
     'help' => t('The date & time of the transaction.'),

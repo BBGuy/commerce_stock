@@ -53,7 +53,7 @@ class CoreStockEvents extends PluginBase implements StockEventsInterface {
       ->getService($entity);
     // Use the stock updater to create the transaction.
     $transaction_id = $stockService->getStockUpdater()
-      ->createTransaction($entity, $location->getId(), '', $quantity, NULL, $transaction_type, $metadata);
+       ->createTransaction($entity, $location->getId(), '', $quantity, NULL, $unit_currency = NULL, $transaction_type, $metadata);
     // Return the transaction ID.
     return $transaction_id;
   }
