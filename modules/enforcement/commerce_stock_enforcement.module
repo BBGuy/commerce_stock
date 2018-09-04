@@ -69,7 +69,7 @@ function commerce_stock_enforcement_form_alter(&$form, \Drupal\Core\Form\FormSta
   }
 
   // Checkout.
-  if (strpos($form_id, "commerce_checkout_flow") !== false) {
+  if (strpos($form_id, "commerce_checkout_flow") !== false && $form_id != "commerce_checkout_flow_edit_form") {
     /** @var Drupal\Core\Form\FormInterface $form_object */
     $form_object = $form_state->getFormObject();
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
@@ -155,6 +155,9 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate($form, F
   /** @var \Drupal\views\ViewExecutable $view */
   $view = reset($form_state->getBuildInfo()['args']);
   //Get the order ID from the view argument.
+  /** @var \Drupal\views\ViewExecutable $view */
+  $view = reset($form_state->getBuildInfo()['args']);
+  // Get the order ID from the view argument.
   $order_id = $view->argument['order_id']->value[0];
   /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
   $order = \Drupal::entityTypeManager()->getStorage('commerce_order')->load($order_id);
