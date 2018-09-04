@@ -1,0 +1,352 @@
+<?php
+
+/**
+ * @file
+ * Commerce stock enforcement module file.
+ */
+
+use Drupal\views\Form\ViewsForm;
+use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce\Context;
+use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\Core\Url;
+use Drupal\commerce\Response\NeedsRedirectException;
+use Drupal\commerce_product\Entity\ProductVariation;
+
+
+
+/**
+ * Implements hook_form_alter().
+ */
+function commerce_stock_enforcement_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+
+  // Add to crt form.
+  if (strpos($form_id, "commerce_order_item_add_to_cart_form") !== false) {
+  //if ( isset( $form[ "#attributes" ][ "class" ] ) && in_array( "commerce-order-item-add-to-cart-form", $form[ "#attributes" ][ "class" ] ) ) {
+
+    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+    $product = $form_state->get('product');
+    // Get the product variation.
+    $selected_variation_id = $form_state->get('selected_variation');
+    if (!empty($selected_variation_id)) {
+      $selected_variation = ProductVariation::load($selected_variation_id);
+    }
+    else {
+      $selected_variation = $product->getDefaultVariation();
+    }
+    // Get the context.
+    $context = commerce_stock_enforcement_get_context($selected_variation);
+
+    // Add a form validate needed for the add to cart action.
+    $form['#validate'] = array_merge($form['#validate'], ['commerce_stock_enforcement_add_to_cart_form_validate']);
+
+    // Check if in stock.
+    $instock = commerce_stock_enforcement_check($selected_variation, 1, $context);
+    if (!$instock) {
+      $form['actions']['submit']['#value'] = t('Out of stock');
+      $form['actions']['submit']['#disabled'] = TRUE;
+    }
+  }
+
+
+  // Cart page.
+  if ($form_state->getFormObject() instanceof ViewsForm) {
+    /** @var \Drupal\views\ViewExecutable $view */
+    $view = reset($form_state->getBuildInfo()['args']);
+    // Only add the Checkout button if the cart form view has order items.
+    if ($view->storage->get('tag') == 'commerce_cart_form' && !empty($view->result)) {
+      // Get the order ID from the view argument.
+      $order_id = $view->args[0];
+      /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+      $order = \Drupal::entityTypeManager()->getStorage('commerce_order')->load($order_id);
+      // Force a check to display the stock state to the user.
+      commerce_stock_enforcement_is_order_in_stock($order, TRUE);
+      // Add a form validate needed for the add to cart action.
+      $form['#validate'] = array_merge($form['#validate'], ['commerce_stock_enforcement_cart_order_item_views_form_validate']);
+    }
+  }
+
+  // Checkout.
+  if (strpos($form_id, "commerce_checkout_flow") !== false && $form_id != "commerce_checkout_flow_edit_form") {
+    /** @var Drupal\Core\Form\FormInterface $form_object */
+    $form_object = $form_state->getFormObject();
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $form_object->getOrder();
+    if (!commerce_stock_enforcement_is_order_in_stock($order, FALSE)) {
+      // Redirect back to cart.
+      $response = new RedirectResponse('/cart');
+      $response->send();
+    }
+    // Add a submit validate.
+    $form['#validate'] = array_merge($form['#validate'], ['commerce_stock_enforcement_checkout_form_validate']);
+  }
+}
+
+
+/**
+ * Validates the add to cart form submit.
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function commerce_stock_enforcement_add_to_cart_form_validate($form, FormStateInterface $form_state) {
+  // Get add to cart quantity.
+  $values = $form_state->getValues();
+  if (isset($values['quantity'])) {
+    $quantity = $values['quantity'][0]['value'];
+  }
+  else {
+    $quantity = 1;
+  }
+  // Load the product variation.
+  $variation_id = $values['purchased_entity'][0]['variation'];
+  /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
+  $purchased_entity = \Drupal\commerce_product\Entity\ProductVariation::load($variation_id);
+
+
+
+
+//  /** @var Drupal\Core\Form\FormInterface $form_object */
+//  $entity_form = $form_state->getFormObject();
+//
+//  $order_item = $entity_form->getEntity();
+//  /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
+//  $purchased_entity = $order_item->getPurchasedEntity();
+
+  $context = commerce_stock_enforcement_get_context($purchased_entity);
+
+  // Get the available stock level.
+  $stock_level = commerce_stock_enforcement_get_stock_level($purchased_entity, $context);
+  // Get the already ordered quantity.
+  $already_ordered = commerce_stock_enforcement_get_ordered_quantity($purchased_entity, $context);
+
+  $total_requested = $already_ordered + $quantity ;
+
+  if ($total_requested > $stock_level) {
+
+    $form_state->setError(
+      $form,
+      t('Sorry we only have %qty in stock and you already added %qty_o to your cart.', array('%qty' => $stock_level, '%qty_o' => $already_ordered))
+    );
+  }
+}
+
+
+/**
+ * Validate the cart page submit.
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ */
+function commerce_stock_enforcement_cart_order_item_views_form_validate($form, FormStateInterface $form_state) {
+  $triggering_element = $form_state->getTriggeringElement();
+  // If triggered by a line item delete.
+  if (isset($triggering_element['#remove_order_item']) && $triggering_element['#remove_order_item']) {
+    // No need to validate.
+    return;
+  }
+
+  $values = $form_state->getValues();
+  $quantities = $values['edit_quantity'];
+
+  /** @var \Drupal\views\ViewExecutable $view */
+  $view = reset($form_state->getBuildInfo()['args']);
+  //Get the order ID from the view argument.
+  /** @var \Drupal\views\ViewExecutable $view */
+  $view = reset($form_state->getBuildInfo()['args']);
+  // Get the order ID from the view argument.
+  $order_id = $view->argument['order_id']->value[0];
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = \Drupal::entityTypeManager()->getStorage('commerce_order')->load($order_id);
+
+  foreach ($order->getItems() as $id =>  $order_item) {
+    $purchased_entity = $order_item->getPurchasedEntity();
+    $name = $purchased_entity->getTitle();
+    $qty = $quantities[$id];
+    $context = commerce_stock_enforcement_get_context($purchased_entity);
+    $stock_level = commerce_stock_enforcement_get_stock_level($purchased_entity, $context);
+    // Get the already ordered quantity.
+    $already_ordered = commerce_stock_enforcement_get_ordered_quantity($purchased_entity, $context);
+
+    if ($qty > $stock_level) {
+      $form_state->setError(
+        $form['edit_quantity'][$id],
+        //t('Sorry we only have %qty in stock', array('%qty' => $stock_level))
+        t('The maximum quantity for %name that can be ordered is %qty.', array('%name' => $name, '%qty' => $stock_level))
+      );
+    }
+  }
+}
+
+/**
+ * Validate the checkout form submit.
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @throws \Drupal\commerce\Response\NeedsRedirectException
+ */
+function commerce_stock_enforcement_checkout_form_validate($form, FormStateInterface $form_state) {
+  $triggering_element = $form_state->getTriggeringElement();
+
+  /** @var Drupal\Core\Form\FormInterface $form_object */
+  $form_object = $form_state->getFormObject();
+
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $form_object->getOrder();
+
+  if (!commerce_stock_enforcement_is_order_in_stock($order, FALSE)) {
+    $cart_page = Url::fromRoute('commerce_cart.page', [], ['absolute' => TRUE]);
+    drupal_set_message(t('One or more Items are out of stock. Checkout canceled!'), 'error');
+    throw new NeedsRedirectException($cart_page->toString());
+  }
+}
+
+
+/**
+ * Get the context for the provided Purchasable Entity.
+ *
+ * @param \Drupal\commerce\PurchasableEntityInterface $entity
+ * @return \Drupal\commerce\Context
+ */
+function commerce_stock_enforcement_get_context(PurchasableEntityInterface $entity) {
+
+  // @todo - think about using selectStore() in commerce_cart.module.
+  $store_to_use = \Drupal::service('commerce_store.current_store')->getStore();
+  $current_user = \Drupal::currentUser();
+  // Make sure the current store is in the entity stores.
+  $stores = $entity->getStores();
+  $found = FALSE;
+  // If we have a current store.
+  if ($store_to_use) {
+    // Make sure it is associated with the curent product.
+    foreach ($stores as $store) {
+      if ($store->id() == $store_to_use->id()) {
+        $found = TRUE;
+        break;
+      }
+    }
+  }
+  // If not found and we have stores associated with the product.
+  if (!$found) {
+    if (!empty($stores)) {
+      // Get the first store the product is assigned to.
+      $store_to_use = array_shift($stores);
+    }
+  }
+  return new Context($current_user, $store_to_use);
+}
+
+
+/**
+ * Check if the PurchasableEntity is in stock.
+ *
+ * @param \Drupal\commerce\PurchasableEntityInterface $entity
+ * @param $quantity
+ * @param \Drupal\commerce\Context $context
+ * @return bool
+ */
+function commerce_stock_enforcement_check(PurchasableEntityInterface $entity, $quantity, Context $context) {
+  if (empty($quantity)) {
+    $quantity = 1;
+  }
+  $stock_level = commerce_stock_enforcement_get_stock_level($entity, $context);
+  return ($stock_level >= $quantity);
+}
+
+
+/**
+ * Check if order is in stock.
+ *
+ * If order contains products that are out of stock, then error messages will be
+ * generated and the user redirected to the cart page.
+ *
+ * @param \Drupal\commerce_order\Entity\OrderInterface $order
+ * @param bool $show_warnings
+ * @return bool
+ */
+function commerce_stock_enforcement_is_order_in_stock(OrderInterface $order, $show_warnings = TRUE) {
+  /** @var Drupal\commerce_store\Entity\StoreInterface $order_store */
+  $order_store = $order->getStore();
+  /** @var Drupal\user\UserInterface $order_user */
+  $order_user = $order->getCustomer();
+  $order_context = new Context($order_user, $order_store);
+
+  $order_in_stock = TRUE;
+  foreach ($order->getItems() as $id =>  $order_item) {
+    $purchased_entity = $order_item->getPurchasedEntity();
+    if (!$purchased_entity) {
+      continue;
+    }
+    $name = $purchased_entity->getTitle();
+    $qty = $order_item->getQuantity();
+    $stock_level = commerce_stock_enforcement_get_stock_level($purchased_entity, $order_context);
+    if ($qty > $stock_level) {
+      if ($show_warnings) {
+        drupal_set_message(t('The maximum quantity for %name that can be ordered is %qty.', array(
+          '%name' => $name,
+          '%qty' => $stock_level
+        )), 'error');
+      }
+      $order_in_stock = FALSE;
+    }
+  }
+    return $order_in_stock;
+}
+
+
+/**
+ * Get the available stock level for the PurchasableEntity.
+ *
+ * @param \Drupal\commerce\PurchasableEntityInterface $entity
+ * @param \Drupal\commerce\Context $context
+ * @return bool
+ */
+function commerce_stock_enforcement_get_stock_level(PurchasableEntityInterface $entity, Context $context) {
+  // Create a stock transaction
+  $stockManager = \Drupal::service('commerce_stock.service_manager');
+
+  $stock_service = $stockManager->getService($entity);
+  $stock_checker = $stock_service->getStockChecker();
+
+  if ($stock_checker->getIsAlwaysInStock($entity)) {
+    return PHP_INT_MAX;
+  }
+
+  $stock_config = $stock_service->getConfiguration();
+  $stock_level = $stock_checker->getTotalStockLevel(
+    $entity,
+    $stock_config->getAvailabilityLocations($context, $entity)
+  );
+
+  return $stock_level;
+}
+
+/**
+ * Get the quantity already ordered for the specified PurchasableEntity.
+ *
+ * @param \Drupal\commerce\PurchasableEntityInterface $entity
+ * @param \Drupal\commerce\Context $context
+ * @return int
+ */
+function commerce_stock_enforcement_get_ordered_quantity(PurchasableEntityInterface $entity, Context $context) {
+  // Get the already ordered quantity.
+  $already_ordered = 0;
+  // Get all the carts.
+  $all_carts = \Drupal::service('commerce_cart.cart_provider')
+    ->getCarts();
+  // Cycle all the carts to get the total stock already ordered.
+  // It is unlikely that a product will be in more then one cart, but it is
+  // probably safer to check.
+  foreach ($all_carts as $cart) {
+    foreach ($cart->getItems() as $order_item) {
+      $purchased_entity = $order_item->getPurchasedEntity();
+      if ($purchased_entity && ($purchased_entity->id() == $entity->id())) {
+        $already_ordered += $order_item->getQuantity();
+      }
+    }
+  }
+  return $already_ordered;
+}
