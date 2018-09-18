@@ -225,9 +225,9 @@ function commerce_stock_local_views_data() {
       'id' => 'standard',
     ],
   ];
-  $data['commerce_stock_transaction']['unit_currency'] = [
-    'title' => t('Unit currency'),
-    'help' => t('The currency of a single unit.'),
+  $data['commerce_stock_transaction']['currency_code'] = [
+    'title' => t('Currency code'),
+    'help' => t('The currency code of a single unit.'),
     'field' => [
       'id' => 'standard',
     ],

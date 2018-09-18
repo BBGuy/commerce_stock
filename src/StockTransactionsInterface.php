@@ -76,14 +76,14 @@ interface StockTransactionsInterface {
    *   The quantity.
    * @param float $unit_cost
    *   The unit cost.
-   * @param string $unit_currency
-   *   The unit currency.
+   * @param string $currency_code
+   *   The currency code.
    * @param int $transaction_type_id
    *   Transaction type ID.
    * @param array $metadata
    *   A metadata array.
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $transaction_type_id, array $metadata = []);
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, array $metadata = []);
 
   /**
    * Receive stock.
@@ -98,12 +98,12 @@ interface StockTransactionsInterface {
    *   The quantity.
    * @param float $unit_cost
    *   The unit cost.
-   * @param string $unit_currency
-   *   The unit currency.
+   * @param string $currency_code
+   *   The currency code.
    * @param string $message
    *   The message.
    */
-  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $message = NULL);
+  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $message = NULL);
 
   /**
    * Sell stock.
@@ -118,8 +118,8 @@ interface StockTransactionsInterface {
    *   The quantity.
    * @param float $unit_cost
    *   The unit cost.
-   * @param string $unit_currency
-   *   The unit currency.
+   * @param string $currency_code
+   *   The currency code.
    * @param int $order_id
    *   The order ID.
    * @param int $user_id
@@ -127,7 +127,7 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $order_id, $user_id, $message = NULL);
+  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $order_id, $user_id, $message = NULL);
 
   /**
    * Move stock.
@@ -146,12 +146,12 @@ interface StockTransactionsInterface {
    *   The quantity.
    * @param float $unit_cost
    *   The unit cost.
-   * @param string $unit_currency
-   *   The unit currency.
+   * @param string $currency_code
+   *   The currency code.
    * @param string $message
    *   The message.
    */
-  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $unit_currency, $message = NULL);
+  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $currency_code, $message = NULL);
 
   /**
    * Stock returns.
@@ -166,8 +166,8 @@ interface StockTransactionsInterface {
    *   The quantity.
    * @param float $unit_cost
    *   The unit cost.
-   * @param string $unit_currency
-   *   The unit currency.
+   * @param string $currency_code
+   *   The currency code.
    * @param int $order_id
    *   The order ID.
    * @param int $user_id
@@ -175,6 +175,6 @@ interface StockTransactionsInterface {
    * @param string $message
    *   The message.
    */
-  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $order_id, $user_id, $message = NULL);
+  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $order_id, $user_id, $message = NULL);
 
 }

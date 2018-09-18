@@ -58,7 +58,7 @@ class LocalStockUpdater implements StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $transaction_type_id, array $metadata) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, array $metadata) {
     // Get optional fields.
     $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
     $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
@@ -73,7 +73,7 @@ class LocalStockUpdater implements StockUpdateInterface {
       'location_id' => $location_id,
       'location_zone' => $zone,
       'unit_cost' => $unit_cost,
-      'unit_currency' => $unit_currency,
+      'currency_code' => $currency_code,
       'transaction_time' => time(),
       'transaction_type_id' => $transaction_type_id,
       'related_tid' => $related_tid,

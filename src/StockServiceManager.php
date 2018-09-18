@@ -166,15 +166,15 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * {@inheritdoc}
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $transaction_type_id, array $metadata = []) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, array $metadata = []) {
     $stock_updater = $this->getService($entity)->getStockUpdater();
-    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $transaction_type_id, $metadata);
+    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $message = NULL) {
+  public function receiveStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $message = NULL) {
     $transaction_type_id = StockTransactionsInterface::NEW_STOCK;
     if (is_null($message)) {
       $metadata = [];
@@ -189,13 +189,13 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     // Make sure quantity is positive.
     $quantity = abs($quantity);
     $stock_updater = $this->getService($entity)->getStockUpdater();
-    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $transaction_type_id, $metadata);
+    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $order_id, $user_id, $message = NULL) {
+  public function sellStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $order_id, $user_id, $message = NULL) {
     $transaction_type_id = StockTransactionsInterface::STOCK_SALE;
     $metadata = [
       'related_oid' => $order_id,
@@ -207,13 +207,13 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     // Make sure quantity is positive.
     $quantity = -1 * abs($quantity);
     $stock_updater = $this->getService($entity)->getStockUpdater();
-    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $transaction_type_id, $metadata);
+    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $unit_currency, $message = NULL) {
+  public function moveStock(PurchasableEntityInterface $entity, $from_location_id, $to_location_id, $from_zone, $to_zone, $quantity, $unit_cost, $currency_code, $message = NULL) {
     if (is_null($message)) {
       $metadata = [];
     }
@@ -228,16 +228,16 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     $quantity_from = -1 * abs($quantity);
     $quantity_to = abs($quantity);
     $stock_updater = $this->getService($entity)->getStockUpdater();
-    $tid = $stock_updater->createTransaction($entity, $from_location_id, $from_zone, $quantity_from, $unit_cost, $unit_currency, StockTransactionsInterface::MOVEMENT_FROM, $metadata);
+    $tid = $stock_updater->createTransaction($entity, $from_location_id, $from_zone, $quantity_from, $unit_cost, $currency_code, StockTransactionsInterface::MOVEMENT_FROM, $metadata);
     // The second transaction will point to the first one.
     $metadata['related_tid'] = $tid;
-    $stock_updater->createTransaction($entity, $to_location_id, $to_zone, $quantity_to, $unit_cost, $unit_currency, StockTransactionsInterface::MOVEMENT_TO, $metadata);
+    $stock_updater->createTransaction($entity, $to_location_id, $to_zone, $quantity_to, $unit_cost, $currency_code, StockTransactionsInterface::MOVEMENT_TO, $metadata);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $order_id, $user_id, $message = NULL) {
+  public function returnStock(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $order_id, $user_id, $message = NULL) {
     $transaction_type_id = StockTransactionsInterface::STOCK_RETURN;
     $metadata = [
       'related_oid' => $order_id,
@@ -249,7 +249,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     // Make sure quantity is positive.
     $quantity = abs($quantity);
     $stock_updater = $this->getService($entity)->getStockUpdater();
-    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $unit_currency, $transaction_type_id, $metadata);
+    $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, $metadata);
   }
 
   /**

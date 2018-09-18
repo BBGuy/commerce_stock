@@ -98,11 +98,10 @@ function commerce_stock_local_schema() {
         'precision' => 19,
         'scale' => 6,
       ],
-      'unit_currency' => [
-        'description' => 'Unit currency',
-        'type'        => 'varchar_ascii',
-        'length'      => 28,
-        'not null'    => FALSE,
+      'currency_code' => [
+        'description' => 'The currency code.',
+        'type'        => 'varchar',
+        'length'      => 3,
       ],
       'transaction_time' => [
         'type' => 'int',
@@ -323,11 +322,10 @@ function commerce_stock_local_update_8002() {
   $schema->addField('commerce_stock_location_level', 'entity_type', $spec);
 
   $spec1 = [
-    'description' => 'The currency for unit',
-    'type'        => 'varchar_ascii',
-    'length'      => 28,
-    'not null'    => FALSE,
+    'description' => 'The currency code',
+    'type'        => 'varchar',
+    'length'      => 3,
   ];
   $schema1 = \Drupal::database()->schema();
-  $schema1->addField('commerce_stock_transaction', 'unit_currency', $spec1);
+  $schema1->addField('commerce_stock_transaction', 'currency_code', $spec1);
 }
