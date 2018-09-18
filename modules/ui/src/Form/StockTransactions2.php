@@ -215,22 +215,22 @@ class StockTransactions2 extends FormBase {
     $product_variation = $this->productVariationStorage->load($product_variation_id);
 
     if ($transaction_type == 'receiveStock') {
-      $this->stockServiceManager->receiveStock($product_variation, $source_location, $source_zone, $qty, NULL, $transaction_note);
+      $this->stockServiceManager->receiveStock($product_variation, $source_location, $source_zone, $qty, NULL, $currency_code = NULL, $transaction_note);
     }
     elseif ($transaction_type == 'sellStock') {
       $order_id = $form_state->getValue('order');;
       $user_id = $form_state->getValue('user');;
-      $this->stockServiceManager->sellStock($product_variation, $source_location, $source_zone, $qty, NULL, $order_id, $user_id, $transaction_note);
+      $this->stockServiceManager->sellStock($product_variation, $source_location, $source_zone, $qty, NULL, $currency_code = NULL, $order_id, $user_id, $transaction_note);
     }
     elseif ($transaction_type == 'returnStock') {
       $order_id = $form_state->getValue('order');;
       $user_id = $form_state->getValue('user');;
-      $this->stockServiceManager->returnStock($product_variation, $source_location, $source_zone, $qty, NULL, $order_id, $user_id, $transaction_note);
+      $this->stockServiceManager->returnStock($product_variation, $source_location, $source_zone, $qty, NULL, $currency_code = NULL, $order_id, $user_id, $transaction_note);
     }
     elseif ($transaction_type == 'moveStock') {
       $target_location = $form_state->getValue('target_location');
       $target_zone = $form_state->getValue('target_zone');
-      $this->stockServiceManager->moveStock($product_variation, $source_location, $target_location, $source_zone, $target_zone, $qty, NULL, $transaction_note);
+      $this->stockServiceManager->moveStock($product_variation, $source_location, $target_location, $source_zone, $target_zone, $qty, NULL, $currency_code = NULL, $transaction_note);
     }
   }
 

@@ -22,6 +22,8 @@ interface StockUpdateInterface {
    *   Tbe quantity.
    * @param float $unit_cost
    *   The unit cost.
+   * @param string $currency_code
+   *   The currency code.
    * @param int $transaction_type_id
    *   The transaction type ID.
    * @param array $metadata
@@ -34,6 +36,6 @@ interface StockUpdateInterface {
    * @return int
    *   Return the ID of the transaction.
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata);
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, array $metadata);
 
 }
