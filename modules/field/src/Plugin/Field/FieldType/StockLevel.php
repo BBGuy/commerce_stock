@@ -145,10 +145,14 @@ class StockLevel extends FieldItemBase {
         $zone = '';
         // @todo Implement unit_cost?
         $unit_cost = NULL;
+        $currency_code = NULL;
+        // $unit_cost = $values['stock']['stocked_entity']->get('price')->getValue()[0]['number'];
+        // $currency_code = $values['stock']['stocked_entity']->get('price')->getValue()[0]['currency_code'];
+
         // @ToDo Make this hardcoded note translatable or remove it at all.
         $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field';
         $metadata = ['data' => ['message' => $transaction_note]];
-        $this->stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $transaction_type, $metadata);
+        $this->stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $currency_code, $transaction_type, $metadata);
       }
     }
   }

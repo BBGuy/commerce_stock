@@ -98,6 +98,11 @@ function commerce_stock_local_schema() {
         'precision' => 19,
         'scale' => 6,
       ],
+      'currency_code' => [
+        'description' => 'The currency code.',
+        'type'        => 'varchar',
+        'length'      => 3,
+      ],
       'transaction_time' => [
         'type' => 'int',
         'not null' => TRUE,
@@ -185,6 +190,12 @@ function commerce_stock_local_schema() {
         'type'        => 'int',
         'unsigned'    => TRUE,
         'not null'    => TRUE,
+      ],
+      'entity_type' => [
+        'description' => 'Purchasable entity type',
+        'type'        => 'varchar_ascii',
+        'length'      => EntityTypeInterface::ID_MAX_LENGTH,
+        'not null'    => FALSE,
       ],
       'qty' => [
         'description' => 'The quantity',
@@ -295,4 +306,26 @@ function commerce_stock_local_update_8001() {
   ];
   $schema = \Drupal::database()->schema();
   $schema->addField('commerce_stock_transaction', 'entity_type', $spec);
+}
+
+/**
+ * Adds 'entity_type' column to commerce_stock_location_level table.
+ */
+function commerce_stock_local_update_8002() {
+  $spec = [
+    'description' => 'Purchasable entity type',
+    'type'        => 'varchar_ascii',
+    'length'      => EntityTypeInterface::ID_MAX_LENGTH,
+    'not null'    => FALSE,
+  ];
+  $schema = \Drupal::database()->schema();
+  $schema->addField('commerce_stock_location_level', 'entity_type', $spec);
+
+  $spec1 = [
+    'description' => 'The currency code',
+    'type'        => 'varchar',
+    'length'      => 3,
+  ];
+  $schema1 = \Drupal::database()->schema();
+  $schema1->addField('commerce_stock_transaction', 'currency_code', $spec1);
 }

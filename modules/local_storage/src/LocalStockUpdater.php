@@ -58,7 +58,7 @@ class LocalStockUpdater implements StockUpdateInterface {
   /**
    * {@inheritdoc}
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $transaction_type_id, array $metadata) {
+  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, array $metadata) {
     // Get optional fields.
     $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
     $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
@@ -73,6 +73,7 @@ class LocalStockUpdater implements StockUpdateInterface {
       'location_id' => $location_id,
       'location_zone' => $zone,
       'unit_cost' => $unit_cost,
+      'currency_code' => $currency_code,
       'transaction_time' => time(),
       'transaction_type_id' => $transaction_type_id,
       'related_tid' => $related_tid,
@@ -80,6 +81,7 @@ class LocalStockUpdater implements StockUpdateInterface {
       'related_uid' => $related_uid,
       'data' => serialize($data),
     ];
+
     $insert = $this->database->insert('commerce_stock_transaction')
       ->fields(array_keys($field_values))
       ->values(array_values($field_values))->execute();
@@ -126,6 +128,7 @@ class LocalStockUpdater implements StockUpdateInterface {
       ->fields('ll')
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
       ->execute()->fetch();
     if ($existing) {
       $this->database->update('commerce_stock_location_level')
@@ -139,8 +142,8 @@ class LocalStockUpdater implements StockUpdateInterface {
     }
     else {
       $this->database->insert('commerce_stock_location_level')
-        ->fields(['location_id', 'entity_id', 'qty', 'last_transaction_id'])
-        ->values([$location_id, $entity->id(), $qty, $last_txn])
+        ->fields(['location_id', 'entity_id', 'entity_type', 'qty', 'last_transaction_id'])
+        ->values([$location_id, $entity->id(), $entity->getEntityTypeId(), $qty, $last_txn])
         ->execute();
     }
   }
