@@ -4,6 +4,7 @@ Feel free to suggest changes!
 
 Standard setup for Commerce stock:
 ==================================
+Install with Composer: $ composer require 'drupal/commerce_stock:^1.0'
 
 1) Download or clone the commerce stock project
 
