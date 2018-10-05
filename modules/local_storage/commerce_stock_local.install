@@ -213,7 +213,7 @@ function commerce_stock_local_schema() {
         'not null' => TRUE,
       ],
     ],
-    'primary key' => ['location_id', 'entity_id'],
+    'primary key' => ['location_id', 'entity_id', 'entity_type'],
     'foreign keys' => [
       'location' => [
         'table' => 'commerce_stock_location',

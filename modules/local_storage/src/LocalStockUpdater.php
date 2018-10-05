@@ -138,6 +138,7 @@ class LocalStockUpdater implements StockUpdateInterface {
         ])
         ->condition('location_id', $location_id, '=')
         ->condition('entity_id', $entity->id(), '=')
+        ->condition('entity_type', $entity->getEntityTypeId())
         ->execute();
     }
     else {

@@ -71,6 +71,7 @@ class LocalStockChecker implements StockCheckInterface {
       ->fields('ll')
       ->condition('location_id', $location_id)
       ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
       ->execute()
       ->fetch();
 
