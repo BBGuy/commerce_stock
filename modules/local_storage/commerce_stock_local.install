@@ -67,7 +67,7 @@ function commerce_stock_local_schema() {
         'description' => 'Purchasable entity type',
         'type'        => 'varchar_ascii',
         'length'      => EntityTypeInterface::ID_MAX_LENGTH,
-        'not null'    => FALSE,
+        'not null'    => TRUE,
       ],
       'qty' => [
         'description' => 'Transaction quantity',
@@ -195,7 +195,7 @@ function commerce_stock_local_schema() {
         'description' => 'Purchasable entity type',
         'type'        => 'varchar_ascii',
         'length'      => EntityTypeInterface::ID_MAX_LENGTH,
-        'not null'    => FALSE,
+        'not null'    => TRUE,
       ],
       'qty' => [
         'description' => 'The quantity',
