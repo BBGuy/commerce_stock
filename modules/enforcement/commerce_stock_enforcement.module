@@ -69,7 +69,7 @@ function commerce_stock_enforcement_form_alter(&$form, \Drupal\Core\Form\FormSta
   }
 
   // Checkout.
-  if (strpos($form_id, "commerce_checkout_flow") !== false && $form_id != "commerce_checkout_flow_edit_form") {
+  if (strpos($form_id, "commerce_checkout_flow") !== false && $form_state->getFormObject()->getBaseFormId() == 'commerce_checkout_flow') {
     /** @var Drupal\Core\Form\FormInterface $form_object */
     $form_object = $form_state->getFormObject();
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
