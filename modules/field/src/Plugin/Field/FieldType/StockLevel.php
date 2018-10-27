@@ -148,7 +148,6 @@ class StockLevel extends FieldItemBase {
         $currency_code = NULL;
         // $unit_cost = $values['stock']['stocked_entity']->get('price')->getValue()[0]['number'];
         // $currency_code = $values['stock']['stocked_entity']->get('price')->getValue()[0]['currency_code'];
-
         // @ToDo Make this hardcoded note translatable or remove it at all.
         $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field';
         $metadata = ['data' => ['message' => $transaction_note]];

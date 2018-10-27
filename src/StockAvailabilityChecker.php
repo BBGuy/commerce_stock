@@ -50,7 +50,6 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
     // @todo - temp fix to disable the integration!!!
     return TRUE;
 
-
     if (empty($quantity)) {
       $quantity = 1;
     }
