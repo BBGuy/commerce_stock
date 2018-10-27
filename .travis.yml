@@ -13,12 +13,13 @@ sudo: false
 dist: precise
 
 php:
-  - 7.1
-  - 7.0
+- 7.2
+- 7.1
+- 7.0
 
 branches:
   except:
-    - "7.x-1.x"
+  - "7.x-1.x"
 
 matrix:
   fast_finish: true
@@ -39,9 +40,19 @@ env:
     #- DRUPAL_TI_SCRIPT_DIR_BEFORE="./drupal_ti/before"
     #- DRUPAL_TI_SCRIPT_DIR_AFTER="./drupal_ti/after"
 
+    # The installation profile to use:
+    #
+    # Note: This is customized for drupal-8 environment in
+    #       tests/drupal-8/drupal_ti_test/tests/drupal_ti/before/environments/drupal-8.sh.
+    #
+    # The reason is that behat strongly depends on a logout link being present,
+    # but minimal does not have one.
+    #
+    #- DRUPAL_TI_INSTALL_PROFILE="testing"
+
     # The environment to use, supported are: drupal-7, drupal-8
     - DRUPAL_TI_ENVIRONMENT="drupal-8"
-    - DRUPAL_TI_CORE_BRANCH="8.5.x"
+    - DRUPAL_TI_CORE_BRANCH="8.6.x"
 
     # Drupal specific variables.
     - DRUPAL_TI_DB="drupal_travis_db"
@@ -77,9 +88,9 @@ env:
     #- DRUPAL_TI_PHPUNIT_CORE_SRC_DIRECTORY="./tests/src"
 
     # Code coverage via coveralls.io
-    - DRUPAL_TI_COVERAGE="satooshi/php-coveralls:0.6.*"
+    # DRUPAL_TI_COVERAGE="satooshi/php-coveralls:0.6.*"
     # This needs to match your .coveralls.yml file.
-    - DRUPAL_TI_COVERAGE_FILE="build/logs/clover.xml"
+    # DRUPAL_TI_COVERAGE_FILE="build/logs/clover.xml"
 
     # Debug options
     #- DRUPAL_TI_DEBUG="-x -v"
@@ -103,7 +114,7 @@ before_install:
   # Remove xdebug. We aren't generating code coverage, and it slows down Composer.
   - phpenv config-rm xdebug.ini || true
   - composer global require "hirak/prestissimo:^0.3"
-  - composer global require "lionsad/drupal_ti:dev-master#396d11d200005eb68491d24170da0a98ae7f51b3"
+  - composer global require "lionsad/drupal_ti:dev-master#0d7c41abd1efa11726d7c908ae7a39bbeea905df"
   - composer global require "squizlabs/php_codesniffer:2.*"
   - drupal-ti before_install
 
@@ -128,7 +139,7 @@ script:
   - phpcs --standard=phpcs.xml tests -s
 
   - drupal-ti script
-  #- drupal-ti --include ".travis-simpletest-js.sh"
+  # - drupal-ti --include ".travis-simpletest-js.sh"
 
 after_script:
   - drupal-ti after_script
