@@ -329,3 +329,63 @@ function commerce_stock_local_update_8002() {
   $schema1 = \Drupal::database()->schema();
   $schema1->addField('commerce_stock_transaction', 'currency_code', $spec1);
 }
+
+/**
+ * Update commerce_stock_location_level table.
+ *
+ * Change the 'entity_type' column to not allow null values.
+ * Add 'entity_type' column to primary key of commerce_stock_location_level
+ * table and initialize 'entity_type' column for existing records.
+ */
+function commerce_stock_local_update_8003() {
+  $table = 'commerce_stock_location_level';
+  $index = 'PRIMARY';
+  $field = 'entity_type';
+  $spec = [
+    'description' => 'Purchasable entity type',
+    'type'        => 'varchar_ascii',
+    'length'      => EntityTypeInterface::ID_MAX_LENGTH,
+    'not null'    => TRUE,
+  ];
+
+  $schema = \Drupal::database()->schema();
+  if ($schema) {
+    if ($schema->tableExists($table)) {
+
+      // Initialize entity_type column for existing records in
+      // commerce_stock_location_level table.
+      \Drupal::database()->update($table)
+        ->fields([
+          'entity_type' => 'commerce_product_variation',
+        ])
+        ->isNull($field)
+        ->execute();
+
+      // Change the 'entity_type' column spec to not allow null values.
+      $schema->changeField($table, $field, $field, $spec);
+
+      // Add new entity_type column to primary key of
+      // commerce_stock_location_level table.
+      if ($schema->indexExists($table, $index)) {
+        $schema->dropIndex($table, $index);
+      }
+      $schema->addPrimaryKey($table, [
+        'location_id',
+        'entity_id',
+        'entity_type',
+      ]);
+    }
+
+    // Update the 'entity_type' column in 'commerce_stock_transaction' table.
+    $table = 'commerce_stock_transaction';
+    if ($schema->tableExists($table)) {
+      \Drupal::database()->update($table)
+        ->fields([
+          'entity_type' => 'commerce_product_variation',
+        ])
+        ->isNull($field)
+        ->execute();
+      $schema->changeField($table, $field, $field, $spec);
+    }
+  }
+}
