@@ -3,8 +3,8 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\AvailabilityCheckerInterface;
-use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Context;
+use Drupal\commerce\PurchasableEntityInterface;
 
 /**
  * The entry point for availability checking through Commerce Stock.
@@ -28,7 +28,9 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
    * @param \Drupal\commerce_stock\StockServiceManagerInterface $stock_service_manager
    *   The stock service manager.
    */
-  public function __construct(StockServiceManagerInterface $stock_service_manager) {
+  public function __construct(
+    StockServiceManagerInterface $stock_service_manager
+  ) {
     $this->stockServiceManager = $stock_service_manager;
   }
 
@@ -44,29 +46,21 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * We don't do anything here. The AvailibilityCheckerInterface allows only
+   * TRUE/FALSE as answer. This isn't enough for sophisticated use cases.
+   *
+   * See the commerce_stock.module for certain inception points.
+   *
+   * @see https://www.drupal.org/project/commerce/issues/2710107
+   * @see https://www.drupal.org/project/commerce/issues/2937041
    */
-  public function check(PurchasableEntityInterface $entity, $quantity, Context $context) {
-
-    // @todo - temp fix to disable the integration!!!
+  public function check(
+    PurchasableEntityInterface $entity,
+    $quantity,
+    Context $context
+  ) {
     return TRUE;
-
-    if (empty($quantity)) {
-      $quantity = 1;
-    }
-    $stock_service = $this->stockServiceManager->getService($entity);
-    $stock_checker = $stock_service->getStockChecker();
-
-    if ($stock_checker->getIsAlwaysInStock($entity)) {
-      return TRUE;
-    }
-
-    $stock_config = $stock_service->getConfiguration();
-    $stock_level = $stock_checker->getTotalStockLevel(
-      $entity,
-      $stock_config->getAvailabilityLocations($context, $entity)
-    );
-
-    return ($stock_level >= $quantity);
   }
 
 }
