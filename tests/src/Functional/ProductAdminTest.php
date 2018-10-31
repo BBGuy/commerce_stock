@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\commerce_stock\Functional;
 
-use Drupal\commerce_price\Price;
+use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\ProductVariation;
 
 /**
@@ -24,17 +24,14 @@ class ProductAdminTest extends StockBrowserTestBase {
   /**
    * Test the create form.
    */
-  public function testCreateProductForm() {
+  public function testCreateProductVariationForm() {
 
     $this->drupalGet('admin/commerce/products');
+    $this->assertSession()->statusCodeEquals(200);
     $this->getSession()->getPage()->clickLink('Add product');
 
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][commerce_stock_always_in_stock][value]');
-    $this->assertSession()->checkboxNotChecked('variations[form][inline_entity_form][commerce_stock_always_in_stock][value]');
-
-    $store_ids = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
+    // Create a product.
+    $store_ids = EntityHelper::extractIds($this->stores);
     $title = $this->randomMachineName();
     $edit = [
       'title[0][value]' => $title,
@@ -42,72 +39,80 @@ class ProductAdminTest extends StockBrowserTestBase {
     foreach ($store_ids as $store_id) {
       $edit['stores[target_id][value][' . $store_id . ']'] = $store_id;
     }
+    $this->submitForm($edit, 'Save and add variations');
+
+    $this->assertNotEmpty($this->getSession()
+      ->getPage()
+      ->hasLink('Add variation'));
+
+    // Create a variation.
+    $this->getSession()->getPage()->clickLink('Add variation');
+    $this->assertSession()->pageTextContains(t('Add variation'));
+    $this->assertSession()->fieldExists('sku[0][value]');
+    $this->assertSession()->fieldExists('price[0][number]');
+    $this->assertSession()->fieldExists('status[value]');
+    $this->assertSession()
+      ->fieldExists('commerce_stock_always_in_stock[value]');
+    $this->assertSession()->buttonExists('Save');
+
     $variation_sku = $this->randomMachineName();
-    $variations_edit = [
-      'variations[form][inline_entity_form][sku][0][value]' => $variation_sku,
-      'variations[form][inline_entity_form][price][0][number]' => '9.99',
-      'variations[form][inline_entity_form][status][value]' => 1,
-    ];
-    $this->submitForm($variations_edit, t('Create variation'));
-    $this->submitForm($edit, t('Save'));
+    $this->getSession()->getPage()->fillField('sku[0][value]', $variation_sku);
+    $this->getSession()->getPage()->fillField('price[0][number]', '9.99');
+    $this->submitForm([], t('Save'));
     $this->assertSession()->statusCodeEquals(200);
 
-    $variation = \Drupal::entityQuery('commerce_product_variation')
-      ->condition('sku', $variation_sku)
-      ->range(0, 1)
-      ->execute();
-
-    $variation = ProductVariation::load(current($variation));
-    $this->assertNotNull($variation, 'The new product variation has been created.');
-    $this->assertEquals('0', $variation->get('commerce_stock_always_in_stock')->getValue()[0]['value']);
+    $variation = ProductVariation::load(4);
+    $this->assertEquals($variation_sku, $variation->getSku());
+    $this->assertEquals('0', $variation->get('commerce_stock_always_in_stock')
+      ->getValue()[0]['value']);
   }
 
   /**
-   * Tests editing a product.
+   * Tests editing a product variation.
    */
   public function testEditProduct() {
-    $variation = $this->createEntity('commerce_product_variation', [
-      'type' => 'default',
-      'sku' => strtolower($this->randomMachineName()),
-    ]);
     $product = $this->createEntity('commerce_product', [
       'type' => 'default',
-      'variations' => [$variation],
+    ]);
+    $variation = $this->createEntity('commerce_product_variation', [
+      'type' => 'default',
+      'product_id' => $product->id(),
+      'sku' => strtolower($this->randomMachineName()),
     ]);
 
-    // Check the integrity of the edit form.
-    $this->drupalGet($product->toUrl('edit-form'));
-    $this->submitForm([], t('Edit'));
-    $this->assertSession()->fieldExists('variations[form][inline_entity_form][entities][0][form][commerce_stock_always_in_stock][value]');
-    $this->assertSession()->checkboxNotChecked('variations[form][inline_entity_form][entities][0][form][commerce_stock_always_in_stock][value]');
-    $title = $this->randomMachineName();
-    $store_ids = array_map(function ($store) {
-      return $store->id();
-    }, $this->stores);
-    $edit = [
-      'title[0][value]' => $title,
-    ];
-    foreach ($store_ids as $store_id) {
-      $edit['stores[target_id][value][' . $store_id . ']'] = $store_id;
-    }
+    $this->drupalGet($variation->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->fieldExists('sku[0][value]');
+    $this->assertSession()->buttonExists('Save');
 
-    $checkbox = $this->getSession()->getPage()->findField('variations[form][inline_entity_form][entities][0][form][commerce_stock_always_in_stock][value]');
+    $this->assertSession()
+      ->fieldExists('commerce_stock_always_in_stock[value]');
+    $this->assertSession()
+      ->checkboxNotChecked('commerce_stock_always_in_stock[value]');
+
+    $new_sku = strtolower($this->randomMachineName());
+    $new_price_amount = '1.11';
+    $variations_edit = [
+      'sku[0][value]' => $new_sku,
+      'price[0][number]' => $new_price_amount,
+      'status[value]' => 1,
+    ];
+    $checkbox = $this->getSession()
+      ->getPage()
+      ->findField('commerce_stock_always_in_stock[value]');
     if ($checkbox) {
       $checkbox->check();
     }
-    // Don't ask why, but the test don't pass, if we only set the stock field.
-    // I guess it's because it's a checkbox.
-    $variations_edit = [
-      'variations[form][inline_entity_form][entities][0][form][price][0][number]' => '11.11',
-    ];
+    $this->submitForm($variations_edit, 'Save');
 
-    $this->submitForm($variations_edit, 'Update variation');
-    $this->submitForm($edit, 'Save');
-
-    \Drupal::service('entity_type.manager')->getStorage('commerce_product_variation')->resetCache([$variation->id()]);
+    \Drupal::service('entity_type.manager')
+      ->getStorage('commerce_product_variation')
+      ->resetCache([$variation->id()]);
     $variation = ProductVariation::load($variation->id());
-    $this->assertEquals(new Price('11.11', 'USD'), $variation->getPrice());
-    $this->assertEquals('1', $variation->get('commerce_stock_always_in_stock')->getValue()[0]['value']);
+    $this->assertEquals($variation->getSku(), $new_sku);
+    $this->assertEquals($variation->getPrice()->getNumber(), $new_price_amount);
+    $this->assertEquals('1', $variation->get('commerce_stock_always_in_stock')
+      ->getValue()[0]['value']);
   }
 
 }

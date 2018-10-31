@@ -65,12 +65,6 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
       'administer commerce_product_variation fields',
       'administer commerce_product_variation display',
       'access commerce_product overview',
-      'administer commerce stock location entities',
-      'administer commerce stock location types',
-      'add commerce stock location entities',
-      'delete commerce stock location entities',
-      'view commerce stock location entities',
-      'access commerce_product overview',
     ], parent::getAdministratorPermissions());
   }
 
@@ -79,6 +73,8 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
    */
   protected function setUp() {
     parent::setUp();
+
+    $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
 
     $this->stockServiceManager = $this->container->get('commerce_stock.service_manager');
 
