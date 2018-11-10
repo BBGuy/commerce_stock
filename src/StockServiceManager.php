@@ -122,7 +122,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
       $this->getContextDetails($entity);
     }
     catch (\Exception $e) {
-      //@todo log the exception?
+      // @todo log the exception?
       return FALSE;
     }
     return TRUE;
@@ -137,8 +137,8 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * @throws \Exception
    *   When the entity can't be purchased from the current store.
    *
-   * @see \Drupal\commerce_cart\Form\AddToCartForm::selectStore() for the
-   * original logic.
+   * @see \Drupal\commerce_cart\Form\AddToCartForm::selectStore()
+   *   Original logic comes from this function.
    *
    * @return \Drupal\commerce\Context
    *   The Stock service context.
@@ -166,6 +166,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
 
   /**
    * {@inheritdoc}
+   *
    * @todo code sniffer error here, can't have optional params first.
    */
   public function getTransactionLocation(Context $context = NULL, PurchasableEntityInterface $entity, $quantity) {
