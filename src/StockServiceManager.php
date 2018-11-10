@@ -3,8 +3,10 @@
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\commerce\Context;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * The stock service manager.
@@ -38,7 +40,6 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    */
   protected $currentStore;
 
-
   /**
    * The current user.
    *
@@ -51,11 +52,15 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
+   * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
+   *   The current store.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
+  public function __construct(ConfigFactoryInterface $config_factory, CurrentStoreInterface $current_store, AccountInterface $current_user) {
     $this->configFactory = $config_factory;
-    $this->currentStore = \Drupal::service('commerce_store.current_store')->getStore();
-    $this->currentUser = \Drupal::currentUser();
+    $this->currentStore = $current_store;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -106,57 +111,62 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
    * {@inheritdoc}
    */
   public function getContext(PurchasableEntityInterface $entity) {
-    $found = FALSE;
-    return $this->getContextDetails($entity, $found);
+    return $this->getContextDetails($entity);
   }
 
   /**
    * {@inheritdoc}
    */
   public function isValidContext(PurchasableEntityInterface $entity) {
-    $found = FALSE;
-    $this->getContextDetails($entity, $found);
-    return $found;
+    try {
+      $this->getContextDetails($entity);
+    }
+    catch (\Exception $e) {
+      //@todo log the exception?
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
    * Get context details.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchaseable entity.
-   * @param bool $found
-   *   Whether the store was found.
+   *   The purchasable entity.
+   *
+   * @throws \Exception
+   *   When the entity can't be purchased from the current store.
+   *
+   * @see \Drupal\commerce_cart\Form\AddToCartForm::selectStore() for the
+   * original logic.
    *
    * @return \Drupal\commerce\Context
    *   The Stock service context.
-   *
-   * @todo: Why is the found passed in?
    */
-  private function getContextDetails(PurchasableEntityInterface $entity, &$found) {
-    $store_to_use = $this->currentStore;
+  private function getContextDetails(PurchasableEntityInterface $entity) {
     // Make sure the current store is in the entity stores.
     $stores = $entity->getStores();
-    $found = FALSE;
-    if ($store_to_use) {
-      foreach ($stores as $store) {
-        if ($store->id() == $store_to_use->id()) {
-          $found = TRUE;
-          break;
-        }
+    if (count($stores) === 1) {
+      $store = reset($stores);
+    }
+    elseif (count($stores) === 0) {
+      // Malformed entity.
+      throw new \Exception('The given entity is not assigned to any store.');
+    }
+    else {
+      $store = $this->currentStore;
+      if (!in_array($store, $stores)) {
+        // Indicates that the site listings are not filtered properly.
+        throw new \Exception("The given entity can't be purchased from the current store.");
       }
     }
-    // If not.
-    if (!$found) {
-      if (!empty($stores)) {
-        // Get the first store the product is assigned to.
-        $store_to_use = array_shift($stores);
-      }
-    }
-    return new Context($this->currentUser, $store_to_use);
+
+    return new Context($this->currentUser, $store);
   }
 
   /**
    * {@inheritdoc}
+   * @todo code sniffer error here, can't have optional params first.
    */
   public function getTransactionLocation(Context $context = NULL, PurchasableEntityInterface $entity, $quantity) {
     $stock_config = $this->getService($entity)->getConfiguration();
@@ -255,11 +265,13 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * Gets the total stock level for a given purchasable entity.
    *
-   * @todo - we should make the methode more abscure as it does not suport
+   * @todo - we should make the method more obscure as it does not support
    * the context. Only useful for single store sites.
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity to get the stock level for.
+   *
+   * @throws \Exception
    *
    * @return int
    *   The stock level.

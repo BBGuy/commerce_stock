@@ -26,6 +26,8 @@ interface StockTransactionsInterface {
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity (most likely a product variation entity).
    *
+   * @throws \Exception
+   *
    * @return \Drupal\commerce\Context
    *   The context containing the customer & store.
    */
@@ -40,14 +42,14 @@ interface StockTransactionsInterface {
    *   The purchasable entity (most likely a product variation entity).
    *
    * @return bool
-   *   True if valid, False if not..
+   *   TRUE if valid, FALSE if not.
    */
   public function isValidContext(PurchasableEntityInterface $entity);
 
   /**
    * Get the location to be used for automatic stock allocation.
    *
-   * This is normaly done by calling the stock service
+   * This is normally done by calling the stock service
    * StockServiceConfigInterface getTransactionLocation() and is provided as a
    * util function.
    *
