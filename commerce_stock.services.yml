@@ -9,7 +9,7 @@ services:
     class: Drupal\commerce_stock\StockServiceManager
     tags:
       - { name: service_collector, tag: commerce_stock.stock_service, call: addService }
-    arguments: [ '@config.factory' ]
+    arguments: [ '@config.factory', '@commerce_store.current_store', '@current_user' ]
 
   commerce_stock.always_in_stock_service:
     class: Drupal\commerce_stock\AlwaysInStockService
