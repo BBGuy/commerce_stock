@@ -23,7 +23,9 @@ class StockServiceManagerTest extends CommerceStockKernelTestBase {
   public function setUp() {
     parent::setUp();
     $configFactory = $this->container->get('config.factory');
-    $this->stockServiceManager = new StockServiceManager($configFactory);
+    $currentStore = $this->container->get('commerce_store.current_store');
+    $this->user = $this->createUser();
+    $this->stockServiceManager = new StockServiceManager($configFactory, $currentStore, $this->user);
   }
 
   /**

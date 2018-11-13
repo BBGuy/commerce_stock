@@ -122,7 +122,6 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
       $this->getContextDetails($entity);
     }
     catch (\Exception $e) {
-      //@todo log the exception?
       return FALSE;
     }
     return TRUE;
