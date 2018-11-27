@@ -16,3 +16,6 @@ field.widget.settings.commerce_stock_level_simple:
     transaction_note:
       type: boolean
       label: 'Whether a transaction note should be captured by the widget'
+    context_fallback:
+      type: boolean
+      label: 'Whether the context fallback should be uses.'
