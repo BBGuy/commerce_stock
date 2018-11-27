@@ -10,26 +10,56 @@ use Drupal\Core\TypedData\TypedData;
 class StockLevelProcessor extends TypedData {
 
   /**
+   * Whether the stock level have already been computed or not.
+   *
+   * @var bool
+   */
+  protected $valueComputed = FALSE;
+
+  /**
    * Cached processed level.
    *
-   * @var int|null
+   * @var float|null
    */
-  protected $processed = NULL;
+  protected $processedLevel = NULL;
 
   /**
    * {@inheritdoc}
    */
   public function getValue() {
-    if ($this->processed !== NULL) {
-      return $this->processed;
-    }
-    $item = $this->getParent();
-    $entity = $item->getEntity();
+    $this->ensureComputedValue();
+    return $this->processedLevel;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setValue($value, $notify = TRUE) {
+    $this->processedLevel = $value;
+    // Make sure that subsequent getter calls do not try to compute the
+    // stock level again.
+    $this->valueComputed = TRUE;
+  }
+
+  /**
+   * Get the current stock level.
+   */
+  protected function computeValue() {
+    $entity = $this->getParent()->getEntity();
     /** @var \Drupal\commerce_stock\StockServiceManager $stockServiceManager */
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
     $level = $stockServiceManager->getStockLevel($entity);
-    $this->processed = $level;
-    return $level;
+    $this->processedLevel = $level;
+  }
+
+  /**
+   * Ensures that the stock level is only computed once.
+   */
+  protected function ensureComputedValue() {
+    if ($this->valueComputed === FALSE) {
+      $this->computeValue();
+      $this->valueComputed = TRUE;
+    }
   }
 
 }
