@@ -153,7 +153,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
       throw new \Exception('The given entity is not assigned to any store.');
     }
     else {
-      $store = $this->currentStore;
+      $store = $this->currentStore->getStore();
       if (!in_array($store, $stores)) {
         // Indicates that the site listings are not filtered properly.
         throw new \Exception("The given entity can't be purchased from the current store.");
