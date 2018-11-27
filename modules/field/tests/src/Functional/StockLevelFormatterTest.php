@@ -5,7 +5,7 @@ namespace Drupal\Tests\commerce_stock_field\Functional;
 /**
  * Provides tests for stock level field default formatter.
  *
- * @package Drupal\Tests\commerce_stock_field\Functional
+ * @group commerce_stock
  */
 class StockLevelFormatterTest extends StockLevelFieldTestBase {
 

@@ -7,6 +7,9 @@ use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\Tests\commerce_stock\Functional\StockBrowserTestBase;
 use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
 
+/**
+ * Provides base class for stock level field tests.
+ */
 abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
 
   use StockLevelFieldCreationTrait;

@@ -2,12 +2,19 @@
 
 namespace Drupal\Tests\commerce_stock_field\Functional;
 
-class StockLevelTest extends StockLevelFieldTestBase {
+/**
+ * Provides tests for the stock level widget.
+ *
+ * @group commerce_stock
+ */
+class StockLevelWidgetsTest extends StockLevelFieldTestBase {
 
   /**
-   * Provides tests for the stock level widget.
+   * Tests the commerce_stock_level_simple widget.
+   *
+   * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function testEditProductVariationForm() {
+  public function testWidgetsOnEditProductVariationForm() {
 
     $entity_type = "commerce_product_variation";
     $bundle = 'default';
