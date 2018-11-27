@@ -7,8 +7,6 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
 
@@ -125,7 +123,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
     Product::create([
       'type' => 'default',
       'variations' => [$variation],
-      'stores' => [$this->store]
+      'stores' => [$this->store],
     ])->save();
     $this->variation = $this->reloadEntity($variation);
 
