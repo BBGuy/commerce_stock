@@ -4,7 +4,6 @@ namespace Drupal\Tests\commerce_stock\Functional;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\commerce_store\StoreCreationTrait;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
@@ -14,7 +13,6 @@ use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
 
   use EntityReferenceTestTrait;
-  use StoreCreationTrait;
 
   /**
    * Modules to enable.
@@ -45,6 +43,13 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
    * @var \Drupal\commerce_product\Entity\ProductInterface
    */
   protected $product;
+
+  /**
+   * Array of product variations.
+   *
+   * @var \Drupal\commerce_product\Entity\ProductVariationInterface[]
+   */
+  protected $variations;
 
   /**
    * The stores to test against.
@@ -94,10 +99,11 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
       $variation->save();
       $variations[] = $variation;
     }
-    $variations = array_reverse($variations);
+    $this->variations = array_reverse($variations);
     $product = Product::create([
       'type' => 'default',
       'variations' => $variations,
+      'stores' => $this->stores,
     ]);
     $product->save();
     $this->product = $product;
