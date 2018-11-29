@@ -8,7 +8,7 @@ use Drupal\Tests\commerce_stock\Functional\StockBrowserTestBase;
 use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
 
 /**
- * Provides base class for stock level field tests.
+ * Provides a base class for stock level fields functional tests.
  */
 abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
 
@@ -64,7 +64,7 @@ abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
       'step' => 1,
       'transaction_note' => FALSE,
     ];
-    $this->createStockLevelField($entity_type, $bundle, 'commerce_stock_level_simple', [], [], $widget_settings);
+    $this->createStockLevelField($entity_type, $bundle, 'commerce_stock_level_simple_transaction', [], [], $widget_settings);
 
     // Varations needs a fresh load to load the new fields.
     $this->variation = $entityTypeManager = \Drupal::entityTypeManager()->getStorage($entity_type)->load($this->variations[2]->id());

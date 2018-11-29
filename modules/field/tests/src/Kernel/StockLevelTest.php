@@ -9,6 +9,7 @@ use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
 use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
+use Drupal\Tests\commerce_stock\Kernel\StockTransactionQueryTrait;
 
 /**
  * Ensure the stock level field works.
@@ -20,6 +21,7 @@ use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
 class StockLevelTest extends CommerceStockKernelTestBase {
 
   use StockLevelFieldCreationTrait;
+  use StockTransactionQueryTrait;
 
   /**
    * Modules to enable.
@@ -165,57 +167,41 @@ class StockLevelTest extends CommerceStockKernelTestBase {
   }
 
   /**
-   * Whether setting via simple entry system works and sets the absolute stock
-   * level.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * Whether a wrong value is throwing.
    */
-  public function testStockLevelSimpleEntry() {
-    $stubSimpleEntry = [
-      'stock' => [
-        'value' => 22,
-        'entry_system' => 'simple',
-      ],
-    ];
-    $this->variation->set('test_stock_level', $stubSimpleEntry);
-    $this->variation->save();
-    $this->assertEquals(22, $this->checker->getTotalStockLevel($this->variation, $this->locations));
+  public function testInvalidArgumentThrows() {
+    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->variation->set('test_stock_level', 'FAIL');
   }
 
   /**
-   * Whether setting via basic entry system works. Positiv value should increase
-   * stock level.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * Whether all data are correctly saved with the transaction.
    */
-  public function testStockLevelBasicEntryStockIn() {
-    $stubBasicEntry = [
-      'stock' => [
-        'adjustment' => 33,
-        'entry_system' => 'basic',
-      ],
-    ];
-    $this->variation->set('test_stock_level', $stubBasicEntry);
-    $this->variation->save();
-    $this->assertEquals(88, $this->checker->getTotalStockLevel($this->variation, $this->locations));
-  }
+  public function testTransactionData() {
 
-  /**
-   * Whether negative values via basic entry system works. Negative values
-   * should reduce the stock level.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   */
-  public function testStockLevelBasicEntryStockOut() {
-    $stubBasicEntry = [
-      'stock' => [
-        'adjustment' => -33,
-        'entry_system' => 'basic',
+    $test_note = $this->randomString();
+    $zone = 'TestZone';
+
+    $mock_widget_values = [
+      'adjustment' => '3.33',
+      'stock_transaction_note' => $test_note,
+      'user_id' => 7,
+      'unit_cost' => [
+        'amount' => 33,
+        'currency_code' => 'USD',
       ],
+      'zone' => $zone,
     ];
-    $this->variation->set('test_stock_level', $stubBasicEntry);
-    $this->variation->save();
-    $this->assertEquals(22, $this->checker->getTotalStockLevel($this->variation, $this->locations));
+
+    $this->variation->set('test_stock_level', $mock_widget_values);
+    $transaction = $this->getLastEntityTransaction($this->variation->id());
+    $data = unserialize($transaction->data);
+    $this->assertEquals($mock_widget_values['zone'], $transaction->location_zone);
+    $this->assertEquals($mock_widget_values['adjustment'], $transaction->qty);
+    $this->assertEquals($mock_widget_values['user_id'], $transaction->related_uid);
+    $this->assertEquals($mock_widget_values['unit_cost']['amount'], $transaction->unit_cost);
+    $this->assertEquals($mock_widget_values['unit_cost']['currency_code'], $transaction->currency_code);
+    $this->assertTrue($mock_widget_values['stock_transaction_note'], $data['message']);
   }
 
 }
