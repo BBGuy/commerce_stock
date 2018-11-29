@@ -9,6 +9,8 @@ use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Tests out of stock functionality.
+ *
+ * @group commerce_stock
  */
 class OutOfStockTest extends EnforcementBrowserTestBase {
 
