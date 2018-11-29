@@ -19,3 +19,31 @@ field.widget.settings.commerce_stock_level_simple:
     context_fallback:
       type: boolean
       label: 'Whether the context fallback should be uses.'
+
+field.widget.settings.commerce_stock_level_absolute:
+  type: mapping
+  label: 'Stock level field display format settings'
+  mapping:
+    step:
+      type: string
+      label: 'Step'
+    custom_transaction_note:
+      type: boolean
+      label: 'Whether a transaction note should be captured by the widget'
+    default_transaction_note:
+      type: text
+      label: 'The default transaction note'
+
+field.widget.settings.commerce_stock_level_simple_transaction:
+  type: mapping
+  label: 'Stock level field display format settings'
+  mapping:
+    step:
+      type: string
+      label: 'Step'
+    custom_transaction_note:
+      type: boolean
+      label: 'Whether a transaction note should be captured by the widget'
+    default_transaction_note:
+      type: text
+      label: 'The default transaction note'

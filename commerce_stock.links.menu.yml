@@ -1,6 +1,6 @@
 commerce_stock.configuration:
   title: 'Stock'
-  route_name: 'commerce_stock.configuration'
+  route_name: commerce_stock.configuration
   parent: 'commerce.configuration'
   weight: -5
 

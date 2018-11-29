@@ -15,28 +15,35 @@ use Drupal\Core\TypedData\DataDefinition;
  *   label = @Translation("Stock level"),
  *   module = "commerce_stock_field",
  *   description = @Translation("Stock level"),
- *   default_widget = "commerce_stock_level_simple",
- *   default_formatter = "commerce_stock_level_simple"
+ *   default_widget = "commerce_stock_level_simple_transaction",
+ *   default_formatter = "commerce_stock_level_simple",
+ *   cardinality = 1,
  * )
  */
 class StockLevel extends FieldItemBase {
 
   /**
    * {@inheritdoc}
+   *
+   * Originally we had to define a real db field, because cores implementation
+   * of computed fields was brittle. During development of the module, we
+   * found, that we can "misuse" this to provide the possibility to enter
+   * initial stock values for newly created product variations.
+   *
+   * Currently we use the column 'value' for exactly this one purpose. Don't get
+   * fooled by this. The calculation of the stock level is transaction based.
+   * The transactions have their own table.
    */
   public static function schema(
     FieldStorageDefinitionInterface $field_definition
   ) {
-    // We don't need storage but as computed fields are not properly implemented
-    // We will use a dummy column that should be ignored.
-    // @see https://www.drupal.org/node/2392845.
     return [
       'columns' => [
         'value' => [
           'type' => 'numeric',
           'size' => 'normal',
-          'precision' => 10,
-          'scale' => 2,
+          'precision' => 19,
+          'scale' => 4,
           'not null' => FALSE,
         ],
       ],
@@ -49,7 +56,6 @@ class StockLevel extends FieldItemBase {
   public static function propertyDefinitions(
     FieldStorageDefinitionInterface $field_definition
   ) {
-    // @todo What's the difference/utility between both fields?
     $properties['value'] = DataDefinition::create('float')
       ->setLabel(t('Available stock'));
     $properties['available_stock'] = DataDefinition::create('float')
@@ -71,20 +77,34 @@ class StockLevel extends FieldItemBase {
   }
 
   /**
+   * @inheritdoc
+   *
    * This updates the stock based on parameters set by the stock widget.
+   *
+   * For computed fields we didn't find a chance to trigger the transaction,
+   * other than in ::setValue(). ::postSave() is not called for computed fields.
+   *
+   * If you pass in a single value programmatically, note that we do not support
+   * the setting of a absolute stock levels here. We assume a stock adjustment
+   * if we get a singe value here. As usual a negative value decreases the
+   * stock level and a positive value increases the stock level.
+   *
+   * @throws \InvalidArgumentException
+   *   In case of a invalid stock level value.
    */
   public function setValue($values, $notify = TRUE) {
-    static $called = [];
+    // To prevent multiple stock transactions, we need to track the processing.
+    static $processed = [];
 
     // Supports absolute values being passed in directly, i.e.
     // programmatically.
     if (!is_array($values)) {
       $value = filter_var($values, FILTER_VALIDATE_FLOAT);
       if ($value) {
-        $values = ['stock' => ['value' => $value]];
+        $values = ['adjustment' => $value];
       }
       else {
-        return;
+        throw new \InvalidArgumentException('Values passed to the commerce stock level field must be floats');
       }
     }
 
@@ -93,33 +113,17 @@ class StockLevel extends FieldItemBase {
       if (empty($entity->id())) {
         return;
       }
-      // @todo Figure out why sometimes this is called twice.
-      if (isset($called[$entity->getEntityTypeId() . $entity->id()])) {
+      // This is essential to prevent triggering of multiple transactions.
+      if (isset($processed[$entity->getEntityTypeId() . $entity->id()])) {
         return;
       }
-      $called[$entity->getEntityTypeId() . $entity->id()] = TRUE;
-      $transaction_qty = 0;
+      $processed[$entity->getEntityTypeId() . $entity->id()] = TRUE;
+
       $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
+      $transaction_qty = empty($values['adjustment']) ? 0 : $values['adjustment'];
 
-      if (isset($values['stock'])) {
-        if (empty($values['stock']['entry_system'])) {
-          $transaction_qty = (int) $values['stock']['value'];
-        }
-        // Or supports a field widget entry system.
-        else {
-          switch ($values['stock']['entry_system']) {
-            case 'simple':
-              $new_level = $values['stock']['value'];
-              $level = $stockServiceManager->getStockLevel($entity);
-              $transaction_qty = $new_level - $level;
-              break;
-
-            case 'basic':
-              $transaction_qty = (int) $values['stock']['adjustment'];
-              break;
-          }
-        }
-      }
+      // Some basic validation and type coercion.
+      $transaction_qty = filter_var((float) ($transaction_qty), FILTER_VALIDATE_FLOAT);
 
       if ($transaction_qty) {
         $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
@@ -127,18 +131,25 @@ class StockLevel extends FieldItemBase {
         /** @var \Drupal\commerce_stock\StockLocationInterface $location */
         $location = $stockServiceManager->getTransactionLocation($stockServiceManager->getContext($entity), $entity, $transaction_qty);
         if (empty($location)) {
-          // This shouldnever get called as we should always have a location.
-          return;
+          // If we have no location, something isn't properly configured.
+          throw new \RuntimeException('The StockServiceManager didn\'t return a location. Did you setup stock correctly?');
         }
-        $zone = '';
+        $zone = empty($values['zone']) ? '' : $values['zone'];
         $unit_cost = NULL;
-        $currency_code = NULL;
-        // $unit_cost = $values['stock']['stocked_entity']->get('price')->getValue()[0]['number'];
-        // $currency_code = $values['stock']['stocked_entity']->get('price')->getValue()[0]['currency_code'];
-        // @ToDo Make this hardcoded note translatable or remove it at all.
-        $transaction_note = isset($values['stock']['stock_transaction_note']) ? $values['stock']['stock_transaction_note'] : 'stock level set or updated by field';
+        if (isset($values['unit_cost']['amount'])) {
+          $unit_cost = filter_var((float) ($values['unit_cost']['amount']), FILTER_VALIDATE_FLOAT);
+          $unit_cost ?: NULL;
+        };
+        $currency_code = empty($values['unit_cost']['currency_code']) ? NULL : $values['unit_cost']['currency_code'];
+        $transaction_note = empty($values['stock_transaction_note']) ? '' : $values['stock_transaction_note'];
         $metadata = ['data' => ['message' => $transaction_note]];
-        $stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, $unit_cost, $currency_code, $transaction_type, $metadata);
+        if (!empty($values['user_id'])) {
+          $metadata['related_uid'] = $values['user_id'];
+        }
+        else {
+          $metadata['related_uid'] = \Drupal::currentUser()->id();
+        }
+        $stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, (float) $unit_cost, $currency_code, $transaction_type, $metadata);
       }
     }
   }
