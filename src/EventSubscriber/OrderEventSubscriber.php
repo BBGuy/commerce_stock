@@ -152,10 +152,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'draft',
           'canceled',
         ])) {
-          $entity = $item->getPurchasedEntity();
-          if (!$entity) {
+          if (!$item->hasPurchasedEntity()) {
             continue;
           }
+          $entity = $item->getPurchasedEntity();
           $service = $this->stockServiceManager->getService($entity);
           $checker = $service->getStockChecker();
           // If always in stock then no need to create a transaction.
