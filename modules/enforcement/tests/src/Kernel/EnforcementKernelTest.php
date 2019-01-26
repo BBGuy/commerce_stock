@@ -12,14 +12,13 @@ use Drupal\field\Entity\FieldStorageConfig;
  *
  * @group commerce_stock
  */
-class OutOfStockTest extends EnforcementBrowserTestBase {
+class EnforcementKernelTest extends EnforcementBrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
-    $this->drupalLogin($this->adminUser);
     $config = \Drupal::configFactory()
       ->getEditable('commerce_stock.service_manager');
     $config->set('default_service_id', 'local_stock');
@@ -29,20 +28,22 @@ class OutOfStockTest extends EnforcementBrowserTestBase {
   }
 
   /**
-   * Test that the add to cart button is displayed.
+   * Test the get stock level function.
    */
-  public function testAvailableStock() {
-    $this->drupalGet('product/' . $this->product->id());
-    $this->assertSession()->buttonExists('Add to cart');
-  }
+  public function testGetStockLevel() {
+    $context = commerce_stock_enforcement_get_context($this->variation);
 
-  /**
-   * Test that the out of stock button is displayed.
-   */
-  public function testOutOfStock() {
-    $this->stockServiceManager->createTransaction($this->variation, $this->locations[1]->getId(), '', -10, 12.12, 'USD', StockTransactionsInterface::STOCK_IN, []);
-    $this->drupalGet('product/' . $this->product->id());
-    $this->assertSession()->buttonExists('Out of stock');
+    $this->stockServiceManager->createTransaction($this->variation, $this->locations[1]->getId(), '', 5, 4.20, 'USD', StockTransactionsInterface::STOCK_IN, []);
+    $stock_level = commerce_stock_enforcement_get_stock_level($this->variation, $context);
+    $this->assertEquals(15, $stock_level);
+
+    $this->stockServiceManager->createTransaction($this->variation, $this->locations[1]->getId(), '', -12, 4.20, 'USD', StockTransactionsInterface::STOCK_OUT, []);
+    $stock_level = commerce_stock_enforcement_get_stock_level($this->variation, $context);
+    $this->assertEquals(3, $stock_level);
+
+    $this->stockServiceManager->createTransaction($this->variation, $this->locations[1]->getId(), '', -5, 4.20, 'USD', StockTransactionsInterface::STOCK_OUT, []);
+    $stock_level = commerce_stock_enforcement_get_stock_level($this->variation, $context);
+    $this->assertEquals(-2, $stock_level);
   }
 
   /**
@@ -79,7 +80,7 @@ class OutOfStockTest extends EnforcementBrowserTestBase {
       'sku' => strtolower($this->randomMachineName()),
       'status' => 1,
       'price' => [
-        'number' => '12.12',
+        'number' => '4.20',
         'currency_code' => 'USD',
       ],
     ]);
@@ -90,7 +91,7 @@ class OutOfStockTest extends EnforcementBrowserTestBase {
     $context = new Context($this->adminUser, $this->store);
     $this->locations = $stockServiceConfiguration->getAvailabilityLocations($context, $this->variation);
     // Set initial Stock level.
-    $this->stockServiceManager->createTransaction($this->variation, $this->locations[1]->getId(), '', 1, 12.12, 'USD', StockTransactionsInterface::STOCK_IN, []);
+    $this->stockServiceManager->createTransaction($this->variation, $this->locations[1]->getId(), '', 10, 4.20, 'USD', StockTransactionsInterface::STOCK_IN, []);
   }
 
 }
