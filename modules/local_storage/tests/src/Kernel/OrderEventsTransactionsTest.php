@@ -4,10 +4,15 @@ namespace Drupal\Tests\commerce_stock_local\Kernel;
 
 use Drupal\commerce\Context;
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_order\Entity\OrderType;
+use Drupal\commerce_order\Event\OrderEvent;
+use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
+use Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber;
+use Drupal\commerce_stock\StockServiceManager;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
 use Drupal\profile\Entity\Profile;
@@ -220,9 +225,20 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     ]);
     $order->save();
 
+    $this->order = $this->reloadEntity($order);
+
     /** @var \Drupal\commerce_order\OrderItemStorageInterface $order_item_storage */
     $order_item_storage = $this->container->get('entity_type.manager')
       ->getStorage('commerce_order_item');
+
+    $order_item2 = OrderItem::create([
+      'type'       => 'default',
+      'quantity'   => 2,
+      'unit_price' => new Price('12.00', 'USD'),
+    ]);
+    $order_item2->save();
+    $order->addItem($order_item2);
+    $order->save();
 
     // Add order item.
     $order_item1 = $order_item_storage->createFromPurchasableEntity($this->variation);
@@ -524,6 +540,26 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->assertEquals('order deleted', unserialize($result[0]->data)['message']);
     $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
     $this->assertEquals(11, $this->checker2->getTotalStockLevel($this->variation2, $this->locations2));
+  }
+
+  /**
+   * Its absolutly possible to get orders from an order event that doesn't hold
+   * a $order->original order object. Here we test, whether our event subscriber fail
+   * graceful in such cases.
+   */
+  public function testFailGracefulIfNoPurchasableEntity() {
+      $prophecy = $this->prophesize(OrderEvent::class);
+
+      $order = $this->order;
+      $order->original = null;
+
+      $prophecy->getOrder()->willReturn($order);
+      $event = $prophecy->reveal();
+
+      $stockServiceManagerStub = $this->prophesize(StockServiceManager::class);
+
+      $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal());
+      $sut->onOrderUpdate($event);
   }
 
 }
