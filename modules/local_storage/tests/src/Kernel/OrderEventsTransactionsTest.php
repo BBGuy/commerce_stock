@@ -237,14 +237,13 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
       'unit_price' => new Price('12.00', 'USD'),
     ]);
     $order_item2->save();
-    $order->addItem($order_item2);
-    $order->save();
 
     // Add order item.
     $order_item1 = $order_item_storage->createFromPurchasableEntity($this->variation);
     $order_item1->save();
     $order_item1 = $this->reloadEntity($order_item1);
     $order->addItem($order_item1);
+    $order->addItem($order_item2);
     $order->save();
     $this->order = $this->reloadEntity($order);
   }
@@ -548,18 +547,18 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
    * graceful in such cases.
    */
   public function testFailGracefulIfNoPurchasableEntity() {
-      $prophecy = $this->prophesize(OrderEvent::class);
+    $prophecy = $this->prophesize(OrderEvent::class);
 
-      $order = $this->order;
-      $order->original = null;
+    $order = $this->order;
+    $order->original = NULL;
 
-      $prophecy->getOrder()->willReturn($order);
-      $event = $prophecy->reveal();
+    $prophecy->getOrder()->willReturn($order);
+    $event = $prophecy->reveal();
 
-      $stockServiceManagerStub = $this->prophesize(StockServiceManager::class);
+    $stockServiceManagerStub = $this->prophesize(StockServiceManager::class);
 
-      $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal());
-      $sut->onOrderUpdate($event);
+    $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal());
+    $sut->onOrderUpdate($event);
   }
 
 }

@@ -135,6 +135,17 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public function onOrderUpdate(OrderEvent $event) {
     $order = $event->getOrder();
     $original_order = $order->original;
+
+    // In certain cases we have no original order object. If loading from
+    // storage fails, we bailout.
+    // @ToDo Consider how this may change due to: ToDo https://www.drupal.org/project/drupal/issues/2839195
+    if (!$original_order) {
+      $original_order = \Drupal::entityTypeManager()->getStorage('commerce_order')->loadUnchanged($order->id());
+      if (!$original_order) {
+        return;
+      }
+    }
+
     foreach ($order->getItems() as $item) {
       if (!$original_order->hasItem($item)) {
         if ($order && !in_array($order->getState()->value, [
