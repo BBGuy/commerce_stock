@@ -132,7 +132,7 @@ class StockLevel extends FieldItemBase {
         $location = $stockServiceManager->getTransactionLocation($stockServiceManager->getContext($entity), $entity, $transaction_qty);
         if (empty($location)) {
           // If we have no location, something isn't properly configured.
-          throw new \RuntimeException('The StockServiceManager didn\'t return a location. Did you setup stock correctly?');
+          throw new \RuntimeException('The StockServiceManager didn\'t return a location. Make sure your store is set up correctly?');
         }
         $zone = empty($values['zone']) ? '' : $values['zone'];
         $unit_cost = NULL;
