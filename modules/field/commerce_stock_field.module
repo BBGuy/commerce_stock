@@ -4,3 +4,18 @@
  * @file
  * Commerce stock field module file.
  */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ *
+ * Removes the required  property form from the field settings page.
+ */
+function commerce_stock_field_form_field_config_edit_form_alter(&$form, FormStateInterface $form_state) {
+  $field = $form_state->getFormObject()->getEntity();
+  if ($field->getType() == 'commerce_stock_level') {
+    $form['required']['#default_value'] = FALSE;
+    $form['required']['#access'] = FALSE;
+  }
+}
