@@ -18,7 +18,6 @@ interface StockTransactionsInterface {
   const MOVEMENT_FROM = 7;
   const MOVEMENT_TO = 8;
 
-
   /**
    * Get the location to be used for automatic stock allocation.
    *

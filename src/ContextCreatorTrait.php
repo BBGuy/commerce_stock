@@ -1,16 +1,13 @@
 <?php
-/**
- * This file is part of the commerce_contrib package.
- *
- * @author Olaf Karsten <olaf.karsten@beckerundkarsten.de>
- */
 
 namespace Drupal\commerce_stock;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_store\CurrentStore;
 
+/**
+ * Provides trait to create a commerce context object from a purchasable entity.
+ */
 trait ContextCreatorTrait {
 
   /**
@@ -56,7 +53,7 @@ trait ContextCreatorTrait {
       throw new \Exception('The given entity is not assigned to any store.');
     }
     else {
-      /** @var CurrentStore $currentStore */
+      /** @var \Drupal\commerce_store\CurrentStore $currentStore */
       $currentStore = \Drupal::service('commerce_store.current_store');
       $store = $currentStore->getStore();
       if (!in_array($store, $stores)) {
