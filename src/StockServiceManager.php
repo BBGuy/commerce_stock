@@ -5,7 +5,6 @@ namespace Drupal\commerce_stock;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\commerce\Context;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -107,16 +106,6 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     }
 
     return $ids;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo code sniffer error here, can't have optional params first.
-   */
-  public function getTransactionLocation(Context $context = NULL, PurchasableEntityInterface $entity, $quantity) {
-    $stock_config = $this->getService($entity)->getConfiguration();
-    return $stock_config->getTransactionLocation($context, $entity, $quantity);
   }
 
   /**

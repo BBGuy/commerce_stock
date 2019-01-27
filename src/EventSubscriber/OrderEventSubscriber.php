@@ -77,7 +77,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         }
         $quantity = -1 * $item->getQuantity();
         $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+        $location = $service->getConfiguration()->getTransactionLocation($context, $entity, $quantity);
         $transaction_type = StockTransactionsInterface::STOCK_SALE;
         $metadata = [
           'related_oid' => $order->id(),
@@ -163,7 +163,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
             return;
           }
           $context = new Context($order->getCustomer(), $order->getStore());
-          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
+          $location = $service->getConfiguration()->getTransactionLocation($context, $entity, $item->getQuantity());
           $transaction_type = StockTransactionsInterface::STOCK_SALE;
           $quantity = -1 * $item->getQuantity();
           $metadata = [
@@ -204,7 +204,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         }
         $quantity = $item->getQuantity();
         $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+        $location = $service->getConfiguration()->getTransactionLocation($context, $entity, $quantity);
         $transaction_type = StockTransactionsInterface::STOCK_RETURN;
         $metadata = [
           'related_oid' => $order->id(),
@@ -246,7 +246,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         }
         $quantity = $item->getQuantity();
         $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+        $location = $service->getConfiguration()->getTransactionLocation($context, $entity, $quantity);
         $transaction_type = StockTransactionsInterface::STOCK_RETURN;
         $metadata = [
           'related_oid' => $order->id(),
@@ -285,7 +285,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           }
           $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
           $context = new Context($order->getCustomer(), $order->getStore());
-          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $diff);
+          $location = $service->getConfiguration()->getTransactionLocation($context, $entity, $diff);
           $metadata = [
             'related_oid' => $order->id(),
             'related_uid' => $order->getCustomerId(),
@@ -313,6 +313,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if (!$entity) {
         return;
       }
+      /** @var \Drupal\commerce_stock\StockServiceInterface $service */
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
       if ($checker->getIsStockManaged($entity)) {
@@ -321,7 +322,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           return;
         }
         $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
+        $location = $service->getConfiguration()->getTransactionLocation($context, $entity, $item->getQuantity());
         $transaction_type = StockTransactionsInterface::STOCK_RETURN;
         $metadata = [
           'related_oid' => $order->id(),
