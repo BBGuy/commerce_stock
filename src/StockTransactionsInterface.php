@@ -18,33 +18,6 @@ interface StockTransactionsInterface {
   const MOVEMENT_FROM = 7;
   const MOVEMENT_TO = 8;
 
-  /**
-   * Returns the active context.
-   *
-   * This is to support UI calls.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity (most likely a product variation entity).
-   *
-   * @throws \Exception
-   *
-   * @return \Drupal\commerce\Context
-   *   The context containing the customer & store.
-   */
-  public function getContext(PurchasableEntityInterface $entity);
-
-  /**
-   * Checks that the context returned is valid for $entity.
-   *
-   * This is to support UI calls.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity (most likely a product variation entity).
-   *
-   * @return bool
-   *   TRUE if valid, FALSE if not.
-   */
-  public function isValidContext(PurchasableEntityInterface $entity);
 
   /**
    * Get the location to be used for automatic stock allocation.

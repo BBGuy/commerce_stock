@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldWidget;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_stock\ContextCreatorTrait;
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -29,6 +30,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPluginInterface {
+
+  use ContextCreatorTrait;
 
   /**
    * The Stock Service Manager.
@@ -138,10 +141,11 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
       return [];
     }
 
-    // Get the Stock service manager.
-    $stockServiceManager = $this->stockServiceManager;
     // If not a valid context.
-    if (!$stockServiceManager->isValidContext($entity)) {
+    try {
+      $this->getContext($entity);
+    }
+    catch (\Exception $e) {
       // If context fallback is not set.
       if (!$this->getSetting('context_fallback')) {
         // Return an empty form.

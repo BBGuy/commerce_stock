@@ -197,10 +197,6 @@ abstract class StockLevelWidgetBase extends WidgetBase implements ContainerFacto
       // We can not work with entities before they are fully created.
       return [];
     }
-    // If not a valid context.
-    if (!$this->stockServiceManager->isValidContext($entity)) {
-      return [];
-    }
 
     // Get the available stock level.
     $level = $field->available_stock;
