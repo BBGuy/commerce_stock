@@ -191,57 +191,39 @@ abstract class StockLevelWidgetBase extends WidgetBase implements ContainerFacto
       // Return an empty array if service is not supported.
       return [];
     }
-    // @ToDo Consider how this may change
-    // @see https://www.drupal.org/project/commerce_stock/issues/2949569
-    if ($entity->isNew()) {
-      // We can not work with entities before they are fully created.
-      return [];
-    }
     // If not a valid context.
     if (!$this->stockServiceManager->isValidContext($entity)) {
       return [];
     }
 
     // Get the available stock level.
-    $level = $field->available_stock;
+    $level = $field->get('available_stock')->getValue();
 
-    if (empty($entity->id())) {
-      // We don't have a product ID yet.
-      $element['#description'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'div',
-        '#value' => $this->t('In order to set the stock level you need to save the product first!'),
-      ];
-      $element['#disabled'] = TRUE;
-    }
-    else {
-      $element['#type'] = 'fieldgroup';
-      $element['#attributes'] = ['class' => ['stock-level-field']];
+    $element['#type'] = 'fieldgroup';
+    $element['#attributes'] = ['class' => ['stock-level-field']];
 
-      $element['stocked_entity'] = [
-        '#type' => 'value',
-        '#value' => $entity,
-      ];
-      $element['adjustment'] = [
-        '#title' => $this->t('Stock level adjustment'),
-        '#description' => $this->t('A positive number will add stock, a negative number will remove stock. Current stock level: @stock_level', ['@stock_level' => $level]),
-        '#type' => 'number',
-        '#step' => $this->getSetting('step'),
-        '#default_value' => 0,
-        '#size' => 7,
-      ];
-      $custom_note_allowed = $this->getSetting('custom_transaction_note');
-      $element['stock_transaction_note'] = [
-        '#title' => $this->t('Transaction note'),
-        '#description' => $custom_note_allowed ? $this->t('Add a note to this transaction.') : $this->t('Default note for transactions. Configurable in the field widget settings.'),
-        '#type' => 'textfield',
-        '#default_value' => $this->getSetting('default_transaction_note'),
-        '#size' => 50,
-        '#maxlength' => 255,
-        '#disabled' => !$custom_note_allowed,
-      ];
-
-    }
+    $element['stocked_entity'] = [
+      '#type' => 'value',
+      '#value' => $entity,
+    ];
+    $element['adjustment'] = [
+      '#title' => $this->t('Stock level adjustment'),
+      '#description' => $this->t('A positive number will add stock, a negative number will remove stock. Current stock level: @stock_level', ['@stock_level' => $level]),
+      '#type' => 'number',
+      '#step' => $this->getSetting('step'),
+      '#default_value' => 0,
+      '#size' => 7,
+    ];
+    $custom_note_allowed = $this->getSetting('custom_transaction_note');
+    $element['stock_transaction_note'] = [
+      '#title' => $this->t('Transaction note'),
+      '#description' => $custom_note_allowed ? $this->t('Add a note to this transaction.') : $this->t('Default note for transactions. Configurable in the field widget settings.'),
+      '#type' => 'textfield',
+      '#default_value' => $this->getSetting('default_transaction_note'),
+      '#size' => 50,
+      '#maxlength' => 255,
+      '#disabled' => !$custom_note_allowed,
+    ];
 
     return $element;
   }

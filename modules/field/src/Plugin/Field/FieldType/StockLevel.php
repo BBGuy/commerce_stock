@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldType;
 
 use Drupal\commerce_stock\StockTransactionsInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
@@ -93,9 +94,6 @@ class StockLevel extends FieldItemBase {
    *   In case of a invalid stock level value.
    */
   public function setValue($values, $notify = TRUE) {
-    // To prevent multiple stock transactions, we need to track the processing.
-    static $processed = [];
-
     // Supports absolute values being passed in directly, i.e.
     // programmatically.
     if (!is_array($values)) {
@@ -108,49 +106,76 @@ class StockLevel extends FieldItemBase {
       }
     }
 
-    if (!empty($this->getEntity())) {
-      $entity = $this->getEntity();
-      if (empty($entity->id())) {
-        return;
-      }
-      // This is essential to prevent triggering of multiple transactions.
-      if (isset($processed[$entity->getEntityTypeId() . $entity->id()])) {
-        return;
-      }
-      $processed[$entity->getEntityTypeId() . $entity->id()] = TRUE;
+    // Set the value so it is not recognized as empty by isEmpty() and
+    // postSave() is called.
+    if (isset($values['value'])) {
+      $values['value'] = $values['value'];
+    }
+    elseif (isset($values['adjustment'])) {
+      $values['value'] = $values['adjustment'];
+    }
+    else {
+      $values['value'] = 0;
+    }
+    parent::setValue($values, $notify);
+  }
 
-      $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
-      $transaction_qty = empty($values['adjustment']) ? 0 : $values['adjustment'];
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave($update) {
+    // Retrieve entity and saved stock.
+    $entity = $this->getEntity();
+    $values = $entity->{$this->getFieldDefinition()->getName()}->getValue();
+    $values = reset($values);
+    // Create transaction.
+    $this->createTransaction($entity, $values);
+  }
 
-      // Some basic validation and type coercion.
-      $transaction_qty = filter_var((float) ($transaction_qty), FILTER_VALIDATE_FLOAT);
+  /**
+   * Internal method to create transactions.
+   */
+  private function createTransaction(EntityInterface $entity, array $values) {
+    // To prevent multiple stock transactions, we need to track the processing.
+    static $processed = [];
 
-      if ($transaction_qty) {
-        $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
-        // @todo Add zone and location to form.
-        /** @var \Drupal\commerce_stock\StockLocationInterface $location */
-        $location = $stockServiceManager->getTransactionLocation($stockServiceManager->getContext($entity), $entity, $transaction_qty);
-        if (empty($location)) {
-          // If we have no location, something isn't properly configured.
-          throw new \RuntimeException('The StockServiceManager didn\'t return a location. Make sure your store is set up correctly?');
-        }
-        $zone = empty($values['zone']) ? '' : $values['zone'];
-        $unit_cost = NULL;
-        if (isset($values['unit_cost']['amount'])) {
-          $unit_cost = filter_var((float) ($values['unit_cost']['amount']), FILTER_VALIDATE_FLOAT);
-          $unit_cost ?: NULL;
-        };
-        $currency_code = empty($values['unit_cost']['currency_code']) ? NULL : $values['unit_cost']['currency_code'];
-        $transaction_note = empty($values['stock_transaction_note']) ? '' : $values['stock_transaction_note'];
-        $metadata = ['data' => ['message' => $transaction_note]];
-        if (!empty($values['user_id'])) {
-          $metadata['related_uid'] = $values['user_id'];
-        }
-        else {
-          $metadata['related_uid'] = \Drupal::currentUser()->id();
-        }
-        $stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, (float) $unit_cost, $currency_code, $transaction_type, $metadata);
+    // This is essential to prevent triggering of multiple transactions.
+    if (isset($processed[$entity->getEntityTypeId() . $entity->id()])) {
+      return;
+    }
+    $processed[$entity->getEntityTypeId() . $entity->id()] = TRUE;
+
+    $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
+    $transaction_qty = empty($values['adjustment']) ? 0 : $values['adjustment'];
+
+    // Some basic validation and type coercion.
+    $transaction_qty = filter_var((float) ($transaction_qty), FILTER_VALIDATE_FLOAT);
+
+    if ($transaction_qty) {
+      $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
+      // @todo Add zone and location to form.
+      /** @var \Drupal\commerce_stock\StockLocationInterface $location */
+      $location = $stockServiceManager->getTransactionLocation($stockServiceManager->getContext($entity), $entity, $transaction_qty);
+      if (empty($location)) {
+        // If we have no location, something isn't properly configured.
+        throw new \RuntimeException('The StockServiceManager didn\'t return a location. Make sure your store is set up correctly?');
       }
+      $zone = empty($values['zone']) ? '' : $values['zone'];
+      $unit_cost = NULL;
+      if (isset($values['unit_cost']['amount'])) {
+        $unit_cost = filter_var((float) ($values['unit_cost']['amount']), FILTER_VALIDATE_FLOAT);
+        $unit_cost ?: NULL;
+      };
+      $currency_code = empty($values['unit_cost']['currency_code']) ? NULL : $values['unit_cost']['currency_code'];
+      $transaction_note = empty($values['stock_transaction_note']) ? '' : $values['stock_transaction_note'];
+      $metadata = ['data' => ['message' => $transaction_note]];
+      if (!empty($values['user_id'])) {
+        $metadata['related_uid'] = $values['user_id'];
+      }
+      else {
+        $metadata['related_uid'] = \Drupal::currentUser()->id();
+      }
+      $stockServiceManager->createTransaction($entity, $location->getId(), $zone, $transaction_qty, (float) $unit_cost, $currency_code, $transaction_type, $metadata);
     }
   }
 

@@ -35,6 +35,9 @@ class StockLevelProcessor extends TypedData {
    * {@inheritdoc}
    */
   public function setValue($value, $notify = TRUE) {
+    if (is_null($value)) {
+      return;
+    }
     $this->processedLevel = $value;
     // Make sure that subsequent getter calls do not try to compute the
     // stock level again.
