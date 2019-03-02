@@ -8,6 +8,8 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 
 /**
  * The second part of a two part create stock transaction form.
@@ -44,11 +46,14 @@ class StockTransactions2 extends FormBase {
    *   The stock service manager.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(ProductVariationStorage $productVariationStorage, StockServiceManager $stockServiceManager, Request $request) {
+  public function __construct(ProductVariationStorage $productVariationStorage, StockServiceManager $stockServiceManager, Request $request, MessengerInterface $messenger) {
     $this->productVariationStorage = $productVariationStorage;
     $this->stockServiceManager = $stockServiceManager;
     $this->request = $request;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -58,7 +63,8 @@ class StockTransactions2 extends FormBase {
     return new static(
       $container->get('entity_type.manager')->getStorage('commerce_product_variation'),
       $container->get('commerce_stock.service_manager'),
-      $container->get('request_stack')->getCurrentRequest()
+      $container->get('request_stack')->getCurrentRequest(),
+      $container->get('messenger')
     );
   }
 
@@ -216,21 +222,35 @@ class StockTransactions2 extends FormBase {
 
     if ($transaction_type == 'receiveStock') {
       $this->stockServiceManager->receiveStock($product_variation, $source_location, $source_zone, $qty, NULL, $currency_code = NULL, $transaction_note);
+      $this->messenger->addMessage($this->t('@qty has been added to "@variation_title" using a "Received Stock" transaction.', ['@qty' => $qty, '@variation_title' => $product_variation->getTitle()]));
     }
     elseif ($transaction_type == 'sellStock') {
-      $order_id = $form_state->getValue('order');;
-      $user_id = $form_state->getValue('user');;
-      $this->stockServiceManager->sellStock($product_variation, $source_location, $source_zone, $qty, NULL, $currency_code = NULL, $order_id, $user_id, $transaction_note);
+      $order_id = $form_state->getValue('order');
+      $user_id = $form_state->getValue('user');
+      $this->messenger->addMessage($this->t('@qty has been removed from "@variation_title" using a "Sell Stock" transaction.', ['@qty' => $qty, '@variation_title' => $product_variation->getTitle()]));
     }
     elseif ($transaction_type == 'returnStock') {
-      $order_id = $form_state->getValue('order');;
-      $user_id = $form_state->getValue('user');;
+      $order_id = $form_state->getValue('order');
+      $user_id = $form_state->getValue('user');
       $this->stockServiceManager->returnStock($product_variation, $source_location, $source_zone, $qty, NULL, $currency_code = NULL, $order_id, $user_id, $transaction_note);
+      $this->messenger->addMessage($this->t('@qty has been added to "@variation_title" using a "Return Stock" transaction.', ['@qty' => $qty, '@variation_title' => $product_variation->getTitle()]));
     }
     elseif ($transaction_type == 'moveStock') {
       $target_location = $form_state->getValue('target_location');
       $target_zone = $form_state->getValue('target_zone');
       $this->stockServiceManager->moveStock($product_variation, $source_location, $target_location, $source_zone, $target_zone, $qty, NULL, $currency_code = NULL, $transaction_note);
+
+      // Display notification for end users.
+      $target_location_entity = \Drupal::entityTypeManager()->getStorage('commerce_stock_location')->load($target_location);
+      $target_location_name = $target_location_entity->getName();
+      $source_location_entity = \Drupal::entityTypeManager()->getStorage('commerce_stock_location')->load($source_location);
+      $source_location_name = $source_location_entity->getName();
+      $this->messenger->addMessage($this->t('@qty has been moved from "@source_location" to "@target_location" for "@variation_title" using a "Move Stock" transaction.', [
+        '@qty' => $qty,
+        '@variation_title' => $product_variation->getTitle(),
+        '@source_location' => $source_location_name,
+        '@target_location' => $target_location_name,
+      ]));
     }
   }
 
