@@ -59,12 +59,18 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $this->assertSession()
       ->fieldValueEquals($this->fieldName . '[0][stock_transaction_note]', $default_note);
 
+    $this->saveHtmlOutput();
+
     $adjustment = 6;
-    $edit = [
+    $new_price_amount = '1.11';
+    $variations_edit = [
+      'price[0][number]' => $new_price_amount,
       $this->fieldName . '[0][adjustment]' => $adjustment,
     ];
-    $this->submitForm($edit, 'Save');
+    $this->submitForm($variations_edit, 'Save');
+
     $this->assertSession()->statusCodeEquals(200);
+    $this->saveHtmlOutput();
 
     $transaction = $this->getLastEntityTransaction($this->variation->id());
     $data = unserialize($transaction->data);
@@ -123,6 +129,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $this->configureFormDisplay($widget_id, $widget_settings, $entity_type, $bundle);
     $this->drupalGet($this->variation->toUrl('edit-form'));
     $this->assertSession()->statusCodeEquals(200);
+    $this->saveHtmlOutput();
     $this->assertSession()->fieldExists($this->fieldName . '[0][stock_level]');
     $this->assertSession()
       ->fieldNotExists($this->fieldName . '[0][adjustment]');
@@ -134,10 +141,13 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
       ->fieldValueEquals($this->fieldName . '[0][stock_transaction_note]', $default_note);
 
     $stock_level = 15;
-    $edit = [
+    $new_price_amount = '1.11';
+    $variations_edit = [
+      'price[0][number]' => $new_price_amount,
       $this->fieldName . '[0][stock_level]' => $stock_level,
     ];
-    $this->submitForm($edit, 'Save');
+    $this->saveHtmlOutput();
+    $this->submitForm($variations_edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
 
     $transaction = $this->getLastEntityTransaction($this->variation->id());
@@ -150,15 +160,19 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
 
     // If the absolute stock level is the same as before, it shouldn't trigger
     // any transaction.
+    $this->drupalGet($this->variation->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
     $stock_level = 15;
-    $edit = [
+    $variations_edit = [
       $this->fieldName . '[0][stock_level]' => $stock_level,
     ];
-    $this->submitForm($edit, 'Save');
+    $this->submitForm($variations_edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
     $transaction2 = $this->getLastEntityTransaction($this->variation->id());
     $this->assertEquals($transaction->id, $transaction2->id);
 
+    $this->drupalGet($this->variation->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
     // Empty absolute stock_level shoudn't trigger any transaction.
     $stock_level = '';
     $edit = [
@@ -195,6 +209,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     ];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
+    $this->saveHtmlOutput();
 
     $transaction = $this->getLastEntityTransaction($this->variation->id());
 
@@ -204,6 +219,8 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $this->assertTrue('CustumNote', $data['message']);
 
     // Testing that zero value, results in a transaction.
+    $this->drupalGet($this->variation->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
     $stock_level = 0;
     $edit = [
       $this->fieldName . '[0][stock_level]' => $stock_level,
@@ -257,11 +274,14 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $this->assertSession()->fieldExists($this->fieldName . '[0][adjustment]');
 
     $adjustment = 5;
-    $edit = [
+    $new_price_amount = '1.11';
+    $variations_edit = [
+      'price[0][number]' => $new_price_amount,
       $this->fieldName . '[0][adjustment]' => $adjustment,
     ];
-    $this->submitForm($edit, 'Save');
+    $this->submitForm($variations_edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
+    $this->saveHtmlOutput();
 
     $transaction = $this->getLastEntityTransaction($this->variation->id());
     $this->assertEquals($adjustment, $transaction->qty);
