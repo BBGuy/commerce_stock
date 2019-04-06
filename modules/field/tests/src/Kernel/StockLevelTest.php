@@ -194,6 +194,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
     ];
 
     $this->variation->set('test_stock_level', $mock_widget_values);
+    $this->variation->save();
     $transaction = $this->getLastEntityTransaction($this->variation->id());
     $data = unserialize($transaction->data);
     $this->assertEquals($mock_widget_values['zone'], $transaction->location_zone);
