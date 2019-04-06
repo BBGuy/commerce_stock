@@ -15,11 +15,6 @@ abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
   use StockLevelFieldCreationTrait;
 
   /**
-   * @var string
-   */
-  protected $fieldName;
-
-  /**
    * The test product variation.
    *
    * @var \Drupal\commerce_product\Entity\ProductVariationInterface
