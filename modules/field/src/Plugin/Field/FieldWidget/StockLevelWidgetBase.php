@@ -178,29 +178,37 @@ abstract class StockLevelWidgetBase extends WidgetBase implements ContainerFacto
     $field = $items->first();
     $entity = $items->getEntity();
 
-    // @ToDo Use ::isApplicable instead.
     if (!($entity instanceof PurchasableEntityInterface)) {
       // No stock if this is not a purchasable entity.
       return [];
     }
-    // @ToDo Use ::isApplicable instead.
     /** @var \Drupal\commerce_stock\StockServiceInterface $stock_service */
     $stock_service = $this->stockServiceManager->getService($entity);
-    // @todo - service should be able can determine if it needs an interface.
     if ($stock_service->getId() === 'always_in_stock') {
       // Return an empty array if service is not supported.
       return [];
     }
+
+    $element['#type'] = 'fieldgroup';
+    $element['#attributes'] = ['class' => ['stock-level-field']];
+
     // If not a valid context.
     if (!$this->stockServiceManager->isValidContext($entity)) {
-      return [];
+      $element['#description'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => $this->t('We have no valid data to process a stock transaction. This may happen if we cannot determine a store to which the entity belongs to.'),
+      ];
+      // In case we have no valid context and a new entity, we probably have
+      // a inline form at hand.
+      if ($entity->isNew) {
+        $element['#description']['#value'] = $this->t('We have no valid data to process a stock transaction. Probably because you use an inline form and the parent entity is not saved yet. In such a case you first need to create and save the entity. On the edit form you should be able to set the stock level.');
+      }
+      return $element;
     }
 
     // Get the available stock level.
     $level = $field->get('available_stock')->getValue();
-
-    $element['#type'] = 'fieldgroup';
-    $element['#attributes'] = ['class' => ['stock-level-field']];
 
     $element['stocked_entity'] = [
       '#type' => 'value',

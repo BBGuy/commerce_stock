@@ -32,7 +32,25 @@ class AbsoluteStockLevelWidget extends StockLevelWidgetBase {
     array &$form,
     FormStateInterface $form_state
   ) {
+
+    // @ToDo ASAP we should add a link to some documentation to provide some
+    // @ToDo Background why we don't support default values.
+    if ($this->isDefaultValueWidget($form_state)) {
+      $element['#description'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => $this->t('Default values for stock transactions are not supported.'),
+      ];
+      return $element;
+    }
+
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    // If we get an empty element from widgetBase or have no valid context bailout.
+    $entity = $items->getEntity();
+    if (empty($element) || !$this->stockServiceManager->isValidContext($entity)) {
+      return $element;
+    }
+
     $field = $items->first();
     $level = $field->available_stock;
     $element['stock_level'] = array_merge(
