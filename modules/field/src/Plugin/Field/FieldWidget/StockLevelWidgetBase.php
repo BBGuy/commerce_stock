@@ -216,11 +216,19 @@ abstract class StockLevelWidgetBase extends WidgetBase implements ContainerFacto
     ];
     $element['adjustment'] = [
       '#title' => $this->t('Stock level adjustment'),
-      '#description' => $this->t('A positive number will add stock, a negative number will remove stock. Current stock level: @stock_level', ['@stock_level' => $level]),
+      '#description' => $this->t('A positive number will add stock, a negative number will remove stock.'),
       '#type' => 'number',
       '#step' => $this->getSetting('step'),
       '#default_value' => 0,
       '#size' => 7,
+      '#weight' => 20,
+    ];
+    $element['current level'] = [
+      '#markup' => $this->t('Current stock level: @stock_level', ['@stock_level' => $level]),
+      '#prefix' => '<div class="stock-level-field-stock-level">',
+      '#suffix' => '</div>',
+      '#type' => 'markup',
+      '#weight' => 10,
     ];
     $custom_note_allowed = $this->getSetting('custom_transaction_note');
     $element['stock_transaction_note'] = [
@@ -231,6 +239,7 @@ abstract class StockLevelWidgetBase extends WidgetBase implements ContainerFacto
       '#size' => 50,
       '#maxlength' => 255,
       '#disabled' => !$custom_note_allowed,
+      '#weight' => 50,
     ];
 
     return $element;
