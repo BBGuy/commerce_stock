@@ -327,7 +327,7 @@ function commerce_stock_enforcement_is_order_in_stock(
         drupal_set_message(t('The maximum quantity for %name that can be ordered is %qty.', [
           '%name' => $name,
           '%qty' => $stock_level,
-        ], 'error'));
+        ]), 'error');
       }
       $order_in_stock = FALSE;
     }
