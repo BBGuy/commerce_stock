@@ -10,7 +10,10 @@ language: php
 
 sudo: false
 
-dist: precise
+dist: trusty
+
+addons:
+  chrome: stable
 
 php:
 - 7.2
@@ -30,6 +33,8 @@ env:
     # add composer's global bin directory to the path
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
+    - # force composer 1.8+ to use a specific folder as home
+    - export COMPOSER_HOME="$HOME/.composer/"
 
     # Configuration variables.
     - DRUPAL_TI_MODULE_NAME="commerce_stock"
@@ -63,7 +68,7 @@ env:
 
     # Simpletest specific commandline arguments, the DRUPAL_TI_SIMPLETEST_GROUP is appended at the end.
     - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 20 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types Simpletest,PHPUnit-Unit,PHPUnit-Kernel,PHPUnit-Functional --suppress-deprecations"
-    - DRUPAL_TI_SIMPLETEST_JS_ARGS="--verbose --color --concurrency 1 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types PHPUnit-FunctionalJavascript --suppress-deprecations"
+    - DRUPAL_TI_SIMPLETEST_JS_ARGS="--verbose --color --concurrency 2 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT --types PHPUnit-FunctionalJavascript --suppress-deprecations"
 
     # === Behat specific variables.
     # This is relative to $TRAVIS_BUILD_DIR
@@ -115,19 +120,25 @@ before_install:
   - phpenv config-rm xdebug.ini || true
   - composer global require "hirak/prestissimo:^0.3"
   - composer global require "lionsad/drupal_ti:dev-master#0d7c41abd1efa11726d7c908ae7a39bbeea905df"
-  - composer global require "squizlabs/php_codesniffer:2.*"
+  - composer global require "squizlabs/php_codesniffer:3.*"
   - drupal-ti before_install
 
 install:
   - drupal-ti install
-  - mkdir travis-phantomjs
-  - wget https://s3.amazonaws.com/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -O $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2
-  - tar -xvf $PWD/travis-phantomjs/phantomjs-2.0.0-ubuntu-12.04.tar.bz2 -C $PWD/travis-phantomjs
-  - export PATH=$PWD/travis-phantomjs:$PATH
-  - phantomjs --version
+
+  # Install Chromedriver.
+  - mkdir travis-chromedriver
+  - CHROMEDRIVER_VERSION=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -qO-)
+  - wget http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip -d travis-chromedriver && rm -f chromedriver_linux64.zip
+  - chmod a+x travis-chromedriver/chromedriver
+  - export PATH=$PWD/travis-chromedriver:$PATH
+  - chromedriver --version
+
   # Installed after Drush to prevent Composer conflicts around symfony/yaml.
-  - composer global require "drupal/coder:8.2.*"
+  - composer global require "drupal/coder:8.3.*"
   - phpcs --config-set installed_paths $HOME/.composer/vendor/drupal/coder/coder_sniffer
+  - phpcs --standard=Drupal -e
 
 before_script:
   - drupal-ti --include ".travis-before-script.sh"
