@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Plugin implementation of the 'commerce_stock_level' widget.
  *
- * Deprecated: We have now a dedicated widget per use case.
+ * @Deprecated: We have now a dedicated widget per use case.
  *
  * @see https://www.drupal.org/project/commerce_stock/issues/2931754
  *

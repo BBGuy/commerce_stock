@@ -8,8 +8,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
 use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
-use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
-use Drupal\Tests\commerce_stock\Kernel\StockTransactionQueryTrait;
+use Drupal\Tests\commerce_stock_local\Kernel\StockTransactionQueryTrait;
 
 /**
  * Ensure the stock level field works.
@@ -31,7 +30,6 @@ class StockLevelTest extends CommerceStockKernelTestBase {
   public static $modules = [
     'path',
     'commerce_product',
-    'commerce_stock',
     'commerce_stock_field',
     'commerce_stock_local',
   ];
@@ -140,6 +138,25 @@ class StockLevelTest extends CommerceStockKernelTestBase {
     $context = new Context($user, $this->store);
 
     $this->locations = $this->stockServiceConfiguration->getAvailabilityLocations($context, $this->variation);
+  }
+
+  /**
+   * Test always in stock field is added to purchasable entities.
+   *
+   * Test that a commerce_stock_always_in_stock base field
+   * is added to purchasable entities.
+   */
+  public function testBaseFieldisAddedtoPurchasableEntity() {
+
+    $variation = ProductVariation::create([
+      'type' => 'default',
+    ]);
+    $variation->save();
+
+    // This would throw an Exception, if the field isn't there.
+    $field = $variation->get('commerce_stock_always_in_stock');
+    // Check the default value is set to FALSE.
+    self::assertFalse($field->getValue()[0]['value']);
   }
 
   /**

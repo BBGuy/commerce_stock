@@ -5,7 +5,7 @@ namespace Drupal\Tests\commerce_stock_field\Functional;
 use Drupal\commerce\Context;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\Tests\commerce_stock\Functional\StockBrowserTestBase;
-use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
+use Drupal\Tests\commerce_stock_field\Kernel\StockLevelFieldCreationTrait;
 
 /**
  * Provides a base class for stock level fields functional tests.

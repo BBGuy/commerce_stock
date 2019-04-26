@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce_stock\Kernel;
+namespace Drupal\Tests\commerce_stock_local\Kernel;
 
 /**
  * Provides methods to query the transaction database.

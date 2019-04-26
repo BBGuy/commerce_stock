@@ -101,6 +101,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     'commerce_product',
     'commerce_order',
     'commerce_store',
+    'commerce_stock_local',
   ];
 
   /**

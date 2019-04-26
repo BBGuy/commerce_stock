@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_stock_field\Plugin\Field\FieldWidget;
+namespace Drupal\commerce_stock_ui\Plugin\Field\FieldWidget;
 
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;

@@ -5,8 +5,8 @@ namespace Drupal\Tests\commerce_stock_field\Functional;
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\commerce\EntityHelper;
 use Drupal\commerce_product\Entity\Product;
-use Drupal\Tests\commerce_stock\Kernel\StockLevelFieldCreationTrait;
-use Drupal\Tests\commerce_stock\Kernel\StockTransactionQueryTrait;
+use Drupal\Tests\commerce_stock_field\Kernel\StockLevelFieldCreationTrait;
+use Drupal\Tests\commerce_stock_local\Kernel\StockTransactionQueryTrait;
 
 /**
  * Provides tests for the stock level widget.
@@ -438,94 +438,6 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $transaction = $this->getLastEntityTransaction($variation->id());
     $this->assertEquals(-10, $transaction->qty);
-  }
-
-  /**
-   * Testing the commerce_stock_level_absolute widget.
-   */
-  public function testLinkToTransactionFormWidget() {
-    $entity_type = "commerce_product_variation";
-    $bundle = 'default';
-    $widget_id = "commerce_stock_level_transaction_form_link";
-    $widget_settings = [];
-
-    $this->configureFormDisplay($widget_id, $widget_settings, $entity_type, $bundle);
-    $this->drupalGet($this->variation->toUrl('edit-form'));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->linkExists(t('transaction form'));
-    $this->clickLink(t('transaction form'));
-    $this->assertSession()->statusCodeEquals(200);
-    $path = '/admin/commerce/config/stock/transactions2';
-    $this->assertSession()->addressEquals($path);
-  }
-
-  /**
-   * Test the deprecated simple widget.
-   */
-  public function testDeprecatedWidget() {
-    $entity_type = "commerce_product_variation";
-    $bundle = 'default';
-    $widget_id = "commerce_stock_level_simple";
-    $widget_settings = [
-      'entry_system' => 'basic',
-      'transaction_note' => FALSE,
-      'context_fallback' => FALSE,
-    ];
-    $this->configureFormDisplay($widget_id, $widget_settings, $entity_type, $bundle);
-    $this->drupalGet($this->variation->toUrl('edit-form'));
-    $this->assertSession()->statusCodeEquals(200);
-
-    // Ensure the stock part of the form is healty.
-    $this->assertSession()
-      ->fieldExists('commerce_stock_always_in_stock[value]');
-    $this->assertSession()
-      ->checkboxNotChecked('commerce_stock_always_in_stock[value]');
-    $this->assertSession()->fieldExists($this->fieldName . '[0][adjustment]');
-
-    $adjustment = 5;
-    $new_price_amount = '1.11';
-    $variations_edit = [
-      'price[0][number]' => $new_price_amount,
-      $this->fieldName . '[0][adjustment]' => $adjustment,
-    ];
-    $this->submitForm($variations_edit, 'Save');
-    $this->assertSession()->statusCodeEquals(200);
-    $transaction = $this->getLastEntityTransaction($this->variation->id());
-    $this->assertEquals($adjustment, $transaction->qty);
-    $this->assertEquals($this->adminUser->id(), $transaction->related_uid);
-
-    $widget_settings = [
-      'entry_system' => 'simple',
-      'transaction_note' => FALSE,
-      'context_fallback' => FALSE,
-    ];
-    $this->configureFormDisplay($widget_id, $widget_settings, $entity_type, $bundle);
-    $this->drupalGet($this->variation->toUrl('edit-form'));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldExists($this->fieldName . '[0][stock_level]');
-
-    $stock_level = 20;
-    $edit = [
-      $this->fieldName . '[0][stock_level]' => $stock_level,
-    ];
-    $this->submitForm($edit, 'Save');
-    $this->assertSession()->statusCodeEquals(200);
-
-    $transaction = $this->getLastEntityTransaction($this->variation->id());
-    // We setup our variation with an initial stock of 15. So setting the
-    // absolute level to 20 should result in a transaction with 5.
-    $this->assertEquals(5, $transaction->qty);
-    $this->assertEquals($this->adminUser->id(), $transaction->related_uid);
-
-    $widget_settings = [
-      'entry_system' => 'transactions',
-      'transaction_note' => FALSE,
-      'context_fallback' => FALSE,
-    ];
-    $this->configureFormDisplay($widget_id, $widget_settings, $entity_type, $bundle);
-    $this->drupalGet($this->variation->toUrl('edit-form'));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->linkExists('New transaction');
   }
 
 }

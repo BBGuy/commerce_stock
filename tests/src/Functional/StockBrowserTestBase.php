@@ -24,7 +24,6 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
     'commerce_product',
     'commerce_order',
     'commerce_stock',
-    'commerce_stock_ui',
     'field_ui',
     'options',
     'taxonomy',

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\commerce_stock\Kernel;
+namespace Drupal\Tests\commerce_stock_field\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
