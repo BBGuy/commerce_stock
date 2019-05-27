@@ -98,7 +98,7 @@ class StockLevel extends FieldItemBase {
     // programmatically.
     if (!is_array($values)) {
       $value = filter_var($values, FILTER_VALIDATE_FLOAT);
-      if ($value) {
+      if ($value !== FALSE) {
         $values = ['adjustment' => $value];
       }
       else {
