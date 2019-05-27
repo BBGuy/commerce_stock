@@ -76,7 +76,7 @@ function commerce_stock_enforcement_form_alter(
     $form_object = $form_state->getFormObject();
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $form_object->getOrder();
-    if (!commerce_stock_enforcement_is_order_in_stock($order, FALSE)) {
+    if ($form['#step_id'] != 'complete' && !commerce_stock_enforcement_is_order_in_stock($order, FALSE)) {
       // Redirect back to cart.
       $response = new RedirectResponse('/cart');
       $response->send();
