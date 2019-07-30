@@ -47,6 +47,10 @@ function commerce_stock_enforcement_form_alter(
     if (!$instock) {
       $form['actions']['submit']['#value'] = t('Out of stock');
       $form['actions']['submit']['#disabled'] = TRUE;
+      // If quantity is visible.
+      if (isset($form['quantity'])) {
+        $form['quantity']['#disabled'] = TRUE;
+      }
     }
   }
 
