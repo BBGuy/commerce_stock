@@ -161,7 +161,11 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
   }
 
   $values = $form_state->getValues();
-  $quantities = $values['edit_quantity'];
+  if (isset($values['edit_quantity'])) {
+    $quantities = $values['edit_quantity'];
+  } else {
+    $quantities = array();
+  }
 
   /** @var \Drupal\views\ViewExecutable $view */
   $view = reset($form_state->getBuildInfo()['args']);
@@ -178,7 +182,12 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
   foreach ($order->getItems() as $id => $order_item) {
     $purchased_entity = $order_item->getPurchasedEntity();
     $name = $purchased_entity->getTitle();
-    $qty = $quantities[$id];
+    if (isset($quantities) && isset($quantities[$id])) {
+      $qty = $quantities[$id];
+    }
+    else {
+      $qty = 1;
+    }
     $context = commerce_stock_enforcement_get_context($purchased_entity);
     $stock_level = commerce_stock_enforcement_get_stock_level($purchased_entity, $context);
     // Get the already ordered quantity.
