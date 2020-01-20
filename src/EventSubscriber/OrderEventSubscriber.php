@@ -73,7 +73,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if ($checker->getIsStockManaged($entity)) {
         // If always in stock then no need to create a transaction.
         if ($checker->getIsAlwaysInStock($entity)) {
-          return;
+          continue;
         }
         $quantity = -1 * $item->getQuantity();
         $context = new Context($order->getCustomer(), $order->getStore());
@@ -160,7 +160,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           $checker = $service->getStockChecker();
           // If always in stock then no need to create a transaction.
           if ($checker->getIsAlwaysInStock($entity)) {
-            return;
+            continue;
           }
           $context = new Context($order->getCustomer(), $order->getStore());
           $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
@@ -200,7 +200,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if ($checker->getIsStockManaged($entity)) {
         // If always in stock then no need to create a transaction.
         if ($checker->getIsAlwaysInStock($entity)) {
-          return;
+          continue;
         }
         $quantity = $item->getQuantity();
         $context = new Context($order->getCustomer(), $order->getStore());
@@ -242,7 +242,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       if ($checker->getIsStockManaged($entity)) {
         // If always in stock then no need to create a transaction.
         if ($checker->getIsAlwaysInStock($entity)) {
-          return;
+          continue;
         }
         $quantity = $item->getQuantity();
         $context = new Context($order->getCustomer(), $order->getStore());
