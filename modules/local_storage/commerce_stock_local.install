@@ -389,3 +389,15 @@ function commerce_stock_local_update_8003() {
     }
   }
 }
+
+/**
+ * Removes the 'canonical' link from StockLocationType entity definitions.
+ */
+function commerce_stock_local_update_8004() {
+    $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+    $entity_type = $definition_update_manager->getEntityType('commerce_stock_location_type');
+    $links = $entity_type->getLinkTemplates();
+    unset($links['canonical']);
+  $entity_type->set('links', $links);
+  $definition_update_manager->updateEntityType($entity_type);
+}
