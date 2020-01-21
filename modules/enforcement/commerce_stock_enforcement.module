@@ -25,7 +25,8 @@ function commerce_stock_enforcement_form_alter(
 ) {
 
   // Add to cart form.
-  if (strpos($form_id, "commerce_order_item_add_to_cart_form") !== FALSE) {
+  if (strpos($form_id, "commerce_order_item_add_to_cart_form") !== FALSE
+    || strpos($form_id, "commerce_order_item_dc_ajax_add_cart_form") !== FALSE) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
     // Get the product variation.
