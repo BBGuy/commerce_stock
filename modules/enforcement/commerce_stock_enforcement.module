@@ -181,6 +181,10 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
     ->load($order_id);
 
   foreach ($order->getItems() as $id => $order_item) {
+    if (!$order_item->hasPurchasedEntity()) {
+      // Not every order item has a purchased entity.
+      continue;
+    }
     $purchased_entity = $order_item->getPurchasedEntity();
     $name = $purchased_entity->getTitle();
     if (isset($quantities) && isset($quantities[$id])) {
@@ -329,6 +333,10 @@ function commerce_stock_enforcement_is_order_in_stock(
 
   $order_in_stock = TRUE;
   foreach ($order->getItems() as $id => $order_item) {
+    if (!$order_item->hasPurchasedEntity()) {
+      // Not every order item has a purchased entity.
+      continue;
+    }
     $purchased_entity = $order_item->getPurchasedEntity();
     if (!$purchased_entity) {
       continue;
