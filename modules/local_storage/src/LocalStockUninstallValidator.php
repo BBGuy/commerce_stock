@@ -39,7 +39,7 @@ class LocalStockUninstallValidator implements ModuleUninstallValidatorInterface 
    *   The entity manager.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
-   * @param EntityFieldManagerInterface $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity_field manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation, EntityFieldManagerInterface $entity_field_manager) {
