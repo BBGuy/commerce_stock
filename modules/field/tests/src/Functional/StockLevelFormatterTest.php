@@ -28,7 +28,7 @@ class StockLevelFormatterTest extends StockLevelFieldTestBase {
     $this->drupalGet('product/' . $this->product->id());
     $this->saveHtmlOutput();
     $this->assertSession()->pageTextContains('stock_level_test');
-    $this->assertSession()->elementContains('css', '.field--name-stock-level-test p', '10');
+    $this->assertSession()->elementContains('css', '.product--variation-field--variation_stock_level_test__1', '10');
   }
 
 }

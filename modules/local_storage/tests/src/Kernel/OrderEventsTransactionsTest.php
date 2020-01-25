@@ -102,6 +102,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     'commerce_order',
     'commerce_store',
     'commerce_stock_local',
+    'commerce_number_pattern',
   ];
 
   /**
@@ -123,11 +124,14 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->installEntitySchema('commerce_stock_location');
     $this->installConfig(['commerce_stock']);
     $this->installConfig(['commerce_stock_local']);
+    $this->installConfig(['commerce_stock_local']);
+    $this->installConfig(['commerce_number_pattern']);
     $this->installSchema('commerce_stock_local', [
       'commerce_stock_transaction_type',
       'commerce_stock_transaction',
       'commerce_stock_location_level',
     ]);
+    $this->installSchema('commerce_number_pattern', ['commerce_number_pattern_sequence']);
 
     // Change the workflow of the default order type.
     $order_type = OrderType::load('default');
@@ -135,9 +139,9 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $order_type->save();
 
     $defaultStockLocation = StockLocation::create([
-      'name' => 'Test',
+      'name'   => 'Test',
       'status' => 1,
-      'type' => "default",
+      'type'   => "default",
     ]);
     $defaultStockLocation->save();
 
@@ -157,12 +161,12 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $variation_type->save();
 
     $this->variation = ProductVariation::create([
-      'type' => 'default',
-      'sku' => 'TEST_' . strtolower($this->randomMachineName()),
-      'title' => $this->randomString(),
+      'type'   => 'default',
+      'sku'    => 'TEST_' . strtolower($this->randomMachineName()),
+      'title'  => $this->randomString(),
       'status' => 1,
-      'price' => [
-        'number' => '11.11',
+      'price'  => [
+        'number'        => '11.11',
         'currency_code' => 'USD',
       ],
     ]);
@@ -170,12 +174,12 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->variation = $this->reloadEntity($this->variation);
 
     $this->variation2 = ProductVariation::create([
-      'type' => 'default',
-      'sku' => 'TEST_' . strtolower($this->randomMachineName()),
-      'title' => $this->randomString(),
+      'type'   => 'default',
+      'sku'    => 'TEST_' . strtolower($this->randomMachineName()),
+      'title'  => $this->randomString(),
       'status' => 1,
-      'price' => [
-        'number' => '12.12',
+      'price'  => [
+        'number'        => '12.12',
         'currency_code' => 'USD',
       ],
     ]);
@@ -183,9 +187,9 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->variation2 = $this->reloadEntity($this->variation2);
 
     $this->product = Product::create([
-      'type' => 'default',
-      'title' => $this->randomMachineName(),
-      'stores' => [$this->store],
+      'type'       => 'default',
+      'title'      => $this->randomMachineName(),
+      'stores'     => [$this->store],
       'variations' => [$this->variation, $this->variation2],
     ]);
     $this->product->save();
@@ -209,20 +213,20 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
 
     $profile = Profile::create([
       'type' => 'customer',
-      'uid' => $user->id(),
+      'uid'  => $user->id(),
     ]);
     $profile->save();
 
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = Order::create([
-      'type' => 'default',
-      'state' => 'draft',
-      'mail' => $user->getEmail(),
-      'uid' => $user->id(),
-      'ip_address' => '127.0.0.1',
-      'order_number' => '6',
+      'type'            => 'default',
+      'state'           => 'draft',
+      'mail'            => $user->getEmail(),
+      'uid'             => $user->id(),
+      'ip_address'      => '127.0.0.1',
+      'order_number'    => '6',
       'billing_profile' => $profile,
-      'store_id' => $this->store->id(),
+      'store_id'        => $this->store->id(),
     ]);
     $order->save();
 
