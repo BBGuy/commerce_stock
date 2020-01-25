@@ -59,7 +59,7 @@ class LocalStockUninstallValidator implements ModuleUninstallValidatorInterface 
     $reasons = [];
 
     foreach ($entity_types as $entity_type_id => $entity_type) {
-      if ($entity_type->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface')) {
+      if ($entity_type->entityClassImplements('\Drupal\commerce\PurchasableEntityInterface')) {
         $storage = $this->entityTypeManager->getStorage($entity_type_id);
 
         if ($storage instanceof SqlContentEntityStorage) {

@@ -114,7 +114,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $data = unserialize($transaction->data);
     $this->assertEquals($adjustment, $transaction->qty);
     $this->assertEquals($this->adminUser->id(), $transaction->related_uid);
-    $this->assertTrue($default_note, $data['message']);
+    $this->assertEquals($default_note, $data['message']);
 
     $widget_settings = [
       'custom_transaction_note' => TRUE,
@@ -145,7 +145,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $data = unserialize($transaction->data);
     $this->assertEquals($adjustment, $transaction->qty);
     $this->assertEquals($this->adminUser->id(), $transaction->related_uid);
-    $this->assertTrue('CustomNote', $data['message']);
+    $this->assertEquals('CustomNote', $data['message']);
 
   }
 
@@ -274,7 +274,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     // absolute level to 15 should result in a transaction with 5.
     $this->assertEquals(5, $transaction->qty);
     $this->assertEquals($this->adminUser->id(), $transaction->related_uid);
-    $this->assertTrue($default_note, $data['message']);
+    $this->assertEquals($default_note, $data['message']);
 
     // If the absolute stock level is the same as before, it shouldn't trigger
     // any transaction.
@@ -331,7 +331,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $data = unserialize($transaction->data);
     $this->assertEquals(-10, $transaction->qty);
     $this->assertEquals($this->adminUser->id(), $transaction->related_uid);
-    $this->assertTrue('CustumNote', $data['message']);
+    $this->assertEquals('CustumNote', $data['message']);
 
     // Testing that zero value, results in a transaction.
     $this->drupalGet($this->variation->toUrl('edit-form'));

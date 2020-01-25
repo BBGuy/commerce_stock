@@ -219,7 +219,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
     $this->assertEquals($mock_widget_values['user_id'], $transaction->related_uid);
     $this->assertEquals($mock_widget_values['unit_cost']['amount'], $transaction->unit_cost);
     $this->assertEquals($mock_widget_values['unit_cost']['currency_code'], $transaction->currency_code);
-    $this->assertTrue($mock_widget_values['stock_transaction_note'], $data['message']);
+    $this->assertEquals($mock_widget_values['stock_transaction_note'], $data['message']);
   }
 
 }
