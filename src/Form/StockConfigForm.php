@@ -226,7 +226,7 @@ class StockConfigForm extends ConfigFormBase {
       $plugin->SaveconfigFormOptions($form, $form_state);
     }
 
-    drupal_set_message($this->t('Stock configuration updated.'));
+    $this->messenger->addMessage($this->t('Stock configuration updated.'));
   }
 
   /**

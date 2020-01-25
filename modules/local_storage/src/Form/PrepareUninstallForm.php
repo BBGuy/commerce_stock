@@ -104,7 +104,7 @@ class PrepareUninstallForm extends ConfirmFormBase {
           ->execute();
       }
     }
-    drupal_set_message(t('All values have been deleted.'));
+    \Drupal::messenger()->addMessage(t('All values have been deleted.'));
 
     $form_state->setRedirect('system.modules_uninstall');
   }

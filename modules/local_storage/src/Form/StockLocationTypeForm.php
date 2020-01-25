@@ -51,13 +51,13 @@ class StockLocationTypeForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label stock location type.', [
+        $this->messenger->addMessage($this->t('Created the %label stock location type.', [
           '%label' => $commerce_stock_location_type->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label stock location type.', [
+        $this->messenger->addMessage($this->t('Saved the %label stock location type.', [
           '%label' => $commerce_stock_location_type->label(),
         ]));
     }
