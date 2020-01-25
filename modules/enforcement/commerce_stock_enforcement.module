@@ -164,8 +164,9 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
   $values = $form_state->getValues();
   if (isset($values['edit_quantity'])) {
     $quantities = $values['edit_quantity'];
-  } else {
-    $quantities = array();
+  }
+  else {
+    $quantities = [];
   }
 
   /** @var \Drupal\views\ViewExecutable $view */
