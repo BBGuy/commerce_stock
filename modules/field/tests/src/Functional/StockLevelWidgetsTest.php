@@ -127,7 +127,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
     $this->assertSession()->fieldExists($this->fieldName . '[0][adjustment]');
     $this->assertSession()
       ->fieldExists($this->fieldName . '[0][stock_transaction_note]');
-    self::setExpectedException(ExpectationException::class);
+    self::expectException(ExpectationException::class);
     $this->assertSession()
       ->fieldDisabled($this->fieldName . '[0][stock_transaction_note]');
     $this->assertSession()
@@ -314,7 +314,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
       ->fieldNotExists($this->fieldName . '[0][adjustment]');
     $this->assertSession()
       ->fieldExists($this->fieldName . '[0][stock_transaction_note]');
-    self::setExpectedException(ExpectationException::class);
+    self::expectException(ExpectationException::class);
     $this->assertSession()
       ->fieldDisabled($this->fieldName . '[0][stock_transaction_note]');
     $this->assertSession()

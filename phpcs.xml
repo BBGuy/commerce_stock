@@ -18,7 +18,9 @@
   <rule ref="Drupal.Files.LineLength.TooLong">
     <severity>0</severity>
   </rule>
-  <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
+  <rule ref="Drupal.Arrays.Array.LongLineDeclaration">
+    <severity>0</severity>
+  </rule>
   <rule ref="Drupal.Commenting.VariableComment.VarOrder">
     <severity>0</severity>
   </rule>

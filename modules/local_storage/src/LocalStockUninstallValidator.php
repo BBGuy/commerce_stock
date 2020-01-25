@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_stock_local;
 
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
@@ -25,16 +26,26 @@ class LocalStockUninstallValidator implements ModuleUninstallValidatorInterface 
   protected $entityTypeManager;
 
   /**
+   * The entity_field manager.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   */
+  protected $entityFieldManager;
+
+  /**
    * Constructs a new LocalStockUninstallValidator.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
+   * @param EntityFieldManagerInterface $entity_field_manager
+   *   The entity_field manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation, EntityFieldManagerInterface $entity_field_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->stringTranslation = $string_translation;
+    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**
@@ -52,7 +63,7 @@ class LocalStockUninstallValidator implements ModuleUninstallValidatorInterface 
         $storage = $this->entityTypeManager->getStorage($entity_type_id);
 
         if ($storage instanceof SqlContentEntityStorage) {
-          foreach ($storage->getFieldStorageDefinitions() as $storage_definition) {
+          foreach ($rhis->entityField->getActiveFieldStorageDefinitions() as $storage_definition) {
             if (
               $storage_definition->getProvider() == $module
               && $storage instanceof FieldableEntityStorageInterface

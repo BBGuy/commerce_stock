@@ -187,7 +187,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
    * Whether a wrong value is throwing.
    */
   public function testInvalidArgumentThrows() {
-    $this->setExpectedException(\InvalidArgumentException::class);
+    $this->expectException(\InvalidArgumentException::class);
     $this->variation->set('test_stock_level', 'FAIL');
   }
 

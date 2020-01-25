@@ -4,7 +4,7 @@ namespace Drupal\Tests\commerce_stock\Functional;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
-use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
 
 /**
