@@ -10,10 +10,13 @@ commerce_stock.core_stock_events:
   mapping:
     core_stock_events_order_place:
         type: boolean
-        label: Whether the order complete stock event is enabled or not.
+        label: Whether the order place stock event is enabled or not.
     core_stock_events_order_cancel:
         type: boolean
         label: Whether the order cancel stock event is enabled or not.
     core_stock_events_order_updates:
         type: boolean
         label: Whether the order update stock event is enabled or not.
+    core_stock_events_order_complete:
+      type: boolean
+      label: Whether the order complete stock event is enabled or not.

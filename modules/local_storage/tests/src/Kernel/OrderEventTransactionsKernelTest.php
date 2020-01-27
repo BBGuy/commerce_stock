@@ -37,8 +37,10 @@ class OrderEventTransactionsKernelTest extends CommerceStockKernelTestBase {
     'commerce_product',
     'commerce_order',
     'commerce_stock',
+    'commerce_stock_field',
     'commerce_stock_local',
     'commerce_stock_local_test',
+    'commerce_number_pattern',
   ];
 
   /**
@@ -144,6 +146,7 @@ class OrderEventTransactionsKernelTest extends CommerceStockKernelTestBase {
       'commerce_stock_local',
       'commerce_stock_local_test',
       'profile',
+      'commerce_number_pattern',
     ]);
     $this->installSchema(
       'commerce_stock_local',
@@ -153,6 +156,7 @@ class OrderEventTransactionsKernelTest extends CommerceStockKernelTestBase {
         'commerce_stock_location_level',
       ]
     );
+    $this->installSchema('commerce_number_pattern', ['commerce_number_pattern_sequence']);
 
     $configFactory = $this->container->get('config.factory');
     $config = $configFactory->getEditable('commerce_stock.service_manager');
@@ -201,8 +205,8 @@ class OrderEventTransactionsKernelTest extends CommerceStockKernelTestBase {
     $this->user = $user;
 
     // Set some initial stock.
-    $this->stockServiceManager->createTransaction($this->variation, 1, '', 100, 0, StockTransactionsInterface::STOCK_IN);
-    $this->stockServiceManager->createTransaction($this->variation2, 1, '', 200, 0, StockTransactionsInterface::STOCK_IN);
+    $this->stockServiceManager->createTransaction($this->variation, 1, '', 100, 0, 'USD', StockTransactionsInterface::STOCK_IN);
+    $this->stockServiceManager->createTransaction($this->variation2, 1, '', 200, 0, 'USD', StockTransactionsInterface::STOCK_IN);
 
     $this->checker = $this->stockServiceManager->getService($this->variation)
       ->getStockChecker();

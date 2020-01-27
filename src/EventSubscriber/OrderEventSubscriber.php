@@ -12,6 +12,7 @@ use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce\Context;
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\commerce\PurchasableEntityInterface;
@@ -36,16 +37,26 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   protected $eventTypeManager;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs a new OrderReceiptSubscriber object.
    *
    * @param \Drupal\commerce_stock\StockServiceManagerInterface $stock_service_manager
    *   The stock service manager.
    * @param \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager
    *   The stock event type manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(StockServiceManagerInterface $stock_service_manager, PluginManagerInterface $plugin_manager) {
+  public function __construct(StockServiceManagerInterface $stock_service_manager, PluginManagerInterface $plugin_manager, EntityTypeManagerInterface $entity_type_manager) {
     $this->stockServiceManager = $stock_service_manager;
     $this->eventTypeManager = $plugin_manager;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -98,7 +109,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // storage fails, we bailout.
     // @ToDo Consider how this may change due to: ToDo https://www.drupal.org/project/drupal/issues/2839195
     if (!$original_order) {
-      $original_order = $this->entity->getStorage('commerce_order')->loadUnchanged($order->id());
+      $original_order = $this->entityTypeManager->getStorage('commerce_order')->loadUnchanged($order->id());
       if (!$original_order) {
         return;
       }

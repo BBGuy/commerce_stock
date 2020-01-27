@@ -15,6 +15,7 @@ use Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber;
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 
@@ -124,7 +125,6 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->installEntitySchema('commerce_stock_location');
     $this->installConfig(['commerce_stock']);
     $this->installConfig(['commerce_stock_local']);
-    $this->installConfig(['commerce_stock_local']);
     $this->installConfig(['commerce_number_pattern']);
     $this->installSchema('commerce_stock_local', [
       'commerce_stock_transaction_type',
@@ -139,9 +139,9 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $order_type->save();
 
     $defaultStockLocation = StockLocation::create([
-      'name'   => 'Test',
+      'name' => 'Test',
       'status' => 1,
-      'type'   => "default",
+      'type' => "default",
     ]);
     $defaultStockLocation->save();
 
@@ -161,12 +161,12 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $variation_type->save();
 
     $this->variation = ProductVariation::create([
-      'type'   => 'default',
-      'sku'    => 'TEST_' . strtolower($this->randomMachineName()),
-      'title'  => $this->randomString(),
+      'type' => 'default',
+      'sku' => 'TEST_' . strtolower($this->randomMachineName()),
+      'title' => $this->randomString(),
       'status' => 1,
-      'price'  => [
-        'number'        => '11.11',
+      'price' => [
+        'number' => '11.11',
         'currency_code' => 'USD',
       ],
     ]);
@@ -174,12 +174,12 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->variation = $this->reloadEntity($this->variation);
 
     $this->variation2 = ProductVariation::create([
-      'type'   => 'default',
-      'sku'    => 'TEST_' . strtolower($this->randomMachineName()),
-      'title'  => $this->randomString(),
+      'type' => 'default',
+      'sku' => 'TEST_' . strtolower($this->randomMachineName()),
+      'title' => $this->randomString(),
       'status' => 1,
-      'price'  => [
-        'number'        => '12.12',
+      'price' => [
+        'number' => '12.12',
         'currency_code' => 'USD',
       ],
     ]);
@@ -187,9 +187,9 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->variation2 = $this->reloadEntity($this->variation2);
 
     $this->product = Product::create([
-      'type'       => 'default',
-      'title'      => $this->randomMachineName(),
-      'stores'     => [$this->store],
+      'type' => 'default',
+      'title' => $this->randomMachineName(),
+      'stores' => [$this->store],
       'variations' => [$this->variation, $this->variation2],
     ]);
     $this->product->save();
@@ -213,20 +213,20 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
 
     $profile = Profile::create([
       'type' => 'customer',
-      'uid'  => $user->id(),
+      'uid' => $user->id(),
     ]);
     $profile->save();
 
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = Order::create([
-      'type'            => 'default',
-      'state'           => 'draft',
-      'mail'            => $user->getEmail(),
-      'uid'             => $user->id(),
-      'ip_address'      => '127.0.0.1',
-      'order_number'    => '6',
+      'type' => 'default',
+      'state' => 'draft',
+      'mail' => $user->getEmail(),
+      'uid' => $user->id(),
+      'ip_address' => '127.0.0.1',
+      'order_number' => '6',
       'billing_profile' => $profile,
-      'store_id'        => $this->store->id(),
+      'store_id' => $this->store->id(),
     ]);
     $order->save();
 
@@ -237,8 +237,8 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
       ->getStorage('commerce_order_item');
 
     $order_item2 = OrderItem::create([
-      'type'       => 'default',
-      'quantity'   => 2,
+      'type' => 'default',
+      'quantity' => 2,
       'unit_price' => new Price('12.00', 'USD'),
     ]);
     $order_item2->save();
@@ -287,7 +287,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->assertEquals($this->order->id(), $result[0]->related_oid);
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('-1.00', $result[0]->qty);
-    $this->assertEquals('order placed', unserialize($result[0]->data)['message']);
+    $this->assertEquals('Order placed.', unserialize($result[0]->data)['message']);
   }
 
   /**
@@ -360,7 +360,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->assertEquals($this->order->id(), $result[0]->related_oid);
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('1.00', $result[0]->qty);
-    $this->assertEquals('order canceled', unserialize($result[0]->data)['message']);
+    $this->assertEquals('Order canceled.', unserialize($result[0]->data)['message']);
     $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
   }
 
@@ -380,6 +380,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $config->set('core_stock_events_order_updates', FALSE);
     $config->set('core_stock_events_order_cancel', FALSE);
     $config->set('core_stock_events_order_complete', FALSE);
+    $config->set('core_stock_events_order_place', FALSE);
     $config->save();
 
     $transition = $this->order->getState()->getTransitions();
@@ -490,7 +491,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->assertEquals($this->order->id(), $result[0]->related_oid);
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('-3.00', $result[0]->qty);
-    $this->assertEquals('order item added', unserialize($result[0]->data)['message']);
+    $this->assertEquals('Order updated: new order item added.', unserialize($result[0]->data)['message']);
 
     // Tests the order item update event.
     $items = $this->order->getItems();
@@ -507,7 +508,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->assertEquals($this->order->id(), $result[1]->related_oid);
     $this->assertEquals($this->order->getCustomerId(), $result[1]->related_uid);
     $this->assertEquals('-2.00', $result[1]->qty);
-    $this->assertEquals('order item quantity updated', unserialize($result[1]->data)['message']);
+    $this->assertEquals('Order item updated.', unserialize($result[1]->data)['message']);
     $this->assertEquals(7, $this->checker->getTotalStockLevel($this->variation, $this->locations));
 
     // Tests the order item delete event.
@@ -525,7 +526,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->assertEquals($this->order->id(), $result[0]->related_oid);
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('3.00', $result[0]->qty);
-    $this->assertEquals('order item deleted', unserialize($result[0]->data)['message']);
+    $this->assertEquals('Order item deleted.', unserialize($result[0]->data)['message']);
     $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
 
     // Tests the order delete event.
@@ -541,7 +542,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $this->assertEquals($this->order->id(), $result[0]->related_oid);
     $this->assertEquals($this->order->getCustomerId(), $result[0]->related_uid);
     $this->assertEquals('3.00', $result[0]->qty);
-    $this->assertEquals('order deleted', unserialize($result[0]->data)['message']);
+    $this->assertEquals('Order deleted.', unserialize($result[0]->data)['message']);
     $this->assertEquals(10, $this->checker->getTotalStockLevel($this->variation, $this->locations));
     $this->assertEquals(11, $this->checker2->getTotalStockLevel($this->variation2, $this->locations2));
   }
@@ -561,8 +562,10 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $event = $prophecy->reveal();
 
     $stockServiceManagerStub = $this->prophesize(StockServiceManager::class);
+    $eventTypeManagerStub = $this->prophesize(PluginManagerInterface::class);
+    $entityTypeManager = \Drupal::EntityTypeManager();
 
-    $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal());
+    $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal(), $eventTypeManagerStub->reveal(), $entityTypeManager);
     $sut->onOrderUpdate($event);
   }
 
