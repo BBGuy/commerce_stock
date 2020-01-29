@@ -32,7 +32,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\commerce_stock\StockServiceManagerInterface $stock_service_manager
    *   The stock service manager.
    */
-  public function __construct(StockServiceManagerInterface $stock_service_manager) {
+  public function __construct(
+    StockServiceManagerInterface $stock_service_manager
+  ) {
     $this->stockServiceManager = $stock_service_manager;
   }
 
@@ -70,24 +72,22 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          continue;
-        }
-        $quantity = -1 * $item->getQuantity();
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
-        $transaction_type = StockTransactionsInterface::STOCK_SALE;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order placed'],
-        ];
-
-        $this->runTransactionEvent(StockEventsInterface::ORDER_PLACE_EVENT, $context,
-          $entity, $quantity, $location, $transaction_type, $metadata);
+      // If always in stock then no need to create a transaction.
+      if ($checker->getIsAlwaysInStock($entity)) {
+        continue;
       }
+      $quantity = -1 * $item->getQuantity();
+      $context = new Context($order->getCustomer(), $order->getStore());
+      $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+      $transaction_type = StockTransactionsInterface::STOCK_SALE;
+      $metadata = [
+        'related_oid' => $order->id(),
+        'related_uid' => $order->getCustomerId(),
+        'data' => ['message' => 'order placed'],
+      ];
+
+      $this->runTransactionEvent(StockEventsInterface::ORDER_PLACE_EVENT, $context,
+        $entity, $quantity, $location, $transaction_type, $metadata);
     }
   }
 
@@ -115,7 +115,15 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * @return int
    *   Return the ID of the transaction or FALSE if no transaction created.
    */
-  private function runTransactionEvent($orderEvent, Context $context, PurchasableEntityInterface $entity, $quantity, StockLocationInterface $location, $transaction_type_id, array $metadata) {
+  private function runTransactionEvent(
+    $orderEvent,
+    Context $context,
+    PurchasableEntityInterface $entity,
+    $quantity,
+    StockLocationInterface $location,
+    $transaction_type_id,
+    array $metadata
+  ) {
 
     $type = \Drupal::service('plugin.manager.stock_events');
     $plugin = $type->createInstance('core_stock_events');
@@ -140,7 +148,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // storage fails, we bailout.
     // @ToDo Consider how this may change due to: ToDo https://www.drupal.org/project/drupal/issues/2839195
     if (!$original_order) {
-      $original_order = \Drupal::entityTypeManager()->getStorage('commerce_order')->loadUnchanged($order->id());
+      $original_order = \Drupal::entityTypeManager()
+        ->getStorage('commerce_order')
+        ->loadUnchanged($order->id());
       if (!$original_order) {
         return;
       }
@@ -197,24 +207,22 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          continue;
-        }
-        $quantity = $item->getQuantity();
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
-        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order canceled'],
-        ];
-
-        $this->runTransactionEvent(StockEventsInterface::ORDER_CANCEL_EVENT, $context,
-          $entity, $quantity, $location, $transaction_type, $metadata);
+      // If always in stock then no need to create a transaction.
+      if ($checker->getIsAlwaysInStock($entity)) {
+        continue;
       }
+      $quantity = $item->getQuantity();
+      $context = new Context($order->getCustomer(), $order->getStore());
+      $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+      $transaction_type = StockTransactionsInterface::STOCK_RETURN;
+      $metadata = [
+        'related_oid' => $order->id(),
+        'related_uid' => $order->getCustomerId(),
+        'data' => ['message' => 'order canceled'],
+      ];
+
+      $this->runTransactionEvent(StockEventsInterface::ORDER_CANCEL_EVENT, $context,
+        $entity, $quantity, $location, $transaction_type, $metadata);
     }
   }
 
@@ -239,23 +247,21 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          continue;
-        }
-        $quantity = $item->getQuantity();
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
-        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order deleted'],
-        ];
-        $this->runTransactionEvent(StockEventsInterface::ORDER_DELET_EVENT, $context,
-          $entity, $quantity, $location, $transaction_type, $metadata);
+      // If always in stock then no need to create a transaction.
+      if ($checker->getIsAlwaysInStock($entity)) {
+        continue;
       }
+      $quantity = $item->getQuantity();
+      $context = new Context($order->getCustomer(), $order->getStore());
+      $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $quantity);
+      $transaction_type = StockTransactionsInterface::STOCK_RETURN;
+      $metadata = [
+        'related_oid' => $order->id(),
+        'related_uid' => $order->getCustomerId(),
+        'data' => ['message' => 'order deleted'],
+      ];
+      $this->runTransactionEvent(StockEventsInterface::ORDER_DELET_EVENT, $context,
+        $entity, $quantity, $location, $transaction_type, $metadata);
     }
   }
 
@@ -278,23 +284,21 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         }
         $service = $this->stockServiceManager->getService($entity);
         $checker = $service->getStockChecker();
-        if ($checker->getIsStockManaged($entity)) {
-          // If always in stock then no need to create a transaction.
-          if ($checker->getIsAlwaysInStock($entity)) {
-            return;
-          }
-          $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
-          $context = new Context($order->getCustomer(), $order->getStore());
-          $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $diff);
-          $metadata = [
-            'related_oid' => $order->id(),
-            'related_uid' => $order->getCustomerId(),
-            'data' => ['message' => 'order item quantity updated'],
-          ];
-
-          $this->runTransactionEvent(StockEventsInterface::ORDER_ITEM_UPDATE_EVENT, $context,
-            $entity, $diff, $location, $transaction_type, $metadata);
+        // If always in stock then no need to create a transaction.
+        if ($checker->getIsAlwaysInStock($entity)) {
+          return;
         }
+        $transaction_type = ($diff < 0) ? StockTransactionsInterface::STOCK_SALE : StockTransactionsInterface::STOCK_RETURN;
+        $context = new Context($order->getCustomer(), $order->getStore());
+        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $diff);
+        $metadata = [
+          'related_oid' => $order->id(),
+          'related_uid' => $order->getCustomerId(),
+          'data' => ['message' => 'order item quantity updated'],
+        ];
+
+        $this->runTransactionEvent(StockEventsInterface::ORDER_ITEM_UPDATE_EVENT, $context,
+          $entity, $diff, $location, $transaction_type, $metadata);
       }
     }
   }
@@ -315,23 +319,21 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       }
       $service = $this->stockServiceManager->getService($entity);
       $checker = $service->getStockChecker();
-      if ($checker->getIsStockManaged($entity)) {
-        // If always in stock then no need to create a transaction.
-        if ($checker->getIsAlwaysInStock($entity)) {
-          return;
-        }
-        $context = new Context($order->getCustomer(), $order->getStore());
-        $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
-        $transaction_type = StockTransactionsInterface::STOCK_RETURN;
-        $metadata = [
-          'related_oid' => $order->id(),
-          'related_uid' => $order->getCustomerId(),
-          'data' => ['message' => 'order item deleted'],
-        ];
-
-        $this->runTransactionEvent(StockEventsInterface::ORDER_ITEM_DELETE_EVENT, $context,
-          $entity, $item->getQuantity(), $location, $transaction_type, $metadata);
+      // If always in stock then no need to create a transaction.
+      if ($checker->getIsAlwaysInStock($entity)) {
+        return;
       }
+      $context = new Context($order->getCustomer(), $order->getStore());
+      $location = $this->stockServiceManager->getTransactionLocation($context, $entity, $item->getQuantity());
+      $transaction_type = StockTransactionsInterface::STOCK_RETURN;
+      $metadata = [
+        'related_oid' => $order->id(),
+        'related_uid' => $order->getCustomerId(),
+        'data' => ['message' => 'order item deleted'],
+      ];
+
+      $this->runTransactionEvent(StockEventsInterface::ORDER_ITEM_DELETE_EVENT, $context,
+        $entity, $item->getQuantity(), $location, $transaction_type, $metadata);
     }
   }
 

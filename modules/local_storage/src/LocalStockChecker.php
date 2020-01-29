@@ -200,17 +200,11 @@ class LocalStockChecker implements StockCheckInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function getIsStockManaged(PurchasableEntityInterface $entity) {
-    // @todo - not yet implemented, so for now all products are managed.
-    // Also we have the "always in stock" function so unless we have cascading s
-    // service functionality this is not needed and can just return TRUE.
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
+   * Gets the locations. This is an old implementation of the now changed
+   * interface.
+   *
+   * @deprecated in commerce_stock:8.x-1.0 and is
+   * removed from commerce_stock:8.x-2.0. Use the StockLocationStorage service instead.
    */
   public function getLocationList($return_active_only = TRUE) {
 
