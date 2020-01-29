@@ -39,22 +39,4 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
     return TRUE;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getIsStockManaged(PurchasableEntityInterface $entity) {
-    // @todo - Not sure about this one. The result will be the same for:
-    // TRUE - managed by this and will always be available.
-    // FALSE - not managed so will be available.
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getLocationList($return_active_only = TRUE) {
-    // We don't have locations, so return an empty array.
-    return [];
-  }
-
 }

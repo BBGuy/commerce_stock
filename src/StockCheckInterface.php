@@ -46,26 +46,4 @@ interface StockCheckInterface {
    */
   public function getIsAlwaysInStock(PurchasableEntityInterface $entity);
 
-  /**
-   * Check if purchasable entity is managed by stock.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity.
-   *
-   * @return bool
-   *   TRUE if the entity is in stock, FALSE otherwise.
-   */
-  public function getIsStockManaged(PurchasableEntityInterface $entity);
-
-  /**
-   * Get list of locations.
-   *
-   * @param bool $return_active_only
-   *   Whether or not only return active locations.
-   *
-   * @return \Drupal\commerce_stock\StockLocationInterface[]
-   *   List of locations.
-   */
-  public function getLocationList($return_active_only = TRUE);
-
 }
