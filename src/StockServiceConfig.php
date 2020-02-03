@@ -6,39 +6,21 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Context;
 
 /**
- * The default stock service configuration class.
+ * The default stock service configuration class. This class does nothing
+ * meaningful and act as a stub to fullfil the StockServiceInterface for the
+ * AlwaysInStockService.
  *
- * Implementing modules are likely to create their own version of this class.
+ * For a more meaningful example see the LocalStockServiceConfig
+ * class in the local_storage submodule.
  */
 class StockServiceConfig implements StockServiceConfigInterface {
-
-  /**
-   * The stock checker.
-   *
-   * @var \Drupal\commerce_stock\StockCheckInterface
-   */
-  protected $stockChecker;
 
   /**
    * A list of stock locations.
    *
    * @var array
    */
-  protected $stockLocations;
-
-  /**
-   * Constructs a new StockServiceConfig object.
-   *
-   * @param \Drupal\commerce_stock\StockCheckInterface $stock_checker
-   *   The stock checker.
-   */
-  public function __construct(StockCheckInterface $stock_checker) {
-    // @todo - we need another object that holds information about the locations
-    // that we need to check.
-    $this->stockChecker = $stock_checker;
-    // Load the configuration.
-    $this->loadConfiguration();
-  }
+  protected $stockLocations = [];
 
   /**
    * {@inheritdoc}
@@ -52,22 +34,7 @@ class StockServiceConfig implements StockServiceConfigInterface {
    */
   public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity, $quantity) {
     $locations = $this->getAvailabilityLocations($context, $entity);
-    // @todo - we need a better way of managing this.
     return array_shift($locations);
-  }
-
-  /**
-   * Load the configuration.
-   */
-  public function loadConfiguration() {
-    // For now we will use all active locations for all products.
-    // @todo - the loaction information is going to be held by the store
-    // entities. We can load it all in advance or query on request.
-    $locations = $this->stockChecker->getLocationList(TRUE);
-    $this->stockLocations = [];
-    foreach ($locations as $key => $value) {
-      $this->stockLocations[$key] = $value;
-    }
   }
 
 }

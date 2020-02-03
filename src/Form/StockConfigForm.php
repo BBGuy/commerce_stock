@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_stock\Form;
 
-use Drupal\commerce_stock\Plugin\StockEventsManager;
+use Drupal\commerce_stock\StockEventsManager;
 use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -33,7 +33,7 @@ class StockConfigForm extends ConfigFormBase {
   /**
    * The Stock Service Manager.
    *
-   * @var \Drupal\commerce_stock\Plugin\StockEventsManager
+   * @var \Drupal\commerce_stock\StockEventsManager
    */
   protected $stockEventsManager;
 
@@ -48,7 +48,7 @@ class StockConfigForm extends ConfigFormBase {
    *   The entity type bundle info service.
    * @param \Drupal\commerce_stock\StockServiceManagerInterface $stock_service_manager
    *   The stock service manager.
-   * @param \Drupal\commerce_stock\Plugin\StockEventsManager $stock_events_manager
+   * @param \Drupal\commerce_stock\StockEventsManager $stock_events_manager
    *   The stock events plugin manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, StockServiceManagerInterface $stock_service_manager, StockEventsManager $stock_events_manager) {

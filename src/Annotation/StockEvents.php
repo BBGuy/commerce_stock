@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a Stock events item annotation object.
  *
- * @see \Drupal\commerce_stock\Plugin\StockEventsManager
+ * @see \Drupal\commerce_stock\StockEventsManager
  * @see plugin_api
  *
  * @Annotation

@@ -15,7 +15,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
   /**
    * The testing profile.
    *
-   * @var string $profile
+   * @var string
    */
   protected $profile = 'testing';
 

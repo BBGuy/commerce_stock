@@ -12,10 +12,11 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber;
+use Drupal\commerce_stock\StockEventsManagerInterface;
+use Drupal\commerce_stock\StockEventTypeManagerInterface;
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\profile\Entity\Profile;
 use Drupal\Tests\commerce_stock\Kernel\CommerceStockKernelTestBase;
 
@@ -380,7 +381,6 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $config->set('core_stock_events_order_updates', FALSE);
     $config->set('core_stock_events_order_cancel', FALSE);
     $config->set('core_stock_events_order_complete', FALSE);
-    $config->set('core_stock_events_order_place', FALSE);
     $config->save();
 
     $transition = $this->order->getState()->getTransitions();
@@ -562,10 +562,11 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $event = $prophecy->reveal();
 
     $stockServiceManagerStub = $this->prophesize(StockServiceManager::class);
-    $eventTypeManagerStub = $this->prophesize(PluginManagerInterface::class);
+    $eventTypeManagerStub = $this->prophesize(StockEventTypeManagerInterface::class);
+    $eventsManagerStub = $this->prophesize(StockEventsManagerInterface::class);
     $entityTypeManager = \Drupal::EntityTypeManager();
 
-    $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal(), $eventTypeManagerStub->reveal(), $entityTypeManager);
+    $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal(), $eventTypeManagerStub->reveal(), $eventsManagerStub->reveal(), $entityTypeManager);
     $sut->onOrderUpdate($event);
   }
 

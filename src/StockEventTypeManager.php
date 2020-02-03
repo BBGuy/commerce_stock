@@ -2,14 +2,14 @@
 
 namespace Drupal\commerce_stock;
 
-use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Plugin\DefaultPluginManager;
 
 /**
  * Provides the Stock Event Type plugin manager.
  */
-class StockEventTypeManager extends DefaultPluginManager {
+class StockEventTypeManager extends DefaultPluginManager implements StockEventTypeManagerInterface {
 
   /**
    * Constructs a new StockEventTypeManager object.
@@ -22,7 +22,11 @@ class StockEventTypeManager extends DefaultPluginManager {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(
+    \Traversable $namespaces,
+    CacheBackendInterface $cache_backend,
+    ModuleHandlerInterface $module_handler
+  ) {
     parent::__construct('Plugin/Commerce/StockEventType', $namespaces, $module_handler, 'Drupal\commerce_stock\Plugin\Commerce\StockEventType\StockEventTypeInterface', 'Drupal\commerce_stock\Annotation\StockEventType');
     $this->alterInfo('commerce_stock_event_type_info');
     $this->setCacheBackend($cache_backend, 'commerce_stock_event_type_plugins');

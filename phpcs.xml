@@ -36,6 +36,9 @@
   <rule ref="Drupal.Commenting.DocComment.MissingShort">
     <severity>0</severity>
   </rule>
+  <rule ref="Drupal.Commenting.Deprecated.DeprecatedMissingSeeTag">
+    <severity>0</severity>
+  </rule>
   <rule ref="Drupal.Commenting.DocComment.ShortSingleLine">
     <severity>0</severity>
   </rule>

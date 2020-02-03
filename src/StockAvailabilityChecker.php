@@ -38,10 +38,7 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
    * {@inheritdoc}
    */
   public function applies(PurchasableEntityInterface $entity) {
-    $stock_service = $this->stockServiceManager->getService($entity);
-    $stock_checker = $stock_service->getStockChecker();
-
-    return $stock_checker->getIsStockManaged($entity);
+    return TRUE;
   }
 
   /**
