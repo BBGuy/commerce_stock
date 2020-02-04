@@ -37,13 +37,13 @@ class StockLocationForm extends ContentEntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        $this->messenger->addMessage($this->t('Created the %label stock location.', [
+        $this->messenger()->addMessage($this->t('Created the %label stock location.', [
           '%label' => $entity->label(),
         ]));
         break;
 
       default:
-        $this->messenger->addMessage($this->t('Saved the %label stock location.', [
+        $this->messenger()->addMessage($this->t('Saved the %label stock location.', [
           '%label' => $entity->label(),
         ]));
     }

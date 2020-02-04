@@ -84,7 +84,7 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
    */
   public function closeForm($form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
-    $this->messenger->addMessage(t('Updated the stock.'));
+    $this->messenger()->addMessage(t('Updated the stock.'));
   }
 
   /**
@@ -268,7 +268,7 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
    * Submits the form.
    */
   public function submitAll(array &$form, FormStateInterface $form_state) {
-    $this->messenger->addMessage($this->t('Updated stock!'));
+    $this->messenger()->addMessage($this->t('Updated stock!'));
   }
 
   /**
