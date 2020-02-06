@@ -1,0 +1,6 @@
+services:
+  commerce_stock_local_test.event_subscriber:
+    class: Drupal\commerce_stock_local_test\EventSubscriber\CommerceStockTransactionSubscriber
+    arguments: []
+    tags:
+      - { name: event_subscriber }

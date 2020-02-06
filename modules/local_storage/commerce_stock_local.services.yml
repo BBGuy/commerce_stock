@@ -11,7 +11,7 @@ services:
 
   commerce_stock.local_stock_updater:
     class: Drupal\commerce_stock_local\LocalStockUpdater
-    arguments: ['@database', '@commerce_stock.local_stock_checker']
+    arguments: ['@database', '@commerce_stock.local_stock_checker', '@event_dispatcher', '@entity_type.manager']
 
   commerce_stock.local_stock_service_config:
     class: Drupal\commerce_stock_local\LocalStockServiceConfig

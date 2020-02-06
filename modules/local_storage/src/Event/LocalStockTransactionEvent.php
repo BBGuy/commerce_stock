@@ -14,7 +14,10 @@ class LocalStockTransactionEvent extends Event {
    * The stock transaction.
    *
    * @var array
-   *   The local stock transaction.
+   *   Assoziative array containing all the values of the transaction.
+   *   This is essentially a map of the database columns.
+   *
+   * @see \Drupal\commerce_stock_local\LocalStockUpdater::createTransaction()
    */
   protected $stockTransaction;
 
@@ -28,24 +31,24 @@ class LocalStockTransactionEvent extends Event {
   /**
    * Constructs a new stock transaction event.
    *
-   * @param object $stock_transaction
-   *   The local stock location.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param array $stock_transaction
+   *   The local stock location.
    */
   public function __construct(
-    $stock_transaction,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
+    array $stock_transaction
   ) {
-    $this->stockTransaction = $stock_transaction;
     $this->entityTypeManager = $entity_type_manager;
+    $this->stockTransaction = $stock_transaction;
   }
 
   /**
-   * Get the stock_location_id for this transaction.
+   * Get the stock_location for this transaction.
    *
-   * @return int
-   *    The stock location.
+   * @return \Drupal\commerce_stock\StockLocationInterface
+   *   The stock location.
    */
   public function getTransactionLocation() {
     $locationId = $this->stockTransaction['location_id'];
@@ -56,8 +59,8 @@ class LocalStockTransactionEvent extends Event {
   /**
    * Get the purchasable entity.
    *
-   * @return  \Drupal\commerce\PurchasableEntityInterface
-   *    The purchasable entity.
+   * @return \Drupal\commerce\PurchasableEntityInterface
+   *   The purchasable entity.
    */
   public function getEntity() {
     $entityId = $this->stockTransaction['entity_id'];
@@ -70,7 +73,7 @@ class LocalStockTransactionEvent extends Event {
    * Get the quantity.
    *
    * @return int
-   *    The quantity value.
+   *   The quantity value.
    */
   public function getQuantity() {
     return $this->stockTransaction['qty'];

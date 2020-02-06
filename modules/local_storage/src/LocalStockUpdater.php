@@ -5,8 +5,12 @@ namespace Drupal\commerce_stock_local;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_stock\StockCheckInterface;
 use Drupal\commerce_stock\StockUpdateInterface;
+use Drupal\commerce_stock_local\Event\LocalStockTransactionEvent;
+use Drupal\commerce_stock_local\Event\LocalStockTransactionEvents;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class LocalStockUpdater.
@@ -28,16 +32,41 @@ class LocalStockUpdater implements StockUpdateInterface {
   protected $checker;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs the local stock updater.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    * @param \Drupal\commerce_stock\StockCheckInterface $checker
    *   The local stock checker.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(Connection $database, StockCheckInterface $checker) {
+  public function __construct(
+    Connection $database,
+    StockCheckInterface $checker,
+    EventDispatcherInterface $event_dispatcher,
+    EntityTypeManagerInterface $entity_type_manager
+  ) {
     $this->database = $database;
     $this->checker = $checker;
+    $this->eventDispatcher = $event_dispatcher;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -51,14 +80,25 @@ class LocalStockUpdater implements StockUpdateInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('database'),
-      $container->get('commerce_stock.local_stock_checker')
+      $container->get('commerce_stock.local_stock_checker'),
+      $container->get('event_dispatcher'),
+      $container->get('entity_type_manager')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function createTransaction(PurchasableEntityInterface $entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, array $metadata) {
+  public function createTransaction(
+    PurchasableEntityInterface $entity,
+    $location_id,
+    $zone,
+    $quantity,
+    $unit_cost,
+    $currency_code,
+    $transaction_type_id,
+    array $metadata
+  ) {
     // Get optional fields.
     $related_tid = isset($metadata['related_tid']) ? $metadata['related_tid'] : NULL;
     $related_oid = isset($metadata['related_oid']) ? $metadata['related_oid'] : NULL;
@@ -82,10 +122,14 @@ class LocalStockUpdater implements StockUpdateInterface {
       'data' => serialize($data),
     ];
 
+    $event = new LocalStockTransactionEvent($this->entityTypeManager, $field_values);
+
+    $this->eventDispatcher->dispatch(LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_CREATE, $event);
     $insert = $this->database->insert('commerce_stock_transaction')
       ->fields(array_keys($field_values))
       ->values(array_values($field_values))->execute();
 
+    $this->eventDispatcher->dispatch(LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_INSERT, $event);
     return $insert;
   }
 
@@ -97,7 +141,10 @@ class LocalStockUpdater implements StockUpdateInterface {
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.
    */
-  public function updateLocationStockLevel($location_id, PurchasableEntityInterface $entity) {
+  public function updateLocationStockLevel(
+    $location_id,
+    PurchasableEntityInterface $entity
+  ) {
     $current_level = $this->checker->getLocationStockLevel($location_id, $entity);
     $last_update = $current_level['last_transaction'];
     $latest_txn = $this->checker->getLocationStockTransactionLatest($location_id, $entity);
@@ -123,7 +170,12 @@ class LocalStockUpdater implements StockUpdateInterface {
    * @param int $last_txn
    *   The last transaction id.
    */
-  public function setLocationStockLevel($location_id, PurchasableEntityInterface $entity, $qty, $last_txn) {
+  public function setLocationStockLevel(
+    $location_id,
+    PurchasableEntityInterface $entity,
+    $qty,
+    $last_txn
+  ) {
     $existing = $this->database->select('commerce_stock_location_level', 'll')
       ->fields('ll')
       ->condition('location_id', $location_id)
@@ -143,8 +195,20 @@ class LocalStockUpdater implements StockUpdateInterface {
     }
     else {
       $this->database->insert('commerce_stock_location_level')
-        ->fields(['location_id', 'entity_id', 'entity_type', 'qty', 'last_transaction_id'])
-        ->values([$location_id, $entity->id(), $entity->getEntityTypeId(), $qty, $last_txn])
+        ->fields([
+          'location_id',
+          'entity_id',
+          'entity_type',
+          'qty',
+          'last_transaction_id',
+        ])
+        ->values([
+          $location_id,
+          $entity->id(),
+          $entity->getEntityTypeId(),
+          $qty,
+          $last_txn,
+        ])
         ->execute();
     }
   }
