@@ -63,7 +63,7 @@ class LocalStockUninstallValidator implements ModuleUninstallValidatorInterface 
         $storage = $this->entityTypeManager->getStorage($entity_type_id);
 
         if ($storage instanceof SqlContentEntityStorage) {
-          foreach ($this->entityField->getActiveFieldStorageDefinitions() as $storage_definition) {
+          foreach ($this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type_id) as $storage_definition) {
             if (
               $storage_definition->getProvider() == $module
               && $storage instanceof FieldableEntityStorageInterface
