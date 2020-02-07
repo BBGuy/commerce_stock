@@ -62,6 +62,7 @@ class StockLevel extends FieldItemBase {
     $properties['available_stock'] = DataDefinition::create('float')
       ->setLabel(t('Available stock'))
       ->setComputed(TRUE)
+      ->setInternal(FALSE)
       ->setReadOnly(TRUE)
       ->setClass('Drupal\commerce_stock_field\StockLevelProcessor')
       ->setSetting('stock level', 'summary');
