@@ -22,3 +22,9 @@ services:
       tags:
         - { name: module_install.uninstall_validator }
       arguments: ['@entity_type.manager', '@string_translation', '@entity_field.manager']
+
+  commerce_stock_local.transaction_subscriber:
+    class: Drupal\commerce_stock_local\EventSubscriber\CommerceLocalStockTransactionSubscriber
+    arguments: ['@cache_tags.invalidator']
+    tags:
+      - { name: event_subscriber }

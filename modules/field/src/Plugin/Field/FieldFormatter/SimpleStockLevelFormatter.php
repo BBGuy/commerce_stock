@@ -86,7 +86,6 @@ class SimpleStockLevelFormatter extends FormatterBase implements ContainerFactor
       '#type' => 'html_tag',
       '#tag' => 'p',
       '#value' => $level,
-      '#cache' => ['max-age' => 2],
     ];
 
     return $elements;
