@@ -340,10 +340,10 @@ function commerce_stock_local_views_data() {
       'click sortable' => FALSE,
     ],
     'filter' => [
-      'id' => 'Standard',
+      'id' => 'string',
     ],
     'argument' => [
-      'id' => 'Standard',
+      'id' => 'standard',
     ],
     'sort' => [
       'id' => 'standard',
