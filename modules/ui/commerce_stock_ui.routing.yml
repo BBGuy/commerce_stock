@@ -10,6 +10,6 @@ commerce_stock_ui.stock_transactions2:
   path: '/admin/commerce/config/stock/transactions2'
   defaults:
     _form: '\Drupal\commerce_stock_ui\Form\StockTransactions2'
-    _title: 'Create stock transaction'
+    _title_callback: '\Drupal\commerce_stock_ui\Form\StockTransactions2::getTitle'
   requirements:
     _access: 'TRUE'
