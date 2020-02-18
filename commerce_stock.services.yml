@@ -18,10 +18,14 @@ services:
 
   commerce_stock.order_event_subscriber:
     class: Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber
-    arguments: ['@commerce_stock.service_manager']
+    arguments: ['@commerce_stock.service_manager', '@plugin.manager.commerce_stock_event_type', '@plugin.manager.stock_events', '@entity_type.manager',]
     tags:
       - { name: 'event_subscriber' }
 
   plugin.manager.stock_events:
-    class: Drupal\commerce_stock\Plugin\StockEventsManager
+    class: Drupal\commerce_stock\StockEventsManager
+    parent: default_plugin_manager
+
+  plugin.manager.commerce_stock_event_type:
+    class: Drupal\commerce_stock\StockEventTypeManager
     parent: default_plugin_manager

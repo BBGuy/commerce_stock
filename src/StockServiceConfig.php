@@ -10,9 +10,7 @@ use Drupal\commerce\Context;
  * meaningful and act as a stub to fullfil the StockServiceInterface for the
  * AlwaysInStockService.
  *
- * For a more meaningful exampand is.
- *
- * |       | removed fromle see the LocalStockServiceConfig
+ * For a more meaningful example see the LocalStockServiceConfig
  * class in the local_storage submodule.
  */
 class StockServiceConfig implements StockServiceConfigInterface {

@@ -6,7 +6,6 @@ use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_stock\Plugin\StockEventsInterface;
 use Drupal\commerce_stock\StockLocationInterface;
-use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -17,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   description = @Translation("Core stock Events."),
  * )
  */
-class CoreStockEvents extends PluginBase implements StockEventsInterface {
+class CoreStockEvents extends CoreStockEventsBase {
 
   /**
    * {@inheritdoc}
@@ -95,6 +94,54 @@ class CoreStockEvents extends PluginBase implements StockEventsInterface {
     $config->set('core_stock_events_order_updates', $values['core_stock_events_order_updates']);
 
     $config->save();
+  }
+
+  /**
+   * To ensure backwards compatibility we introduced StockEventTypes plugins
+   * without changing the StockEventsInterface. This functions maps the
+   * interface constants to StockEventTypes.
+   *
+   * @param int $event_type_id
+   *   The StockEventsInterface interface constant.
+   *
+   * @return string
+   *   The StockEventType id or FALSE if not exists.
+   */
+  public static function mapStockEventTypes($event_type_id) {
+    $map = self::getEventTypeMap();
+    $result = array_key_exists($event_type_id, $map) ? $map[$event_type_id] : FALSE;
+    return $result;
+  }
+
+  /**
+   * To ensure backwards compatibility we introduced StockEventTypes plugins
+   * without changing the StockEventsInterface. This functions maps the
+   * interface constants to StockEventTypes.
+   *
+   * @param string $stock_event_type_id
+   *   The StockEventType id.
+   *
+   * @return int
+   *   The StockEventsInterface interface constant or FALSE if it not exists.
+   */
+  public static function mapStockEventIds($stock_event_type_id) {
+    $map = array_flip(self::getEventTypeMap());
+    $result = array_key_exists($stock_event_type_id, $map) ? $map[$stock_event_type_id] : FALSE;
+    return $result;
+  }
+
+  /**
+   * Get the map of StockEvenTypes.
+   */
+  private static function getEventTypeMap() {
+    return $map = [
+      StockEventsInterface::ORDER_PLACE_EVENT => 'commerce_stock_order_place',
+      StockEventsInterface::ORDER_UPDATE_EVENT => 'commerce_stock_order_update',
+      StockEventsInterface::ORDER_CANCEL_EVENT => 'commerce_stock_order_cancel',
+      StockEventsInterface::ORDER_DELET_EVENT => 'commerce_stock_order_delete',
+      StockEventsInterface::ORDER_ITEM_DELETE_EVENT => 'commerce_stock_order_item_delete',
+      StockEventsInterface::ORDER_ITEM_UPDATE_EVENT => 'commerce_stock_order_item_update',
+    ];
   }
 
 }
