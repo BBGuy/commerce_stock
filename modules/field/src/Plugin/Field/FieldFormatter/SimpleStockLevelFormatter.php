@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldFormatter;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_stock\ContextCreatorTrait;
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -23,6 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class SimpleStockLevelFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  use ContextCreatorTrait;
 
   /**
    * The Stock Service Manager.
@@ -73,8 +76,10 @@ class SimpleStockLevelFormatter extends FormatterBase implements ContainerFactor
 
     if ($entity instanceof PurchasableEntityInterface) {
       // Get the available Stock for the product variation.
-      $stockServiceManager = $this->stockServiceManager;
-      $level = $stockServiceManager->getStockLevel($entity);
+      /** @var \Drupal\commerce_stock\StockServiceInterface $stockService */
+      $stockService = $this->stockServiceManager->getService($entity);
+      $locations = $stockService->getConfiguration()->getAvailabilityLocations($this->getContext($entity), $entity);
+      $level = $stockService->getStockChecker()->getTotalStockLevel($entity, $locations);
     }
     else {
       // No stock if this is not a purchasable entity.

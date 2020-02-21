@@ -29,6 +29,7 @@ abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
   public static $modules = [
     'commerce_stock_field',
     'commerce_stock_local',
+    'commerce_stock_ui',
   ];
 
   /**
@@ -47,8 +48,6 @@ abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
     $entity_type = "commerce_product_variation";
     $bundle = 'default';
     $this->fieldName = 'stock_level_test';
-
-    $this->drupalLogin($this->adminUser);
 
     $config = \Drupal::configFactory()
       ->getEditable('commerce_stock.service_manager');

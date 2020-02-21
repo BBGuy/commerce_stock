@@ -2,12 +2,15 @@
 
 namespace Drupal\commerce_stock_field;
 
+use Drupal\commerce_stock\ContextCreatorTrait;
 use Drupal\Core\TypedData\TypedData;
 
 /**
  * Processor used by the StockLevel field.
  */
 class StockLevelProcessor extends TypedData {
+
+  use ContextCreatorTrait;
 
   /**
    * Whether the stock level have already been computed or not.
@@ -51,7 +54,9 @@ class StockLevelProcessor extends TypedData {
     $entity = $this->getParent()->getEntity();
     /** @var \Drupal\commerce_stock\StockServiceManager $stockServiceManager */
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
-    $level = $stockServiceManager->getStockLevel($entity);
+    $context = $this->getContext($entity);
+    $locations = $stockServiceManager->getService($entity)->getConfiguration()->getAvailabilityLocations($context, $entity);
+    $level = $stockServiceManager->getService($entity)->getStockChecker()->getTotalStockLevel($entity, $locations);
     $this->processedLevel = $level;
   }
 
