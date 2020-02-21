@@ -35,6 +35,32 @@ Download or clone the
 
 ### Other configuration
 
+#### Using Widgets for updating stock
+Commerce stock comes with three widgets for stock level editing.
+To set the widget, go to the "Manage form display" of the product variation
+type you want to set and use the Widget drop-down of the "Stock Level" field.
+
+The following are the widgets and their functionality:
+
+"Absolute stock level" - This is the equivalent to the Drupal 7 version and
+allows setting the current stock level. The list secure approach and not
+recommended for live sites as other stock transactions can occur from the point
+a stock count was made and the entering of the data. Can be handy for priming a
+new site and stock takes while in maintenance mode.
+
+"Simple stock transaction" - A simple form for creating transactions. Allows
+for entering of positive (stock in) and negative (stock out) transactions.
+Targeted at simple sites that don't require much extra metadata about their
+transactions.
+
+"Link to stock transaction form" - This provides a link to a transaction form
+providing full transaction details.
+
+Both "Absolute stock level" and "Simple stock transaction" also have the
+options: "Allow custom note per transaction." and "Allow decimal quantities".
+This and more are available on the "stock transaction form" so not needed as
+an options for the "Link to stock transaction form" widget.
+
 #### Event handling
 By default, the stock system reacts only on "order complete" events - creates a
 negative transaction resulting with that stock no longer available.
