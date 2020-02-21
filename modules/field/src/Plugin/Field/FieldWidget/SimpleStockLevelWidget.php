@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldWidget;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_stock\ContextCreatorTrait;
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -30,6 +31,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPluginInterface {
+
+  use ContextCreatorTrait;
 
   use MessengerTrait;
 
@@ -142,10 +145,11 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
       return [];
     }
 
-    // Get the Stock service manager.
-    $stockServiceManager = $this->stockServiceManager;
     // If not a valid context.
-    if (!$stockServiceManager->isValidContext($entity)) {
+    try {
+      $this->getContext($entity);
+    }
+    catch (\Exception $e) {
       // If context fallback is not set.
       if (!$this->getSetting('context_fallback')) {
         // Return an empty form.
@@ -282,7 +286,10 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
         return $values;
       }
       $new_level = $values[0]['stock_level'];
-      $current_level = $this->stockServiceManager->getStockLevel($values[0]['stocked_entity']);
+      $purchasable_entity = $values[0]['stocked_entity'];
+      $stockService = $this->stockServiceManager->getService($purchasable_entity);
+      $locations = $stockService->getConfiguration()->getAvailabilityLocations($this->getContext($purchasable_entity), $purchasable_entity);
+      $current_level = $stockService->getStockChecker()->getTotalStockLevel($purchasable_entity, $locations);
       $values[0]['adjustment'] = $new_level - $current_level;
 
       return $values;

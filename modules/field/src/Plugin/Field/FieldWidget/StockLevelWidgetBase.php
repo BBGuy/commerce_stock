@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldWidget;
 
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_stock\ContextCreatorTrait;
 use Drupal\commerce_stock\StockServiceManager;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -15,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides the base structure for commerce stock level widgets.
  */
 abstract class StockLevelWidgetBase extends WidgetBase implements ContainerFactoryPluginInterface {
+
+  use ContextCreatorTrait;
 
   /**
    * The Stock Service Manager.
@@ -193,7 +196,7 @@ abstract class StockLevelWidgetBase extends WidgetBase implements ContainerFacto
     $element['#attributes'] = ['class' => ['stock-level-field']];
 
     // If not a valid context.
-    if (!$this->stockServiceManager->isValidContext($entity)) {
+    if (!$this->isValidContext($entity)) {
       $element['#description'] = [
         '#type' => 'html_tag',
         '#tag' => 'div',

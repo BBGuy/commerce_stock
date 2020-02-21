@@ -1,29 +1,21 @@
 <?php
 
-namespace Drupal\Tests\commerce_stock\Functional;
+namespace Drupal\Tests\commerce_stock\FunctionalJavascript;
 
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_stock_local\Entity\StockLocation;
 use Drupal\commerce_store\StoreCreationTrait;
-use Drupal\Tests\commerce\Functional\CommerceBrowserTestBase;
+use Drupal\FunctionalJavascriptTests\JSWebAssert;
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\commerce\Traits\CommerceBrowserTestTrait;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
 
 /**
  * Defines base class for commerce stock test cases.
  */
-abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
+abstract class StockWebDriverTestBase extends WebDriverTestBase {
 
-  /**
-   * The testing profile.
-   *
-   * @var string
-   */
-  protected $profile = 'testing';
-
-  use EntityReferenceTestTrait;
   use StoreCreationTrait;
   use CommerceBrowserTestTrait;
 
@@ -33,6 +25,11 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
    * @var array
    */
   public static $modules = [
+    'system',
+    'field',
+    'block',
+    'commerce',
+    'commerce_price',
     'commerce_store',
     'commerce_product',
     'commerce_order',
@@ -69,6 +66,13 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
    * @var \Drupal\commerce_store\Entity\StoreInterface[]
    */
   protected $stores;
+
+  /**
+   * A test user with administrative privileges.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $adminUser;
 
   /**
    * {@inheritdoc}
@@ -145,11 +149,40 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
   }
 
   /**
+   * Waits for the given time or until the given JS condition becomes TRUE.
+   *
+   * @param string $condition
+   *   JS condition to wait until it becomes TRUE.
+   * @param int $timeout
+   *   (Optional) Timeout in milliseconds, defaults to 1000.
+   * @param string $message
+   *   (optional) A message to display with the assertion. If left blank, a
+   *   default message will be displayed.
+   *
+   * @see \Behat\Mink\Driver\DriverInterface::evaluateScript()
+   */
+  protected function assertJsCondition($condition, $timeout = 1000, $message = '') {
+    $message = $message ?: "Javascript condition met:\n" . $condition;
+    $result = $this->getSession()->getDriver()->wait($timeout, $condition);
+    $this->assertNotEmpty($result, $message);
+  }
+
+  /**
    * Waits for jQuery to become active and animations to complete.
    */
   protected function waitForAjaxToFinish() {
     $condition = "(0 === jQuery.active && 0 === jQuery(':animated').length)";
     $this->assertJsCondition($condition, 10000);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \Drupal\FunctionalJavascriptTests\JSWebAssert
+   *   A new web-assert option for asserting the presence of elements with.
+   */
+  public function assertSession($name = NULL) {
+    return new JSWebAssert($this->getSession($name), $this->baseUrl);
   }
 
 }

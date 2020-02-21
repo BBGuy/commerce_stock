@@ -27,7 +27,6 @@ class ProductAdminTest extends StockBrowserTestBase {
   public function testCreateProductVariationForm() {
 
     $this->drupalGet('admin/commerce/products');
-    $this->assertSession()->statusCodeEquals(200);
     $this->getSession()->getPage()->clickLink('Add product');
 
     // Create a product.
@@ -58,6 +57,7 @@ class ProductAdminTest extends StockBrowserTestBase {
     $variation_sku = $this->randomMachineName();
     $this->getSession()->getPage()->fillField('sku[0][value]', $variation_sku);
     $this->getSession()->getPage()->fillField('price[0][number]', '9.99');
+    $this->getSession()->getPage()->fillField('title[0][value]', $this->randomString());
     $this->submitForm([], t('Save'));
     $this->assertSession()->statusCodeEquals(200);
 
@@ -74,10 +74,12 @@ class ProductAdminTest extends StockBrowserTestBase {
     $product = $this->createEntity('commerce_product', [
       'type' => 'default',
     ]);
+    $original_sku = strtolower($this->randomMachineName());
     $variation = $this->createEntity('commerce_product_variation', [
       'type' => 'default',
       'product_id' => $product->id(),
-      'sku' => strtolower($this->randomMachineName()),
+      'sku' => $original_sku,
+      'title' => $this->randomString(),
     ]);
 
     $this->drupalGet($variation->toUrl('edit-form'));
@@ -109,7 +111,7 @@ class ProductAdminTest extends StockBrowserTestBase {
       ->getStorage('commerce_product_variation')
       ->resetCache([$variation->id()]);
     $variation = ProductVariation::load($variation->id());
-    $this->assertEquals($variation->getSku(), $new_sku);
+    $this->assertEquals($variation->getSku(), $new_sku, 'SKU successfully changed.');
     $this->assertEquals($variation->getPrice()->getNumber(), $new_price_amount);
     $this->assertEquals('1', $variation->get('commerce_stock_always_in_stock')
       ->getValue()[0]['value']);

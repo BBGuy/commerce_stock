@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_stock_field\Plugin\Field\FieldType;
 
+use Drupal\commerce_stock\ContextCreatorTrait;
 use Drupal\commerce_stock\StockTransactionsInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -22,6 +23,8 @@ use Drupal\Core\TypedData\DataDefinition;
  * )
  */
 class StockLevel extends FieldItemBase {
+
+  use ContextCreatorTrait;
 
   /**
    * {@inheritdoc}
@@ -156,7 +159,9 @@ class StockLevel extends FieldItemBase {
       $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
       // @todo Add zone and location to form.
       /** @var \Drupal\commerce_stock\StockLocationInterface $location */
-      $location = $stockServiceManager->getTransactionLocation($stockServiceManager->getContext($entity), $entity, $transaction_qty);
+      $location = $stockServiceManager->getService($entity)
+        ->getConfiguration()
+        ->getTransactionLocation($this->getContext($entity), $entity, $transaction_qty);
       if (empty($location)) {
         // If we have no location, something isn't properly configured.
         throw new \RuntimeException('The StockServiceManager didn\'t return a location. Make sure your store is set up correctly?');
