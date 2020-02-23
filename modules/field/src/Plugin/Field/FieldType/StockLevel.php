@@ -159,9 +159,7 @@ class StockLevel extends FieldItemBase {
       $transaction_type = ($transaction_qty > 0) ? StockTransactionsInterface::STOCK_IN : StockTransactionsInterface::STOCK_OUT;
       // @todo Add zone and location to form.
       /** @var \Drupal\commerce_stock\StockLocationInterface $location */
-      $location = $stockServiceManager->getService($entity)
-        ->getConfiguration()
-        ->getTransactionLocation($this->getContext($entity), $entity, $transaction_qty);
+      $location = $stockServiceManager->getTransactionLocation($this->getContext($entity), $entity, $transaction_qty);
       if (empty($location)) {
         // If we have no location, something isn't properly configured.
         throw new \RuntimeException('The StockServiceManager didn\'t return a location. Make sure your store is set up correctly?');

@@ -19,6 +19,8 @@ use Drupal\Core\Session\AccountInterface;
  */
 class StockServiceManager implements StockServiceManagerInterface, StockTransactionsInterface {
 
+  use ContextCreatorTrait;
+
   /**
    * The stock services.
    *
@@ -105,62 +107,6 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     }
 
     return $ids;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getContext(PurchasableEntityInterface $entity) {
-    return $this->getContextDetails($entity);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isValidContext(PurchasableEntityInterface $entity) {
-    try {
-      $this->getContextDetails($entity);
-    }
-    catch (\Exception $e) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * Get context details.
-   *
-   * @param \Drupal\commerce\PurchasableEntityInterface $entity
-   *   The purchasable entity.
-   *
-   * @throws \Exception
-   *   When the entity can't be purchased from the current store.
-   *
-   * @see \Drupal\commerce_cart\Form\AddToCartForm::selectStore()
-   *   Original logic comes from this function.
-   *
-   * @return \Drupal\commerce\Context
-   *   The Stock service context.
-   */
-  private function getContextDetails(PurchasableEntityInterface $entity) {
-    // Make sure the current store is in the entity stores.
-    $stores = $entity->getStores();
-    if (count($stores) === 1) {
-      $store = reset($stores);
-    }
-    elseif (count($stores) === 0) {
-      // Malformed entity.
-      throw new \Exception('The given entity is not assigned to any store.');
-    }
-    else {
-      $store = $this->currentStore->getStore();
-      if (!in_array($store, $stores)) {
-        // Indicates that the site listings are not filtered properly.
-        throw new \Exception("The given entity can't be purchased from the current store.");
-      }
-    }
-
-    return new Context($this->currentUser, $store);
   }
 
   /**

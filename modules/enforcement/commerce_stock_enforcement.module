@@ -246,6 +246,9 @@ function commerce_stock_enforcement_checkout_form_validate(
  *
  * @return \Drupal\commerce\Context
  *   The context.
+ *
+ * @see \Drupal\commerce_stock\ContextCreatorTrait::getContextDetails()
+ * @see \Drupal\commerce_cart\Form\AddToCartForm::selectStore()
  */
 function commerce_stock_enforcement_get_context(
   PurchasableEntityInterface $entity

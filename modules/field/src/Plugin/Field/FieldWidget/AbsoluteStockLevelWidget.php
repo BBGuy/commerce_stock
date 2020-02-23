@@ -78,10 +78,7 @@ class AbsoluteStockLevelWidget extends StockLevelWidgetBase {
         return $values;
       }
       $new_level = $values[0]['stock_level'];
-      $purchasable_entity = $values[0]['stocked_entity'];
-      $stockService = $this->stockServiceManager->getService($purchasable_entity);
-      $locations = $stockService->getConfiguration()->getAvailabilityLocations($this->getContext($purchasable_entity), $purchasable_entity);
-      $current_level = $stockService->getStockChecker()->getTotalStockLevel($purchasable_entity, $locations);
+      $current_level = $this->stockServiceManager->getStockLevel($values[0]['stocked_entity']);
       $values[0]['adjustment'] = $new_level - $current_level;
       return $values;
     }

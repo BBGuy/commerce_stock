@@ -33,7 +33,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   use ContextCreatorTrait;
-
   use MessengerTrait;
 
   /**
@@ -61,7 +60,12 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(
+    ContainerInterface $container,
+    array $configuration,
+    $plugin_id,
+    $plugin_definition
+  ) {
     return new static(
       $plugin_id,
       $plugin_definition,
@@ -77,7 +81,7 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
   public static function defaultSettings() {
     return [
       'transaction_note' => FALSE,
-      'entry_system'     => 'simple',
+      'entry_system' => 'simple',
       'context_fallback' => FALSE,
     ] + parent::defaultSettings();
   }
@@ -112,8 +116,8 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
     $element = [];
 
     $element['deprecation_notiz'] = [
-      '#type'  => 'html_tag',
-      '#tag'   => 'div',
+      '#type' => 'html_tag',
+      '#tag' => 'div',
       '#value' => $this->t('Deprecated: This widget is deprecated and will be removed soon. Please choose another widget.'),
     ];
 
@@ -123,7 +127,13 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(
+    FieldItemListInterface $items,
+    $delta,
+    array $element,
+    array &$form,
+    FormStateInterface $form_state
+  ) {
     $field = $items->first();
     $entity = $items->getEntity();
 
@@ -168,50 +178,50 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
     // Set the entry system so we know how to set the value.
     // @see StockLevel::setValue().
     $element['entry_system'] = [
-      '#type'  => 'value',
+      '#type' => 'value',
       '#value' => $entry_system,
     ];
     if (empty($entity->id())) {
       // We don't have a product ID yet.
       $element['#description'] = [
-        '#type'  => 'html_tag',
-        '#tag'   => 'strong',
+        '#type' => 'html_tag',
+        '#tag' => 'strong',
         '#value' => $this->t('In order to set the stock level you need to save the product first!'),
       ];
       $element['#disabled'] = TRUE;
     }
     else {
       $element['stocked_entity'] = [
-        '#type'  => 'value',
+        '#type' => 'value',
         '#value' => $entity,
       ];
       if ($entry_system == 'simple') {
         $element['stock_level'] = [
-          '#title'         => $this->t('Absolute stock level settings'),
-          '#description'   => $this->t('Sets the stock level. Current stock level: @stock_level. Note: Under the hood we create a transaction. Setting the absolute stock level may end in unexpected results. Learn more about transaction based inventory management in the docs.', ['@stock_level' => $level]),
-          '#type'          => 'number',
-          '#min'           => 0,
-          '#step'          => 1,
+          '#title' => $this->t('Absolute stock level settings'),
+          '#description' => $this->t('Sets the stock level. Current stock level: @stock_level. Note: Under the hood we create a transaction. Setting the absolute stock level may end in unexpected results. Learn more about transaction based inventory management in the docs.', ['@stock_level' => $level]),
+          '#type' => 'number',
+          '#min' => 0,
+          '#step' => 1,
           // We don't use zero as default, because its a valid value and would reset
           // the stock level to 0.
           '#default_value' => NULL,
-          '#size'          => 7,
+          '#size' => 7,
         ];
       }
       elseif ($entry_system == 'basic') {
         $element['adjustment'] = [
-          '#title'         => $this->t('Stock level adjustment'),
-          '#description'   => $this->t('A positive number will add stock, a negative number will remove stock. Current stock level: @stock_level', ['@stock_level' => $level]),
-          '#type'          => 'number',
-          '#step'          => 1,
+          '#title' => $this->t('Stock level adjustment'),
+          '#description' => $this->t('A positive number will add stock, a negative number will remove stock. Current stock level: @stock_level', ['@stock_level' => $level]),
+          '#type' => 'number',
+          '#step' => 1,
           '#default_value' => 0,
-          '#size'          => 7,
+          '#size' => 7,
         ];
       }
       elseif ($entry_system == 'transactions') {
         $element['stock_level_title'] = [
-          '#type'  => 'html_tag',
-          '#tag'   => 'div',
+          '#type' => 'html_tag',
+          '#tag' => 'div',
           '#value' => $this->t('Current stock level: @stock_level', ['@stock_level' => $level]),
         ];
         $link = Link::createFromRoute(
@@ -221,24 +231,24 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
           ['attributes' => ['target' => '_blank']]
         )->toString();
         $element['stock_transactions_form_link'] = [
-          '#type'  => 'html_tag',
-          '#tag'   => 'div',
+          '#type' => 'html_tag',
+          '#tag' => 'div',
           '#value' => $this->t('Please use the @transaction form to create any stock transactions.', ['@transaction' => $link]),
         ];
       }
       if ($this->getSetting('transaction_note')) {
         $element['stock_transaction_note'] = [
-          '#title'         => $this->t('Transaction note'),
-          '#description'   => $this->t('Add a note to this transaction.'),
-          '#type'          => 'textfield',
+          '#title' => $this->t('Transaction note'),
+          '#description' => $this->t('Add a note to this transaction.'),
+          '#type' => 'textfield',
           '#default_value' => '',
-          '#size'          => 50,
-          '#maxlength'     => 255,
+          '#size' => 50,
+          '#maxlength' => 255,
         ];
       }
       $element['deprecation_notiz'] = [
-        '#type'  => 'html_tag',
-        '#tag'   => 'div',
+        '#type' => 'html_tag',
+        '#tag' => 'div',
         '#value' => $this->t('Deprecated: This widget is deprecated and will be removed soon. Please choose another widget.'),
       ];
     }
@@ -278,7 +288,11 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+  public function massageFormValues(
+    array $values,
+    array $form,
+    FormStateInterface $form_state
+  ) {
     if (isset($values[0]['stock_level'])) {
       if (empty($values[0]['stock_level']) && $values[0]['stock_level'] !== "0") {
         $values[0]['adjustment'] = NULL;
@@ -286,10 +300,7 @@ class SimpleStockLevelWidget extends WidgetBase implements ContainerFactoryPlugi
         return $values;
       }
       $new_level = $values[0]['stock_level'];
-      $purchasable_entity = $values[0]['stocked_entity'];
-      $stockService = $this->stockServiceManager->getService($purchasable_entity);
-      $locations = $stockService->getConfiguration()->getAvailabilityLocations($this->getContext($purchasable_entity), $purchasable_entity);
-      $current_level = $stockService->getStockChecker()->getTotalStockLevel($purchasable_entity, $locations);
+      $current_level = $this->stockServiceManager->getStockLevel($values[0]['stocked_entity']);
       $values[0]['adjustment'] = $new_level - $current_level;
 
       return $values;
