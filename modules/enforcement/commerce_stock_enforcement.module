@@ -179,7 +179,7 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
     ->load($order_id);
 
   foreach ($order->getItems() as $id => $order_item) {
-    $purchased_entity = $order_item->getPurchasedEntity;
+    $purchased_entity = $order_item->getPurchasedEntity();
     if (!$purchased_entity) {
       // Not every order item has a purchased entity.
       continue;
