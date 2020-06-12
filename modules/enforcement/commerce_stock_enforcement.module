@@ -68,7 +68,12 @@ function commerce_stock_enforcement_form_alter(
         ->getStorage('commerce_order')
         ->load($order_id);
       // Force a check to display the stock state to the user.
-      commerce_stock_enforcement_is_order_in_stock($order, TRUE);
+      $request_method = \Drupal::requestStack()->getCurrentRequest()->getMethod();
+      // If a GET e.g. not a submit/post.
+      if ($request_method == 'GET' ) {
+        // Perform a check to display the stock state to the user.
+        commerce_stock_enforcement_is_order_in_stock($order, TRUE);
+      }
       // Add a form validate needed for the add to cart action.
       $form['#validate'] = array_merge($form['#validate'], ['commerce_stock_enforcement_cart_order_item_views_form_validate']);
     }
