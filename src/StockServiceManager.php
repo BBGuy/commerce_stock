@@ -38,7 +38,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   /**
    * The current store.
    *
-   * @var \Drupal\commerce_store\Entity\Store
+   * @var \Drupal\commerce_store\CurrentStoreInterface
    */
   protected $currentStore;
 

@@ -19,7 +19,7 @@ interface StockTransactionsInterface {
   const MOVEMENT_TO = 8;
 
   /**
-   * Returns the active context.
+   * Returns the active commerce context.
    *
    * This is to support UI calls.
    *
