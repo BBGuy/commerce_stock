@@ -71,10 +71,13 @@ trait ContextCreatorTrait {
       throw new \Exception('The given entity is not assigned to any store.');
     }
     else {
+      foreach ($stores as $store) {
+        $store_ids[] = $store->id();
+      }
       /** @var \Drupal\commerce_store\CurrentStore $currentStore */
       $currentStore = \Drupal::service('commerce_store.current_store');
       $store = $currentStore->getStore();
-      if (!in_array($store, $stores)) {
+      if (!in_array($store->id(), $store_ids)) {
         // Indicates that the site listings are not filtered properly.
         throw new \Exception("The given entity can't be purchased from the current store.");
       }
