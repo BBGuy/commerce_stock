@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Add the default configuration for messages.
+ */
+function commerce_stock_enforcement_update_8001() {
+  $config = \Drupal::configFactory()
+    ->getEditable('commerce_stock_enforcement.settings');
+
+  $config->set('insufficient_stock_cart', 'The maximum quantity for %name that can be ordered is %qty.');
+  $config->set('insufficient_stock_add_to_cart_zero_in_cart', 'Sorry, we only have %qty in stock and you\'ve asked for %qty_asked.');
+  $config->set('insufficient_stock_add_to_cart_quantity_in_cart', 'Sorry, we only have %qty in stock and you already added %qty_o to your cart.');
+
+  $config->save();
+}

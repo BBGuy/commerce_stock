@@ -1,0 +1,3 @@
+insufficient_stock_cart: 'The maximum quantity for %name that can be ordered is %qty.'
+insufficient_stock_add_to_cart_zero_in_cart: 'Sorry, we only have %qty in stock and you''ve asked for %qty_asked.'
+insufficient_stock_add_to_cart_quantity_in_cart: 'Sorry, we only have %qty in stock and you already added %qty_o to your cart.'

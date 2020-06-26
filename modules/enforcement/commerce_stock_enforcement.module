@@ -139,13 +139,17 @@ function commerce_stock_enforcement_add_to_cart_form_validate(
   }
 
   if ($already_ordered === 0) {
-    $message = t('Sorry we only have %qty in stock and you ask for %qty_asked.', [
+    $message_text = Drupal::config('commerce_stock_enforcement.settings')
+      ->get('insufficient_stock_add_to_cart_zero_in_cart');
+    $message = t($message_text, [
       '%qty' => $stock_level,
       '%qty_asked' => $quantity,
     ]);
   }
   else {
-    $message = t('Sorry we only have %qty in stock and you already added %qty_o to your cart.', [
+    $message_text = Drupal::config('commerce_stock_enforcement.settings')
+      ->get('insufficient_stock_add_to_cart_quantity_in_cart');
+    $message = t($message_text, [
       '%qty' => $stock_level,
       '%qty_o' => $already_ordered,
     ]);
@@ -210,10 +214,12 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
     $already_ordered = commerce_stock_enforcement_get_ordered_quantity($purchased_entity, $context);
 
     if ($qty > $stock_level) {
+      $message_text = Drupal::config('commerce_stock_enforcement.settings')
+        ->get('insufficient_stock_cart');
       $form_state->setError(
         $form['edit_quantity'][$id],
         // t('Sorry we only have %qty in stock', array('%qty' => $stock_level))
-        t('The maximum quantity for %name that can be ordered is %qty.', [
+        t($message_text, [
           '%name' => $name,
           '%qty' => $stock_level,
         ])
@@ -357,7 +363,9 @@ function commerce_stock_enforcement_is_order_in_stock(
     $stock_level = commerce_stock_enforcement_get_stock_level($purchased_entity, $order_context);
     if ($qty > $stock_level) {
       if ($show_warnings) {
-        \Drupal::messenger()->addError(t('The maximum quantity for %name that can be ordered is %qty.', [
+        $message_text = Drupal::config('commerce_stock_enforcement.settings')
+          ->get('insufficient_stock_cart');
+        \Drupal::messenger()->addError(t($message_text, [
           '%name' => $name,
           '%qty' => $stock_level,
         ]));

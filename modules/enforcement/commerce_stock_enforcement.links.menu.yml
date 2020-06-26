@@ -1,0 +1,6 @@
+commerce_stock_enforcement.settings:
+  title: 'Stock enforcement settings'
+  description: 'Configure Commerce Stock Enforcement settings.'
+  route_name: commerce_stock_enforcement.settings
+  parent: 'commerce_stock.configuration'
+  weight: 50

@@ -1,0 +1,12 @@
+commerce_stock_enforcement.settings:
+  type: config_object
+  mapping:
+    insufficient_stock_cart:
+      type: string
+      label: 'Insufficient stock message'
+    insufficient_stock_add_to_cart_zero_in_cart:
+      type: string
+      label: 'Insufficient stock message'
+    insufficient_stock_add_to_cart_quantity_in_cart:
+      type: string
+      label: 'Insufficient stock message'

@@ -1,0 +1,9 @@
+commerce_stock_enforcement.settings:
+  path: '/admin/commerce/config/stock/enforcement/settings'
+  defaults:
+    _form: '\Drupal\commerce_stock_enforcement\Form\StockEnforcementConfigForm'
+    _title: 'Configure Commerce Stock Enforcement'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
