@@ -10,6 +10,7 @@ use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Response\NeedsRedirectException;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\views\Form\ViewsForm;
@@ -141,6 +142,7 @@ function commerce_stock_enforcement_add_to_cart_form_validate(
   if ($already_ordered === 0) {
     $message_text = Drupal::config('commerce_stock_enforcement.settings')
       ->get('insufficient_stock_add_to_cart_zero_in_cart');
+    $message_text = Xss::filter($message_text);
     $message = t($message_text, [
       '%qty' => $stock_level,
       '%qty_asked' => $quantity,
@@ -149,6 +151,7 @@ function commerce_stock_enforcement_add_to_cart_form_validate(
   else {
     $message_text = Drupal::config('commerce_stock_enforcement.settings')
       ->get('insufficient_stock_add_to_cart_quantity_in_cart');
+    $message_text = Xss::filter($message_text);
     $message = t($message_text, [
       '%qty' => $stock_level,
       '%qty_o' => $already_ordered,
@@ -216,6 +219,7 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
     if ($qty > $stock_level) {
       $message_text = Drupal::config('commerce_stock_enforcement.settings')
         ->get('insufficient_stock_cart');
+      $message_text = Xss::filter($message_text);
       $form_state->setError(
         $form['edit_quantity'][$id],
         // t('Sorry we only have %qty in stock', array('%qty' => $stock_level))
@@ -365,6 +369,7 @@ function commerce_stock_enforcement_is_order_in_stock(
       if ($show_warnings) {
         $message_text = Drupal::config('commerce_stock_enforcement.settings')
           ->get('insufficient_stock_cart');
+        $message_text = Xss::filter($message_text);
         \Drupal::messenger()->addError(t($message_text, [
           '%name' => $name,
           '%qty' => $stock_level,
