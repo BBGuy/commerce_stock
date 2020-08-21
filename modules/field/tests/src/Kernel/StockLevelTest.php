@@ -225,7 +225,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
   }
 
   /**
-   * @covers ::generateSampleValue().
+   * Tests the ::generateSampleValue() method.
    */
   public function testSampeValueGenerator() {
     $i = 0;
@@ -235,7 +235,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
       $value = $sampleValue['value'];
       $this->assertTrue(is_float($value));
       $this->assertTrue(is_float($value));
-      $this->assertTrue(999 <= $value && -999 >= $value);
+      $this->assertTrue(999 >= $value && -999 <= $value);
       $i++;
     }
   }

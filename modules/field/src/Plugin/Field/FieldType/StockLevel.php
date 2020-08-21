@@ -191,16 +191,14 @@ class StockLevel extends FieldItemBase {
     FieldDefinitionInterface $field_definition
   ) {
     // Hint: These are our hardcoded values from the schema definitiion.
-    $scale = 4;
     // We could use a decimal with 15 digits, but lets keep it closer to the
     // 99% use cases. A random float between -999 and +999 should do it.
-    $max = 999;
-    $min = -999;
-    // @see "Example #1 Calculate a random floating-point number" in
-    // http://php.net/manual/function.mt-getrandmax.php
-    $random_decimal = -$min + mt_rand() / mt_getrandmax() * ($max - $min);
+    $scale = 4;
+    // (mt_rand() / $r_max) = A number between 0 and 1.
+    $random_decimal =  (mt_rand() / mt_getrandmax() * 999 * 2) - 999;
     // @see Drupal\Core\Field\Plugin\Field\FieldTypeNumericItemBase::truncateDecimal()
     $values['value'] = floor($random_decimal * pow(10, $scale)) / pow(10, $scale);
+    return $values;
   }
 
 }
