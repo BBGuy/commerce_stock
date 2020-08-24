@@ -71,7 +71,7 @@ function commerce_stock_enforcement_form_alter(
       // Force a check to display the stock state to the user.
       $request_method = \Drupal::requestStack()->getCurrentRequest()->getMethod();
       // If a GET e.g. not a submit/post.
-      if ($request_method == 'GET' ) {
+      if ($request_method == 'GET') {
         // Perform a check to display the stock state to the user.
         commerce_stock_enforcement_is_order_in_stock($order, TRUE);
       }
