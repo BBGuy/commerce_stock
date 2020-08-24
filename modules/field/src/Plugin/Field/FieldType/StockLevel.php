@@ -195,7 +195,7 @@ class StockLevel extends FieldItemBase {
     // 99% use cases. A random float between -999 and +999 should do it.
     $scale = 4;
     // (mt_rand() / $r_max) = A number between 0 and 1.
-    $random_decimal =  (mt_rand() / mt_getrandmax() * 999 * 2) - 999;
+    $random_decimal = (mt_rand() / mt_getrandmax() * 999 * 2) - 999;
     // @see Drupal\Core\Field\Plugin\Field\FieldTypeNumericItemBase::truncateDecimal()
     $values['value'] = floor($random_decimal * pow(10, $scale)) / pow(10, $scale);
     return $values;

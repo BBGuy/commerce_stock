@@ -229,9 +229,9 @@ class StockLevelTest extends CommerceStockKernelTestBase {
    */
   public function testSampeValueGenerator() {
     $i = 0;
-    $FieldDefinition = $this->createMock(FieldDefinitionInterface::class);
-    while($i < 100) {
-      $sampleValue = StockLevel::generateSampleValue($FieldDefinition);
+    $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
+    while ($i < 100) {
+      $sampleValue = StockLevel::generateSampleValue($fieldDefinition);
       $value = $sampleValue['value'];
       $this->assertTrue(is_float($value));
       $this->assertTrue(is_float($value));

@@ -23,7 +23,7 @@ class StockLevelUpdater extends QueueWorkerBase {
   public function processItem($data) {
     $storage = \Drupal::entityTypeManager()->getStorage($data['entity_type']);
     $entity = $storage->load($data['entity_id']);
-    if(!$entity){
+    if (!$entity) {
       return;
     }
     // Load the Stockupdate Service.

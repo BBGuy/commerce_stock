@@ -62,7 +62,7 @@ class StockEnforcementConfigForm extends ConfigFormBase {
     foreach ($message_data as $element_name => $data) {
       $form[$message_settings][$element_name] = [
         '#type' => 'textarea',
-        '#title' => $this->t($data['title']),
+        '#title' => $this->t('@title', ['@title' => $data['title']]),
         '#default_value' => $config->get($element_name) ?? '',
       ];
 
@@ -70,11 +70,11 @@ class StockEnforcementConfigForm extends ConfigFormBase {
       $list = [
         '#theme' => 'item_list',
         '#items' => $data['tokens'],
-        '#prefix' => $this->t(' Available tokens:'),
+        '#prefix' => ' ' . $this->t('Available tokens:'),
       ];
 
       $form[$message_settings][$element_name]['#description'][] = [
-        '#markup' => $this->t($data['description']),
+        '#markup' => $this->t('@data', ['@data' => $data['description']]),
       ];
       $form[$message_settings][$element_name]['#description'][] = $list;
     }
