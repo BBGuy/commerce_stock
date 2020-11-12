@@ -2,9 +2,10 @@
 
 namespace Drupal\commerce_stock;
 
-use Drupal\commerce\AvailabilityCheckerInterface;
+use Drupal\commerce_order\AvailabilityCheckerInterface;
 use Drupal\commerce\Context;
-use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\commerce_order\AvailabilityResult;
 
 /**
  * The entry point for availability checking through Commerce Stock.
@@ -37,27 +38,18 @@ class StockAvailabilityChecker implements AvailabilityCheckerInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(PurchasableEntityInterface $entity) {
+  public function applies(OrderItemInterface $order_item) {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
-   *
-   * We don't do anything here. The AvailibilityCheckerInterface allows only
-   * TRUE/FALSE as answer. This isn't enough for sophisticated use cases.
-   *
-   * See the commerce_stock.module for certain inception points.
-   *
-   * @see https://www.drupal.org/project/commerce/issues/2710107
-   * @see https://www.drupal.org/project/commerce/issues/2937041
    */
   public function check(
-    PurchasableEntityInterface $entity,
-    $quantity,
-    Context $context
+      OrderItemInterface $order_item,
+      Context $context
   ) {
-    return TRUE;
+    return (new AvailabilityResult(TRUE))->isNeutral();
   }
 
 }

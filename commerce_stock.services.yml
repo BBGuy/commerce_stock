@@ -3,7 +3,7 @@ services:
     class: Drupal\commerce_stock\StockAvailabilityChecker
     arguments: ['@commerce_stock.service_manager']
     tags:
-      - { name: commerce.availability_checker, priority: 0 }
+      - { name: commerce_order.availability_checker, priority: 0 }
 
   commerce_stock.service_manager:
     class: Drupal\commerce_stock\StockServiceManager

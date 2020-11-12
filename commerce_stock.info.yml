@@ -5,5 +5,6 @@ dependencies:
   - commerce:commerce_product
   - commerce:commerce_order
 core: 8.x
+core_version_requirement: ^8 || ^9
 type: module
 configure: commerce_stock.admin_settings

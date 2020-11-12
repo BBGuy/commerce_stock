@@ -6,4 +6,5 @@ dependencies:
   - commerce:commerce_product
   - commerce_stock:commerce_stock
 core: 8.x
+core_version_requirement: ^8 || ^9
 configure: commerce_stock_enforcement.settings

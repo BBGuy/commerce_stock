@@ -2,6 +2,7 @@ name: 'Commerce Stock UI'
 description: 'Provides forms, admin views and other user interface elements for the commerce stock module.'
 package: 'Commerce Stock'
 core: 8.x
+core_version_requirement: ^8 || ^9
 type: module
 dependencies:
   - commerce:commerce_stock
