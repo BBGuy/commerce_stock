@@ -6,6 +6,8 @@ use Drupal\commerce_stock\StockLocationInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\commerce\EntityOwnerTrait;
 
 /**
  * Defines the stock location entity.
@@ -24,6 +26,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   handlers = {
  *     "event" = "Drupal\commerce_stock_local\Event\StockLocationEvent",
  *     "storage" = "Drupal\commerce_stock_local\StockLocationStorage",
+ *     "access" = "Drupal\entity\EntityAccessControlHandler",
+ *     "permission_provider" = "Drupal\entity\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_stock_local\StockLocationListBuilder",
  *     "views_data" = "Drupal\commerce_stock_local\Entity\StockLocationViewsData",
@@ -39,10 +43,11 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *        "delete-multiple" = "Drupal\entity\Routing\DeleteMultipleRouteProvider",
  *     },
  *   },
+ *   admin_permission = "administer commerce_stock_location",
+ *   permission_granularity = "bundle",
+ *   translatable = TRUE,
  *   base_table = "commerce_stock_location",
  *   data_table = "commerce_stock_location_field_data",
- *   translatable = TRUE,
- *   admin_permission = "administer commerce stock location entities",
  *   entity_keys = {
  *     "id" = "location_id",
  *     "bundle" = "type",
@@ -50,6 +55,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "uuid" = "uuid",
  *     "langcode" = "langcode",
  *     "status" = "status",
+ *     "owner" = "uid",
  *   },
  *   links = {
  *     "canonical" = "/commerce_stock_location/{commerce_stock_location}",
@@ -64,6 +70,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
  * )
  */
 class StockLocation extends ContentEntityBase implements LocalStockLocationInterface, StockLocationInterface {
+
+  use EntityOwnerTrait;
 
   /**
    * {@inheritdoc}
@@ -112,8 +120,27 @@ class StockLocation extends ContentEntityBase implements LocalStockLocationInter
   /**
    * {@inheritdoc}
    */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
+      $translation = $this->getTranslation($langcode);
+
+      // Explicitly set the owner ID to 0 if the translation owner is anonymous
+      // (This will ensure we don't store a broken reference in case the user
+      // no longer exists).
+      if ($translation->getOwner()->isAnonymous()) {
+        $translation->setOwnerId(0);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
+    $fields += static::ownerBaseFieldDefinitions($entity_type);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))

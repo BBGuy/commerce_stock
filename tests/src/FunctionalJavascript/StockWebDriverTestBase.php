@@ -92,6 +92,8 @@ abstract class StockWebDriverTestBase extends WebDriverTestBase {
       'administer commerce_store',
       'administer commerce_store_type',
       'administer commerce_order',
+      'administer commerce_stock_location',
+      'administer commerce_stock_location_type',
     ], []);
   }
 

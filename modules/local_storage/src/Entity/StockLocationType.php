@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *   id = "commerce_stock_location_type",
  *   label = @Translation("Stock location type"),
  *   handlers = {
+ *     "access" = "Drupal\entity\BundleEntityAccessControlHandler",
  *     "list_builder" = "Drupal\commerce_stock_local\StockLocationTypeListBuilder",
  *     "form" = {
  *       "add" = "Drupal\commerce_stock_local\Form\StockLocationTypeForm",
@@ -23,7 +24,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     },
  *   },
  *   config_prefix = "commerce_stock_location_type",
- *   admin_permission = "administer commerce stock location entities",
+ *   admin_permission = "administer commerce_stock_location_type",
  *   bundle_of = "commerce_stock_location",
  *   entity_keys = {
  *     "id" = "id",
