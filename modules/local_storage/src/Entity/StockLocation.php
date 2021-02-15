@@ -30,7 +30,7 @@ use Drupal\commerce\EntityOwnerTrait;
  *     "permission_provider" = "Drupal\entity\EntityPermissionProvider",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\commerce_stock_local\StockLocationListBuilder",
- *     "views_data" = "Drupal\commerce_stock_local\Entity\StockLocationViewsData",
+ *     "views_data" = "Drupal\commerce_stock_local\StockLocationViewsData",
  *     "translation" = "Drupal\commerce_stock_local\StockLocationTranslationHandler",
  *     "form" = {
  *       "default" = "Drupal\commerce_stock_local\Form\StockLocationForm",
