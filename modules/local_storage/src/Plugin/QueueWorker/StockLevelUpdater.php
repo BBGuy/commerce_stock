@@ -38,6 +38,7 @@ class StockLevelUpdater extends QueueWorkerBase {
     foreach ($locations as $location) {
       $updater->updateLocationStockLevel($location->getId(), $entity);
     }
+    $entity->save();
   }
 
 }
