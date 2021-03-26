@@ -117,10 +117,16 @@ function commerce_stock_enforcement_add_to_cart_form_validate(
   else {
     $quantity = 1;
   }
+
   // Load the product variation.
-  $variation_id = $values['purchased_entity'][0]['variation'];
-  /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
-  $purchased_entity = ProductVariation::load($variation_id);
+  if (isset($values['purchased_entity'][0]['variation'])) {
+    $variation_id = $values['purchased_entity'][0]['variation'];
+    /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
+    $purchased_entity = ProductVariation::load($variation_id);
+  }
+  else {
+    $purchased_entity = ProductVariation::load($values['purchased_entity'][0]['target_id']);
+  }
 
   // ** @var Drupal\Core\Form\FormInterface $form_object */
   // $entity_form = $form_state->getFormObject();
