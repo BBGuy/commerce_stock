@@ -4,7 +4,7 @@ commerce_stock_ui.stock_transactions1:
     _form: '\Drupal\commerce_stock_ui\Form\StockTransactions1'
     _title: 'Create stock transaction'
   requirements:
-    _access: 'TRUE'
+    _permission: 'use commerce stock transaction form'
 
 commerce_stock_ui.stock_transactions2:
   path: '/admin/commerce/config/stock/transactions2'
@@ -12,4 +12,4 @@ commerce_stock_ui.stock_transactions2:
     _form: '\Drupal\commerce_stock_ui\Form\StockTransactions2'
     _title_callback: '\Drupal\commerce_stock_ui\Form\StockTransactions2::getTitle'
   requirements:
-    _access: 'TRUE'
+    _permission: 'use commerce stock transaction form'

@@ -1,0 +1,8 @@
+access commerce stock administration pages:
+  title: 'Access Commerce Stock administration pages'
+  description: 'Use Commerce Stock administrative pages and functionality.'
+
+administer commerce stock:
+  title: 'Administer Commerce Stock'
+  description: 'Administer the Commerce Stock settings.'
+  restrict access: true
