@@ -18,6 +18,7 @@ Download or clone the
     * Commerce Stock Field
     * Commerce Stock Local Storage
     * Commerce Stock UI
+    * Commerce Stock Enforcement (optional)
 
 2. Commerce >> Configuration >> Stock >> Stock configuration
     * Set Default service to "Local stock" (optionally select Local stock only
@@ -30,8 +31,11 @@ Download or clone the
     * Select "Stock Level" under the "General" section and name the field "stock
      level"
     * Save and continue
-    * Set "Allowed number of values" to 1 and "Save field settings"
+    * "Allowed number of values" is set to 1 - "Save field settings"
     * "Save settings" one last time
+If you have more product variation types:
+   * Reuse the field that was created for the Default Product variation type:
+     "field_stock_level"
 
 ### Other configuration
 
