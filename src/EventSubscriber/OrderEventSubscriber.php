@@ -124,6 +124,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public function onOrderUpdate(OrderEvent $event) {
     $eventType = $this->getEventType('commerce_stock_order_update');
     $order = $event->getOrder();
+    if ($order->getState()->getWorkflow()->getGroup() !== 'commerce_order') {
+      return;
+    }
     $original_order = $this->getOriginalEntity($order);
 
     foreach ($order->getItems() as $item) {
@@ -200,6 +203,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public function onOrderDelete(OrderEvent $event) {
     $eventType = $this->getEventType('commerce_stock_order_delete');
     $order = $event->getOrder();
+    if ($order->getState()->getWorkflow()->getGroup() !== 'commerce_order') {
+      return;
+    }
     if (in_array($order->getState()->value, ['draft', 'canceled'])) {
       return;
     }
@@ -237,6 +243,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order = $item->getOrder();
 
     if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
+      if ($order->getState()->getWorkflow()->getGroup() !== 'commerce_order') {
+        return;
+      }
       $original = $this->getOriginalEntity($item);
       $diff = $original->getQuantity() - $item->getQuantity();
       if ($diff) {
@@ -271,6 +280,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $item = $event->getOrderItem();
     $order = $item->getOrder();
     if ($order && !in_array($order->getState()->value, ['draft', 'canceled'])) {
+      if ($order->getState()->getWorkflow()->getGroup() !== 'commerce_order') {
+        return;
+      }
       $entity = $item->getPurchasedEntity();
       if (!$entity) {
         return;
