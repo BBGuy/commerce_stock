@@ -93,4 +93,14 @@ types (we may automate this later on):
   *  Stock allocation location (field_stock_allocation_location) - Entity
   reference to stock location - 1
 
+How to add a stock locations reference field.
+1. Add a new field
+2. Select Reference: Other.
+3. Enter the label and make sure the machine name is correct.
+4. Set the "Type of item to reference" to "Stock Location" and the "Allowed number of values"
+5. Press Save Field settings
+6. Set the "Stock location type"
+7. Press Save Setting
+
+
 You can then edit each of the stores and set the locations.
