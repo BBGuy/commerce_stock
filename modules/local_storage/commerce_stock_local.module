@@ -35,7 +35,14 @@ function commerce_stock_local_cron() {
   $next = \Drupal::state()->get('commerce_stock_local.update_level_next') ?: 0;
   $request_time = \Drupal::time()->getRequestTime();
   if ($request_time >= $next) {
-    _commerce_stock_local_update_stock_level_queue();
+    $cron_run_mode = \Drupal::config('commerce_stock_local.cron')->get('cron_run_mode');
+    if ($cron_run_mode == 'legacy') {
+      _commerce_stock_local_update_stock_level_queue_legacy();
+    }
+    else {
+      _commerce_stock_local_update_stock_level_queue();
+    }
+    // Set the next run time.
     $interval = \Drupal::config('commerce_stock_local.cron')->get('update_interval');
     \Drupal::state()->set('commerce_stock_local.update_level_next', $request_time + $interval);
   }
@@ -51,6 +58,53 @@ function commerce_stock_local_cron() {
  * @see https://www.drupal.org/node/2844010
  */
 function _commerce_stock_local_update_stock_level_queue() {
+  // Get the queue.
+  $queue = \Drupal::queue('commerce_stock_local_stock_level_updater');
+  // If we have unprocessed items.
+  if ($queue->numberOfItems() > 0) {
+    // We do not want to add more items until all qued items are processed.
+    return;
+  }
+
+  // Build the query to return only variations with new transactions.
+  $db = \Drupal::database();
+  $query = $db->select('commerce_stock_transaction', 'st_t');
+  // Join the location level table.
+  $query->leftjoin('commerce_stock_location_level', 'st_l', ' st_l.location_id = st_t.location_id and st_l.entity_id = st_t.entity_id');
+  // We only return the entity ID.
+  $query->fields('st_t', ['entity_id']);
+  // Create the OR Condition group
+  $group = $query
+    ->orConditionGroup()
+    ->isNull('st_l.entity_id')
+    ->where('st_l.last_transaction_id < st_t.id');
+  // Add OR group as a condition.
+  $query->condition($group);
+  $result = $query->distinct()->execute()->fetchAll();
+
+  /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('commerce_product_variation');
+
+  // Cycle the returned entity IDs and add them to the queue.
+  foreach ($result as $pid) {
+    $entity = $storage->load($pid->entity_id);
+    $data = [
+      'entity_id' => $entity->id(),
+      'entity_type' => $entity->getEntityTypeId(),
+    ];
+    $queue->createItem($data);
+  }
+}
+
+
+/**
+ * Updates the stock level update queue legacy system.
+ *
+ * This will systematically check all products on the site.
+ * Adds purchasable entities from the latest unprocessed stock transactions
+ * to the queue worker responsible for totaling location stock levels.
+ */
+function _commerce_stock_local_update_stock_level_queue_legacy() {
   $queue = \Drupal::queue('commerce_stock_local_stock_level_updater');
 
   // Get the last processed product id.
@@ -69,11 +123,12 @@ function _commerce_stock_local_update_stock_level_queue() {
     $llq_reset = !empty($llq_reset) ? $llq_reset : FALSE;
   }
   // Get the batch size.
-  $llq_batchsize = \Drupal::state()->get('commerce_stock_local.llq_batchsize');
+  $llq_batchsize = \Drupal::config('commerce_stock_local.cron')->get('update_batch_size');
   $llq_batchsize = !empty($llq_batchsize) ? $llq_batchsize : 50;
 
   /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
   $storage = \Drupal::entityTypeManager()->getStorage('commerce_product_variation');
+
 
   $result = $storage->getQuery()
     ->condition('variation_id', $level_last_id, '>')

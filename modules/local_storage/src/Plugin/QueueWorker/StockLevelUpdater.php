@@ -10,7 +10,7 @@ use Drupal\Core\Queue\QueueWorkerBase;
  * @QueueWorker(
  *   id = "commerce_stock_local_stock_level_updater",
  *   title = @Translation("Commerce Stock Local stock level updater"),
- *   cron = {"time" = 10}
+ *   cron = {"time" = 30}
  * )
  *
  * @ToDo Inject the config factory instead of calling \Drupal::
