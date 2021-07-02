@@ -6,9 +6,9 @@ commerce_stock_local.prepare_module_uninstall:
   requirements:
     _permission: 'administer modules'
 commerce_stock_local.cron_config_form:
-  path: '/admin/commerce/config/stock/local_stock_cron'
+  path: '/admin/commerce/config/stock/local_stock_config'
   defaults:
     _form: '\Drupal\commerce_stock_local\Form\CronConfigForm'
-    _title: 'Local Stock Cron Configuration'
+    _title: 'Local Stock Configuration'
   requirements:
     _permission: 'administer commerce stock'

@@ -130,6 +130,21 @@ class LocalStockUpdater implements StockUpdateInterface {
       ->values(array_values($field_values))->execute();
 
     $this->eventDispatcher->dispatch(LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_INSERT, $event);
+
+    // Find out if we have real-time aggregation turned on.
+    $transactions_aggregation_mode = \Drupal::config('commerce_stock_local.transactions')->get('transactions_aggregation_mode');
+    if ($transactions_aggregation_mode == 'real-time') {
+      // Aggregate if we do.
+      /** @var \Drupal\commerce_stock_local\StockLocationStorage $locationStorage */
+      $locationStorage = \Drupal::entityTypeManager()
+        ->getStorage('commerce_stock_location');
+      $locations = $locationStorage->loadEnabled($entity);
+
+      foreach ($locations as $location) {
+        $this->updateLocationStockLevel($location->getId(), $entity);
+      }
+    }
+
     return $insert;
   }
 
@@ -152,6 +167,14 @@ class LocalStockUpdater implements StockUpdateInterface {
     $new_level = $current_level['qty'] + $latest_sum;
 
     $this->setLocationStockLevel($location_id, $entity, $new_level, $latest_txn);
+
+
+    // Do we need to clear the transactions after they have been aggregated?
+    $transactions_retention = \Drupal::config('commerce_stock_local.transactions')->get('transactions_retention');
+    if ($transactions_retention == 'delete') {
+       $this->clearLocationStockTransactions($location_id, $entity, $latest_txn);
+    }
+
   }
 
   /**
@@ -211,6 +234,23 @@ class LocalStockUpdater implements StockUpdateInterface {
         ])
         ->execute();
     }
+  }
+
+
+  public function clearLocationStockTransactions(
+    $location_id,
+    PurchasableEntityInterface $entity,
+    $last_txn
+  ) {
+    $query = $this->database->delete('commerce_stock_transaction')
+      ->condition('location_id', $location_id)
+      ->condition('entity_id', $entity->id())
+      ->condition('entity_type', $entity->getEntityTypeId())
+      ->condition('id', $last_txn, '<=');
+    $result = $query->execute();
+
+    return $result;
+
   }
 
 }

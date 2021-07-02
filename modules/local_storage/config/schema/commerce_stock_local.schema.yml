@@ -1,6 +1,6 @@
 commerce_stock_local.cron:
  type: config_object
- label: 'Commerce Stock Local Cron'
+ label: 'Commerce Stock Local - Cron'
  mapping:
    update_interval:
      type: integer
@@ -8,3 +8,16 @@ commerce_stock_local.cron:
    update_batch_size:
      type: integer
      label: 'Update batch size'
+   cron_run_mode:
+     type: string
+     label: 'Cron run mode'
+commerce_stock_local.transactions:
+  type: config_object
+  label: 'Commerce Stock Local - transactions'
+  mapping:
+  transactions_aggregation_mode:
+    type: string
+    label: 'Stock aggregation mode'
+  transactions_retention:
+    type: string
+    label: 'Transactions retention'
