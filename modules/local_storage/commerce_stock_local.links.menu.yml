@@ -18,9 +18,9 @@ entity.commerce_stock_location_type.collection:
   weight: 30
 
 # Cron configuration and related behaviours
-commerce_stock_local.cron_config_form:
+commerce_stock_local.ls_config_form:
   title: 'Local stock configuration'
   description: 'Configure Commerce local stock and cron settings.'
   parent: 'commerce_stock.configuration'
-  route_name: 'commerce_stock_local.cron_config_form'
+  route_name: 'commerce_stock_local.ls_config_form'
   weight: 40

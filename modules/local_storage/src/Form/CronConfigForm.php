@@ -15,7 +15,7 @@ class CronConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'cron_config_form';
+    return 'ls_config_form';
   }
 
 
