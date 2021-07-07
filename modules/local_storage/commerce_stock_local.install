@@ -142,6 +142,13 @@ function commerce_stock_local_schema() {
 
     ],
     'primary key' => ['id'],
+    'indexes' => [
+      'entity_id__entity_type__location_id' => [
+        'entity_id',
+        'entity_type',
+        'location_id'
+      ],
+    ],
     'foreign keys' => [
       'location' => [
         'table' => 'commerce_stock_location',
@@ -400,4 +407,43 @@ function commerce_stock_local_update_8004() {
   unset($links['canonical']);
   $entity_type->set('links', $links);
   $definition_update_manager->updateEntityType($entity_type);
+}
+
+/**
+ * Add index to entity_id field in commerce_stock_transaction table.
+ */
+function commerce_stock_local_update_8005() {
+  $spec = [
+    'fields' => [
+      'entity_id' => [
+        'description' => 'Purchasable entity ID',
+        'type'        => 'int',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+      ],
+      'entity_type' => [
+        'description' => 'Purchasable entity type',
+        'type'        => 'varchar_ascii',
+        'length'      => EntityTypeInterface::ID_MAX_LENGTH,
+        'not null'    => TRUE,
+      ],
+      'location_id' => [
+        'description' => 'Transaction location ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'entity_id__entity_type__location_id' => [
+        'entity_id',
+        'entity_type',
+        'location_id'
+      ],
+    ],
+  ];
+  $schema = \Drupal::database()->schema();
+  $index_name = 'entity_id__entity_type__location_id';
+  $fields = ['entity_id', 'entity_type', 'location_id'];
+  $schema->addIndex('commerce_stock_transaction', $index_name, $fields, $spec);
 }
