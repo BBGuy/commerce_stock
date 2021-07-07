@@ -12,6 +12,129 @@ function commerce_stock_local_views_data() {
   // Define the return array.
   $data = [];
 
+  // Stock Location Level.
+  $data['commerce_stock_location_level'] = [];
+  $data['commerce_stock_location_level']['table'] = [];
+  $data['commerce_stock_location_level']['table']['group'] = t('Local Stock Location Level');
+  $data['commerce_stock_location_level']['table']['provider'] = 'commerce_stock_local';
+  $data['commerce_stock_location_level']['table']['base'] = [
+    'field' => 'location_id',
+    'title' => t('Local Stock Location Level'),
+    'help' => t('Table holding the aggregated stock levels by location.'),
+    'weight' => -10,
+  ];
+
+  // Define relationships.
+  $data['commerce_stock_location_level']['table']['join'] = [
+
+    // Relation to the location table.
+    'commerce_stock_location_field_data' => [
+      'left_field' => 'location_id',
+      'field' => 'location_id',
+    ],
+
+     // Relation to the product variation table.
+    'commerce_product_variation_field_data' => [
+      'left_field' => 'variation_id',
+      'field' => 'entity_id',
+    ],
+  ];
+
+  // Fields.
+  $data['commerce_stock_location_level']['location_id'] = [
+    'title' => t('Location ID'),
+    'help' => t('The location ID.'),
+    'field' => [
+      'id' => 'numeric',
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'argument' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+    'relationship' => [
+      'base' => 'commerce_stock_location_field_data',
+      'base field' => 'location_id',
+      'id' => 'standard',
+      'label' => t('Stock Location'),
+    ],
+  ];
+  $data['commerce_stock_location_level']['entity_id'] = [
+    'title' => t('Purchasable entity ID'),
+    'help' => t('The purchasable entity ID.'),
+    'field' => [
+      'id' => 'numeric',
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'argument' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+    'relationship' => [
+      'base' => 'commerce_product_variation_field_data',
+      'base field' => 'variation_id',
+      'id' => 'standard',
+      'label' => t('Product variation'),
+    ],
+  ];
+  $data['commerce_stock_transaction']['entity_type'] = [
+    'title' => t('Purchasable entity type'),
+    'help' => t('The purchasable entity type.'),
+    'field' => [
+      'id' => 'standard',
+    ],
+    'filter' => [
+      'id' => 'string',
+    ],
+    'argument' => [
+      'id' => 'string',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+  $data['commerce_stock_location_level']['qty'] = [
+    'title' => t('Quantity'),
+    'help' => t('The purchasable entity Stock Level/Quantity.'),
+    'field' => [
+      'id' => 'numeric',
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'argument' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+  $data['commerce_stock_location_level']['last_transaction_id'] = [
+    'title' => t('Last transaction id'),
+    'help' => t('The last transaction that was used to aggregate the stock level for the location & entity.'),
+    'field' => [
+      'id' => 'numeric',
+    ],
+    'filter' => [
+      'id' => 'numeric',
+    ],
+    'argument' => [
+      'id' => 'numeric',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+  ];
+
+
   // Stock transactions.
   $data['commerce_stock_transaction'] = [];
   $data['commerce_stock_transaction']['table'] = [];
@@ -54,6 +177,12 @@ function commerce_stock_local_views_data() {
     ],
     'sort' => [
       'id' => 'standard',
+    ],
+    'relationship' => [
+      'base' => 'commerce_product_variation_field_data',
+      'base field' => 'variation_id',
+      'id' => 'standard',
+      'label' => t('Product variation'),
     ],
   ];
   $data['commerce_stock_transaction']['entity_type'] = [
