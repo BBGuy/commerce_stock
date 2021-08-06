@@ -447,3 +447,20 @@ function commerce_stock_local_update_8005() {
   $fields = ['entity_id', 'entity_type', 'location_id'];
   $schema->addIndex('commerce_stock_transaction', $index_name, $fields, $spec);
 }
+
+
+/**
+ * Add "uid" field to the "StockLocation" entity if missing.
+ */
+function commerce_stock_local_update_8006() {
+  $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  if ($entityDefinitionUpdateManager->getFieldStorageDefinition('uid', 'commerce_stock_location') === NULL) {
+    $field = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(new TranslatableMarkup('User ID'))
+      ->setSetting('target_type', 'user')
+      ->setTranslatable(TRUE)
+      ->setDefaultValueCallback(StockLocation::class . '::getDefaultEntityOwner');
+
+    $entityDefinitionUpdateManager->installFieldStorageDefinition('uid', 'commerce_stock_location', 'commerce_stock_local', $field);
+  }
+}
