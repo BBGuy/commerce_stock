@@ -7,6 +7,8 @@
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\commerce_stock_local\Entity\StockLocation;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Implements hook_schema().
