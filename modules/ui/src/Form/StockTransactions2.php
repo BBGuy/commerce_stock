@@ -91,7 +91,14 @@ class StockTransactions2 extends FormBase {
       return $this->redirect('commerce_stock_ui.stock_transactions1');
     }
 
-    $product_variation = $this->productVariationStorage->load($variation_id);
+    if (!$product_variation = $this->productVariationStorage->load($variation_id)) {
+      // Message
+      $this->messenger()->addError($this->t('Product not found. Please select a valid product variation'));
+      return $this->redirect('commerce_stock_ui.stock_transactions1');
+    }
+
+
+
     $stockService = $this->stockServiceManager->getService($product_variation);
     $locations = $stockService->getStockChecker()->getLocationList(TRUE);
     $location_options = [];
