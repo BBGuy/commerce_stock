@@ -31,7 +31,7 @@ class StockConfigForm extends ConfigFormBase {
   protected $stockServiceManager;
 
   /**
-   * The Stock Service Manager.
+   * The Stock Event Manager.
    *
    * @var \Drupal\commerce_stock\StockEventsManager
    */
