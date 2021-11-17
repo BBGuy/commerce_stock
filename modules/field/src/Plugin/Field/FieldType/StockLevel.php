@@ -133,25 +133,21 @@ class StockLevel extends FieldItemBase {
     $entity = $this->getEntity();
     $values = $entity->{$this->getFieldDefinition()->getName()}->getValue();
     $values = reset($values);
-    // Create transaction.
-    $this->createTransaction($entity, $values);
+    // If no adjustment is made skip transaction.
+    // This should also prevent the creation of multiple transaction.
+    // On entity save.
+    if (!empty($values['adjustment'])) {
+      // Create transaction.
+      $this->createTransaction($entity, $values);
+    }
   }
 
   /**
    * Internal method to create transactions.
    */
   private function createTransaction(EntityInterface $entity, array $values) {
-    // To prevent multiple stock transactions, we need to track the processing.
-    static $processed = [];
-
-    // This is essential to prevent triggering of multiple transactions.
-    if (isset($processed[$entity->getEntityTypeId() . $entity->id()])) {
-      return;
-    }
-    $processed[$entity->getEntityTypeId() . $entity->id()] = TRUE;
-
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
-    $transaction_qty = empty($values['adjustment']) ? 0 : $values['adjustment'];
+    $transaction_qty = $values['adjustment'];
 
     // Some basic validation and type coercion.
     $transaction_qty = filter_var((float) ($transaction_qty), FILTER_VALIDATE_FLOAT);
