@@ -21,6 +21,15 @@ class StockServiceTest extends StockBrowserTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->adminUser = $this->drupalCreateUser(['administer commerce stock']);
+    $this->drupalLogin($this->adminUser);
+  }
+
+  /**
    * Tests stock service manager and configuration changes through the UI.
    *
    * @covers ::getService

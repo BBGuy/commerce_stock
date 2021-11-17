@@ -15,9 +15,9 @@ commerce_stock_local.transactions:
   type: config_object
   label: 'Commerce Stock Local - transactions'
   mapping:
-  transactions_aggregation_mode:
-    type: string
-    label: 'Stock aggregation mode'
-  transactions_retention:
-    type: string
-    label: 'Transactions retention'
+    transactions_aggregation_mode:
+      type: string
+      label: 'Stock aggregation mode'
+    transactions_retention:
+      type: string
+      label: 'Transactions retention'
