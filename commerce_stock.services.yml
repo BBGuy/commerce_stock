@@ -18,7 +18,7 @@ services:
 
   commerce_stock.order_event_subscriber:
     class: Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber
-    arguments: ['@commerce_stock.service_manager', '@plugin.manager.commerce_stock_event_type', '@plugin.manager.stock_events', '@entity_type.manager',]
+    arguments: ['@commerce_stock.service_manager', '@plugin.manager.commerce_stock_event_type', '@plugin.manager.stock_events', '@entity_type.manager', '@config.factory']
     tags:
       - { name: 'event_subscriber' }
 

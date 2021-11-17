@@ -16,6 +16,7 @@ use Drupal\commerce_stock\StockEventTypeManagerInterface;
 use Drupal\commerce_stock\StockLocationInterface;
 use Drupal\commerce_stock\StockServiceManagerInterface;
 use Drupal\commerce_stock\StockTransactionsInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -59,6 +60,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   protected $entityTypeManager;
 
   /**
+   * The config factory manager.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Constructs a new OrderReceiptSubscriber object.
    *
    * @param \Drupal\commerce_stock\StockServiceManagerInterface $stock_service_manager
@@ -74,12 +82,14 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     StockServiceManagerInterface $stock_service_manager,
     StockEventTypeManagerInterface $event_type_manager,
     StockEventsManagerInterface $events_manager,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
+    ConfigFactoryInterface $config_factory
   ) {
     $this->stockServiceManager = $stock_service_manager;
     $this->eventTypeManager = $event_type_manager;
     $this->eventsManager = $events_manager;
     $this->entityTypeManager = $entity_type_manager;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -362,7 +372,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
 
     $event_type_id = CoreStockEvents::mapStockEventIds($event_type->getPluginId());
 
-    return $this->eventsManager->createInstance('core_stock_events')
+    $event_handler = $this->configFactory->get('commerce_stock.service_manager')->get('stock_events_plugin_id');
+
+    return $this->eventsManager->createInstance($event_handler)
       ->stockEvent($context, $entity, $event_type_id, $quantity, $location,
         $transaction_type_id, $metadata);
   }
