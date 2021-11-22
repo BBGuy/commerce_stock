@@ -15,6 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\views\Form\ViewsForm;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\commerce_product\Entity\ProductVariationInterface;
 
 /**
  * Implements hook_form_alter().
@@ -28,30 +29,35 @@ function commerce_stock_enforcement_form_alter(
   // Add to cart form.
   if (strpos($form_id, "commerce_order_item_add_to_cart_form") !== FALSE
     || strpos($form_id, "commerce_order_item_dc_ajax_add_cart_form") !== FALSE) {
-    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
-    $product = $form_state->get('product');
     // Get the product variation.
     $selected_variation_id = $form_state->get('selected_variation');
     if (!empty($selected_variation_id)) {
       $selected_variation = ProductVariation::load($selected_variation_id);
     }
     else {
-      $selected_variation = $product->getDefaultVariation();
+      /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
+      $product = $form_state->get('product');
+      if (!empty($product)) {
+        $selected_variation = $product->getDefaultVariation();
+      }
     }
-    // Get the context.
-    $context = commerce_stock_enforcement_get_context($selected_variation);
 
-    // Add a form validate needed for the add to cart action.
-    $form['#validate'] = array_merge($form['#validate'], ['commerce_stock_enforcement_add_to_cart_form_validate']);
+    if (isset($selected_variation) && ($selected_variation instanceof ProductVariationInterface)) {
+      // Get the context.
+      $context = commerce_stock_enforcement_get_context($selected_variation);
 
-    // Check if in stock.
-    $instock = commerce_stock_enforcement_check($selected_variation, 1, $context);
-    if (!$instock) {
-      $form['actions']['submit']['#value'] = t('Out of stock');
-      $form['actions']['submit']['#disabled'] = TRUE;
-      // If quantity is visible.
-      if (isset($form['quantity'])) {
-        $form['quantity']['#disabled'] = TRUE;
+      // Add a form validate needed for the add to cart action.
+      $form['#validate'] = array_merge($form['#validate'], ['commerce_stock_enforcement_add_to_cart_form_validate']);
+
+      // Check if in stock.
+      $instock = commerce_stock_enforcement_check($selected_variation, 1, $context);
+      if (!$instock) {
+        $form['actions']['submit']['#value'] = t('Out of stock');
+        $form['actions']['submit']['#disabled'] = TRUE;
+        // If quantity is visible.
+        if (isset($form['quantity'])) {
+          $form['quantity']['#disabled'] = TRUE;
+        }
       }
     }
   }
