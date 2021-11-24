@@ -8,9 +8,9 @@ commerce_stock.service_manager:
 commerce_stock.core_stock_events:
   type: config_object
   mapping:
-    core_stock_events_order_complete:
-        type: boolean
-        label: Whether the order complete stock event is enabled or not.
+    core_stock_events_order_complete_event_type:
+        type: string
+        label: What event should trigger the complete transaction.
     core_stock_events_order_cancel:
         type: boolean
         label: Whether the order cancel stock event is enabled or not.

@@ -22,31 +22,6 @@ class CoreStockEvents extends CoreStockEventsBase {
    * {@inheritdoc}
    */
   public function stockEvent(Context $context, PurchasableEntityInterface $entity, $stockEvent, $quantity, StockLocationInterface $location, $transaction_type, array $metadata) {
-
-    $config = \Drupal::configFactory()->get('commerce_stock.core_stock_events');
-
-    // Check if event should be handled.
-    $order_placed_events = [StockEventsInterface::ORDER_PLACE_EVENT];
-    $order_update_events = [
-      StockEventsInterface::ORDER_UPDATE_EVENT,
-      StockEventsInterface::ORDER_ITEM_UPDATE_EVENT,
-    ];
-    $order_delete_events = [
-      StockEventsInterface::ORDER_CANCEL_EVENT,
-      StockEventsInterface::ORDER_DELET_EVENT,
-      StockEventsInterface::ORDER_ITEM_DELETE_EVENT,
-    ];
-    // Cancel if event type is not enabled.
-    if ((in_array($stockEvent, $order_placed_events)) && !$config->get('core_stock_events_order_complete')) {
-      return FALSE;
-    }
-    elseif ((in_array($stockEvent, $order_update_events)) && !$config->get('core_stock_events_order_updates')) {
-      return FALSE;
-    }
-    elseif ((in_array($stockEvent, $order_delete_events)) && !$config->get('core_stock_events_order_cancel')) {
-      return FALSE;
-    }
-
     // Get the stock service.
     $stockService = \Drupal::service('commerce_stock.service_manager')
       ->getService($entity);
@@ -64,10 +39,16 @@ class CoreStockEvents extends CoreStockEventsBase {
 
     $config = \Drupal::configFactory()->get('commerce_stock.core_stock_events');
 
-    $form_options['core_stock_events_order_complete'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Reserve stock on order complete'),
-      '#default_value' => $config->get('core_stock_events_order_complete'),
+    $form_options['core_stock_events_order_complete_event_type'] = [
+      '#type' => 'select',
+      '#title' => t('Order complete transaction'),
+      '#description' => t('What event should trigger the complete transaction.'),
+      '#options' => [
+        'disabled' => "Don't create a transaction for completed orders",
+        'placed' => 'Create a transaction when order is Placed',
+        'completed' => 'Create a transaction when order is Completed/Fulfilled',
+        ],
+      '#default_value' => $config->get('core_stock_events_order_complete_event_type'),
     ];
     $form_options['core_stock_events_order_cancel'] = [
       '#type' => 'checkbox',
@@ -89,7 +70,7 @@ class CoreStockEvents extends CoreStockEventsBase {
     $values = $form_state->getValues();
     $config = \Drupal::configFactory()
       ->getEditable('commerce_stock.core_stock_events');
-    $config->set('core_stock_events_order_complete', $values['core_stock_events_order_complete']);
+    $config->set('core_stock_events_order_complete_event_type', $values['core_stock_events_order_complete_event_type']);
     $config->set('core_stock_events_order_cancel', $values['core_stock_events_order_cancel']);
     $config->set('core_stock_events_order_updates', $values['core_stock_events_order_updates']);
 

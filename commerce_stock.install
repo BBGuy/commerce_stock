@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for commerce stock.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\commerce_stock_local\Entity\StockLocation;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+
+/**
+ * Upgrade the complete order event boolean to the new typed one.
+ */
+function commerce_stock_update_8001() {
+  $config = \Drupal::configFactory()->getEditable('commerce_stock.core_stock_events');
+  $old_order_complete = $config->get('core_stock_events_order_complete');
+  // Set the new value
+  if ($old_order_complete) {
+    $config->set('core_stock_events_order_complete_event_type', 'placed');
+  }
+  else {
+    $config->set('core_stock_events_order_complete_event_type', 'disabled');
+  }
+  // Clear the old configuration.
+  $config->clear('core_stock_events_order_complete');
+  $config->save();
+}
