@@ -77,9 +77,14 @@ class SimpleStockLevelFormatter extends FormatterBase implements ContainerFactor
     $entity = $items->getEntity();
 
     if ($entity instanceof PurchasableEntityInterface) {
-      // Get the available Stock for the product variation.
-      $stockServiceManager = $this->stockServiceManager;
-      $level = $stockServiceManager->getStockLevel($entity);
+      try {
+        // Get the available Stock for the product variation.
+        $stockServiceManager = $this->stockServiceManager;
+        $level = $stockServiceManager->getStockLevel($entity);
+      }
+      catch (\Exception $e) {
+        $level = 'N/A';
+      }
     }
     else {
       // No stock if this is not a purchasable entity.
