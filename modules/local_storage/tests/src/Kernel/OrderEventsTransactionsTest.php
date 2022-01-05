@@ -153,6 +153,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $config = \Drupal::configFactory()
       ->getEditable('commerce_stock.service_manager');
     $config->set('default_service_id', 'local_stock');
+    $config->set('stock_events_plugin_id', 'core_stock_events');
     $config->save();
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
 
@@ -565,8 +566,9 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
     $eventTypeManagerStub = $this->prophesize(StockEventTypeManagerInterface::class);
     $eventsManagerStub = $this->prophesize(StockEventsManagerInterface::class);
     $entityTypeManager = \Drupal::EntityTypeManager();
+    $configFactory = \Drupal::configFactory();
 
-    $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal(), $eventTypeManagerStub->reveal(), $eventsManagerStub->reveal(), $entityTypeManager);
+    $sut = new OrderEventSubscriber($stockServiceManagerStub->reveal(), $eventTypeManagerStub->reveal(), $eventsManagerStub->reveal(), $entityTypeManager, $configFactory);
     $sut->onOrderUpdate($event);
   }
 

@@ -102,7 +102,7 @@ class StockConfigForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Get the default service.
     $config = $this->config('commerce_stock.service_manager');
-    $default_service_id = $config->get('default_service_id');
+    $default_service_id = $config->get('default_service_id') ?? 'always_in_stock';
 
     $stock_service_manager = $this->stockServiceManager;
     $service_options = $stock_service_manager->listServiceIds();

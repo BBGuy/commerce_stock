@@ -161,6 +161,7 @@ class OrderEventTransactionsKernelTest extends CommerceStockKernelTestBase {
     $configFactory = $this->container->get('config.factory');
     $config = $configFactory->getEditable('commerce_stock.service_manager');
     $config->set('default_service_id', 'local_stock');
+    $config->set('stock_events_plugin_id', 'core_stock_events');
     $config->save();
     $this->stockServiceManager = \Drupal::service('commerce_stock.service_manager');
 

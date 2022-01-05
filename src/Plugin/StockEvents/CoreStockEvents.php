@@ -47,18 +47,18 @@ class CoreStockEvents extends CoreStockEventsBase {
         'disabled' => "Don't create a transaction for completed orders",
         'placed' => 'Create a transaction when order is Placed',
         'completed' => 'Create a transaction when order is Completed/Fulfilled',
-        ],
-      '#default_value' => $config->get('core_stock_events_order_complete_event_type'),
+      ],
+      '#default_value' => $config->get('core_stock_events_order_complete_event_type') ?? 'placed',
     ];
     $form_options['core_stock_events_order_cancel'] = [
       '#type' => 'checkbox',
       '#title' => t('Automatically return stock on cancel'),
-      '#default_value' => $config->get('core_stock_events_order_cancel'),
+      '#default_value' => $config->get('core_stock_events_order_cancel') ?? FALSE,
     ];
     $form_options['core_stock_events_order_updates'] = [
       '#type' => 'checkbox',
       '#title' => t('Adjust stock on order updates (after the order was completed)'),
-      '#default_value' => $config->get('core_stock_events_order_updates'),
+      '#default_value' => $config->get('core_stock_events_order_updates') ?? FALSE,
     ];
     return $form_options;
   }

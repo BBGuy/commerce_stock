@@ -9,7 +9,6 @@ use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderEvents;
 use Drupal\commerce_order\Event\OrderItemEvent;
 use Drupal\commerce_stock\ContextCreatorTrait;
-use Drupal\commerce_stock\Plugin\Commerce\StockEventType\OrderItemUpdate;
 use Drupal\commerce_stock\Plugin\Commerce\StockEventType\StockEventTypeInterface;
 use Drupal\commerce_stock\Plugin\StockEvents\CoreStockEvents;
 use Drupal\commerce_stock\Plugin\StockEventsInterface;
@@ -101,8 +100,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    *   The order workflow event.
    */
   public function onOrderPlace(WorkflowTransitionEvent $event) {
-    $complete_event_type = $this->configFactory->get('commerce_stock.core_stock_events')
-      ->get('core_stock_events_order_complete_event_type');
+    $config = $this->configFactory->get('commerce_stock.core_stock_events');
+    $complete_event_type = $config->get('core_stock_events_order_complete_event_type') ?? 'placed';
     // Only update a placed order if the matching configuration is set.
     if ($complete_event_type == 'placed') {
       // Create the complete transaction.
@@ -118,8 +117,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public function onOrderComplete(WorkflowTransitionEvent $event) {
     $id = $event->getTransition()->getToState()->getId();
-    $complete_event_type = $this->configFactory->get('commerce_stock.core_stock_events')
-      ->get('core_stock_events_order_complete_event_type');
+    $config = $this->configFactory->get('commerce_stock.core_stock_events');
+    $complete_event_type = $config->get('core_stock_events_order_complete_event_type') ?? 'placed';
     // Only update if a completed event and the matching configuration is set.
     if (($id == 'completed') && ($complete_event_type == 'completed')) {
       // Create the complete transaction.
@@ -352,15 +351,24 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   }
 
 
-  private function shouldWeUpdateOrderStockOrder(OrderEvent $event, StockEventTypeInterface $event_type): bool {
-    //Make sure we have an order.
-    $order = $event->getOrder();
+  private function shouldWeUpdateOrderStockOrder($event, StockEventTypeInterface $event_type): bool {
+    // Make sure we have an order.
+    if ($event instanceof OrderEvent) {
+      $order = $event->getOrder();
+    }
+    elseif ($event instanceof WorkflowTransitionEvent) {
+      $order = $event->getEntity();
+    }
+
     if (!isset($order)) {
       return FALSE;
     }
     return $this->shouldWeUpdateOrderStock($order, $event_type);
   }
 
+  /**
+   *
+   */
   private function shouldWeUpdateOrderStockItem(OrderItemEvent $event, StockEventTypeInterface $event_type): bool {
     $item = $event->getOrderItem();
     $order = $item->getOrder();
@@ -370,15 +378,11 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     return $this->shouldWeUpdateOrderStock($order, $event_type);
   }
 
-
-
-
   /**
    * Should we create stock update transactions?
    *
    * We only want to create a stock update transaction on an order that has been
    * placed/completed.
-   *
    */
   private function shouldWeUpdateOrderStock(Order $order, StockEventTypeInterface $event_type): bool {
     // We are only handling the commerce order workflows.
@@ -388,8 +392,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
 
     // Check for a valid completed state.
     $order_state = $order->getState()->value;
-    $complete_event_type = $this->configFactory->get('commerce_stock.core_stock_events')
-      ->get('core_stock_events_order_complete_event_type');
+    $config = $this->configFactory->get('commerce_stock.core_stock_events');
+    $complete_event_type = $config->get('core_stock_events_order_complete_event_type') ?? 'placed';
     switch ($complete_event_type) {
       case 'placed':
         if (in_array($order_state, ['draft', 'validation', 'canceled'])) {
@@ -401,11 +405,12 @@ class OrderEventSubscriber implements EventSubscriberInterface {
           'draft',
           'validation',
           'canceled',
-          'fulfillment'
+          'fulfillment',
         ])) {
           return FALSE;
         }
         break;
+
       default:
         // Completed transaction disabled.
         return FALSE;
@@ -423,10 +428,12 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     ];
     $config = \Drupal::configFactory()->get('commerce_stock.core_stock_events');
     $event_type_id = CoreStockEvents::mapStockEventIds($event_type->getPluginId());
-    if ((in_array($event_type_id, $order_update_events)) && !$config->get('core_stock_events_order_updates')) {
+    $core_stock_events_order_updates = $config->get('core_stock_events_order_updates') ?? FALSE;
+    $core_stock_events_order_cancel = $config->get('core_stock_events_order_cancel') ?? FALSE;
+    if ((in_array($event_type_id, $order_update_events)) && !$core_stock_events_order_updates) {
       return FALSE;
     }
-    elseif ((in_array($event_type_id, $order_delete_events)) && !$config->get('core_stock_events_order_cancel')) {
+    elseif ((in_array($event_type_id, $order_delete_events)) && !$core_stock_events_order_cancel) {
       return FALSE;
     }
 

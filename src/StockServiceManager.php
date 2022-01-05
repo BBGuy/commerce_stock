@@ -78,7 +78,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
   public function getService(PurchasableEntityInterface $entity) {
     $config = $this->configFactory->get('commerce_stock.service_manager');
 
-    $default_service_id = $config->get('default_service_id');
+    $default_service_id = $config->get('default_service_id') ?? 'always_in_stock';
 
     $entity_type = $entity->getEntityTypeId();
     $entity_bundle = $entity->bundle();

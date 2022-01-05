@@ -16,7 +16,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 function commerce_stock_update_8001() {
   $config = \Drupal::configFactory()->getEditable('commerce_stock.core_stock_events');
-  $old_order_complete = $config->get('core_stock_events_order_complete');
+  $old_order_complete = $config->get('core_stock_events_order_complete') ?? TRUE;
   // Set the new value
   if ($old_order_complete) {
     $config->set('core_stock_events_order_complete_event_type', 'placed');
