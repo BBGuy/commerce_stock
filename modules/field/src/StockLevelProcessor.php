@@ -3,6 +3,7 @@
 namespace Drupal\commerce_stock_field;
 
 use Drupal\Core\TypedData\TypedData;
+use Drupal\commerce\PurchasableEntityInterface;
 
 /**
  * Processor used by the StockLevel field.
@@ -51,7 +52,12 @@ class StockLevelProcessor extends TypedData {
     $entity = $this->getParent()->getEntity();
     /** @var \Drupal\commerce_stock\StockServiceManager $stockServiceManager */
     $stockServiceManager = \Drupal::service('commerce_stock.service_manager');
-    $level = $stockServiceManager->getStockLevel($entity);
+    if ($entity instanceof PurchasableEntityInterface && !empty($entity->getStores())) {
+      $level = $stockServiceManager->getStockLevel($entity);
+    }
+    else {
+      $level = 0;
+    }
     $this->processedLevel = $level;
   }
 
