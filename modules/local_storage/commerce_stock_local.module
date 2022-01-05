@@ -34,7 +34,6 @@ function commerce_stock_local_entity_base_field_info(EntityTypeInterface $entity
 function commerce_stock_local_cron() {
   $next = \Drupal::state()->get('commerce_stock_local.update_level_next') ?: 0;
   $request_time = \Drupal::time()->getRequestTime();
-  $next = 0;
   if ($request_time >= $next) {
     $cron_run_mode = \Drupal::config('commerce_stock_local.cron')->get('cron_run_mode');
     if ($cron_run_mode == 'legacy') {
