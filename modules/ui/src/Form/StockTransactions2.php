@@ -99,8 +99,10 @@ class StockTransactions2 extends FormBase {
 
 
 
-    $stockService = $this->stockServiceManager->getService($product_variation);
-    $locations = $stockService->getStockChecker()->getLocationList(TRUE);
+    /** @var \Drupal\commerce_stock_local\StockLocationStorage $locationStorage */
+    $locationStorage = \Drupal::entityTypeManager()->getStorage('commerce_stock_location');
+    $locations = $locationStorage->loadEnabled($product_variation);
+
     $location_options = [];
     /** @var \Drupal\commerce_stock\StockLocationInterface $location */
     foreach ($locations as $location) {
