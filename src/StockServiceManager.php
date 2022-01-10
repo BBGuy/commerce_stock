@@ -158,7 +158,7 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
     if (!is_null($message)) {
       $metadata['data']['message'] = $message;
     }
-    // Make sure quantity is positive.
+    // Make sure quantity is negative.
     $quantity = -1 * abs($quantity);
     $stock_updater = $this->getService($entity)->getStockUpdater();
     $stock_updater->createTransaction($entity, $location_id, $zone, $quantity, $unit_cost, $currency_code, $transaction_type_id, $metadata);
