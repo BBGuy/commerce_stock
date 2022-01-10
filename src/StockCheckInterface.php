@@ -22,8 +22,29 @@ interface StockCheckInterface {
    */
   public function getTotalStockLevel(PurchasableEntityInterface $entity, array $locations);
 
+
+  /**
+   * Gets the available to buy stock level.
+   *
+   * This allows for the separation of the actual stock level and the quantity
+   * available for a user to porches.
+   *
+   * @param \Drupal\commerce\PurchasableEntityInterface $entity
+   *   The purchasable entity.
+   * @param \Drupal\commerce_stock\StockLocationInterface[] $locations
+   *   The locations.
+   *
+   * @return int
+   *   The stock level available for purchase.
+   */
+  public function getTotalAvailableStockLevel(PurchasableEntityInterface $entity, array $locations);
+
   /**
    * Check if purchasable entity is in stock.
+   *
+   * @deprecated in Drupal  8.x-1.0-rc1, will be removed at a later stage.
+   *   Use getTotalAvailableStockLevel() > 0.
+   *
    *
    * @param \Drupal\commerce\PurchasableEntityInterface $entity
    *   The purchasable entity.

@@ -27,6 +27,18 @@ class AlwaysInStock implements StockCheckInterface, StockUpdateInterface {
     return PHP_INT_MAX;
   }
 
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTotalAvailableStockLevel(
+    PurchasableEntityInterface $entity,
+    array $locations
+  ) {
+    return PHP_INT_MAX;
+  }
+
+
   /**
    * {@inheritdoc}
    */
