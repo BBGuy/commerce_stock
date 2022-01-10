@@ -111,10 +111,8 @@ class StockServiceManager implements StockServiceManagerInterface, StockTransact
 
   /**
    * {@inheritdoc}
-   *
-   * @todo code sniffer error here, can't have optional params first.
    */
-  public function getTransactionLocation(Context $context = NULL, PurchasableEntityInterface $entity, $quantity) {
+  public function getTransactionLocation(Context $context, PurchasableEntityInterface $entity, $quantity) {
     $stock_config = $this->getService($entity)->getConfiguration();
     return $stock_config->getTransactionLocation($context, $entity, $quantity);
   }
