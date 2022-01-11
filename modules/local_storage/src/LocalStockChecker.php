@@ -148,7 +148,7 @@ class LocalStockChecker implements StockCheckInterface {
     // The local stock service does not distinguish between the stock level and
     // the quantity a user can purchase. This function can be overridden by
     // other custom and contrib modules to implement such restrictions.
-    return getTotalStockLevel($entity, $locations);
+    return $this->getTotalStockLevel($entity, $locations);
   }
 
   /**
