@@ -28,7 +28,7 @@ class LocalStockServiceTest extends CommerceStockKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
+  protected function setUp() {
     parent::setUp();
     $this->installConfig(['commerce_stock']);
     $this->installConfig(['commerce_stock_local']);

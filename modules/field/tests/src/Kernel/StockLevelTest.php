@@ -74,7 +74,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
+  protected function setUp() {
     $this->fieldName = 'test_stock_level';
     parent::setUp();
 

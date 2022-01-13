@@ -31,7 +31,7 @@ class StockLocationTest extends CommerceStockKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
+  protected function setUp() {
     parent::setUp();
 
     $this->installEntitySchema('commerce_stock_location_type');

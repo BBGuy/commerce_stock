@@ -17,7 +17,7 @@ class EnforcementBrowserTest extends EnforcementBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  public function setUp() {
     parent::setUp();
     $this->drupalLogin($this->adminUser);
     $config = \Drupal::configFactory()

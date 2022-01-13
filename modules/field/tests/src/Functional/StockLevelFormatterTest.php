@@ -14,7 +14,7 @@ class StockLevelFormatterTest extends StockLevelFieldTestBase {
   /**
    * Setting the field name.
    */
-  public function setup(): void  {
+  public function setup() {
     $this->fieldName = "Stock Level Test";
     parent::setup();
   }

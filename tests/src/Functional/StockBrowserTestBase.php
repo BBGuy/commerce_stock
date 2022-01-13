@@ -96,7 +96,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
+  protected function setUp() {
     parent::setUp();
 
     $this->stockServiceManager = $this->container->get('commerce_stock.service_manager');
