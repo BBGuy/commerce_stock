@@ -394,9 +394,15 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order_state = $order->getState()->value;
     $config = $this->configFactory->get('commerce_stock.core_stock_events');
     $complete_event_type = $config->get('core_stock_events_order_complete_event_type') ?? 'placed';
+
+    // Don;t double return stock.
+    if ($event_type->getPluginId() == 'commerce_stock_order_delete' &&  $order_state == 'canceled') {
+      return FALSE;
+    }
+
     switch ($complete_event_type) {
       case 'placed':
-        if (in_array($order_state, ['draft', 'validation', 'canceled'])) {
+        if (in_array($order_state, ['draft'])) {
           return FALSE;
         }
         break;
