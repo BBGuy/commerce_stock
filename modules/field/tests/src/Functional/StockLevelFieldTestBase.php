@@ -42,7 +42,7 @@ abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
   /**
    * Setting up the test.
    */
-  protected function setup() {
+  protected function setup(): void {
     parent::setUp();
 
     $entity_type = "commerce_product_variation";

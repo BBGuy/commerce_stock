@@ -20,7 +20,7 @@ class StockServiceManagerTest extends CommerceStockKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void  {
     parent::setUp();
     $configFactory = $this->container->get('config.factory');
     $currentStore = $this->container->get('commerce_store.current_store');

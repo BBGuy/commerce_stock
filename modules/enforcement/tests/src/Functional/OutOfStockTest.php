@@ -17,7 +17,7 @@ class OutOfStockTest extends EnforcementBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->drupalLogin($this->adminUser);
     $config = \Drupal::configFactory()

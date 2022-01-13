@@ -100,7 +100,7 @@ abstract class StockWebDriverTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->stockServiceManager = $this->container->get('commerce_stock.service_manager');
