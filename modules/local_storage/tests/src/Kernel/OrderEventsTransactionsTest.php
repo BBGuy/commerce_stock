@@ -381,7 +381,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
       ->getEditable('commerce_stock.core_stock_events');
     $config->set('core_stock_events_order_updates', FALSE);
     $config->set('core_stock_events_order_cancel', FALSE);
-    $config->set('core_stock_events_order_complete_event_type', 'placed');
+    $config->set('core_stock_events_order_complete_event_type', 'disabled');
     $config->save();
 
     $transition = $this->order->getState()->getTransitions();
