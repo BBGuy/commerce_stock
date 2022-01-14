@@ -218,6 +218,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $eventType = $this->getEventType('commerce_stock_order_cancel');
     $order = $event->getEntity();
     $original_order = $this->getOriginalEntity($order);
+    //  Don't update canceled draft orders.
+    if ($original_order->getState()->value == 'draft') {
+      return FALSE;
+    }
 
     // Check if we should create a transaction.
     if (!$this->shouldWeUpdateOrderStockOrder($event, $eventType)) {
@@ -395,7 +399,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $config = $this->configFactory->get('commerce_stock.core_stock_events');
     $complete_event_type = $config->get('core_stock_events_order_complete_event_type') ?? 'placed';
 
-    // Don;t double return stock.
+    // Don't double return stock.
     if ($event_type->getPluginId() == 'commerce_stock_order_delete' &&  $order_state == 'canceled') {
       return FALSE;
     }
