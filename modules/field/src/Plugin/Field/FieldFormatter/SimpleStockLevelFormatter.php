@@ -94,7 +94,7 @@ class SimpleStockLevelFormatter extends FormatterBase implements ContainerFactor
     // Return a single item.
     $elements[0] = [
       '#type' => 'html_tag',
-      '#tag' => 'p',
+      '#tag' => 'span',
       '#value' => $level,
     ];
 
