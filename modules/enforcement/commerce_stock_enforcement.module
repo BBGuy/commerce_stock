@@ -8,6 +8,7 @@
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce\Response\NeedsRedirectException;
+use Drupal\commerce_cart\Form\AddToCartFormInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\Component\Utility\Xss;
@@ -26,9 +27,9 @@ function commerce_stock_enforcement_form_alter(
   $form_id
 ) {
 
-  // Add to cart form.
-  if (strpos($form_id, "commerce_order_item_add_to_cart_form") !== FALSE
-    || strpos($form_id, "commerce_order_item_dc_ajax_add_cart_form") !== FALSE) {
+  // Add to cart forms.
+  $build_info = $form_state->getBuildInfo();
+  if (!empty($build_info['callback_object']) && $build_info['callback_object'] instanceof AddToCartFormInterface) {
     // Get the product variation.
     $selected_variation_id = $form_state->get('selected_variation');
     if (!empty($selected_variation_id)) {
