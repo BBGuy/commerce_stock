@@ -270,7 +270,7 @@ function commerce_stock_enforcement_checkout_form_validate(
   if ($form['#step_id'] != 'complete' && !commerce_stock_enforcement_is_order_in_stock($order, FALSE)) {
     $cart_page = Url::fromRoute('commerce_cart.page', [], ['absolute' => TRUE]);
     \Drupal::messenger()
-      ->addError('One or more Items are out of stock. Checkout canceled!');
+      ->addError(t('One or more Items are out of stock. Checkout canceled!'));
     throw new NeedsRedirectException($cart_page->toString());
   }
 }
