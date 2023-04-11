@@ -14,7 +14,7 @@ abstract class EnforcementBrowserTestBase extends StockBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_cart',
     'commerce_stock_enforcement',
     'commerce_stock_field',

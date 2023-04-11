@@ -2,15 +2,15 @@
 
 namespace Drupal\commerce_stock_local\Event;
 
+use Drupal\commerce\EventBase;
 use Drupal\commerce\PurchasableEntityInterface;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Defines the filter locations event.
  *
  * @see \Drupal\commerce_stock_local\Event\LocalStockEvents
  */
-class FilterLocationsEvent extends Event {
+class FilterLocationsEvent extends EventBase {
 
   /**
    * The purchasable entity.

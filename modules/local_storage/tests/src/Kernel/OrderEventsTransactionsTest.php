@@ -12,6 +12,7 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_stock\EventSubscriber\OrderEventSubscriber;
+use Drupal\commerce_stock\Plugin\Commerce\StockEventType\OrderUpdate;
 use Drupal\commerce_stock\StockEventsManagerInterface;
 use Drupal\commerce_stock\StockEventTypeManagerInterface;
 use Drupal\commerce_stock\StockServiceManager;
@@ -95,7 +96,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'entity_reference_revisions',
     'path',
     'profile',
@@ -110,7 +111,7 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('commerce_product_variation');
@@ -564,6 +565,9 @@ class OrderEventsTransactionsTest extends CommerceStockKernelTestBase {
 
     $stockServiceManagerStub = $this->prophesize(StockServiceManager::class);
     $eventTypeManagerStub = $this->prophesize(StockEventTypeManagerInterface::class);
+    $eventTypeManagerStub
+      ->createInstance('commerce_stock_order_update')
+      ->willReturn($this->prophesize(OrderUpdate::class));
     $eventsManagerStub = $this->prophesize(StockEventsManagerInterface::class);
     $entityTypeManager = \Drupal::EntityTypeManager();
     $configFactory = \Drupal::configFactory();

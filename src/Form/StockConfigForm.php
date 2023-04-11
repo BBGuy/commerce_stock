@@ -60,7 +60,7 @@ class StockConfigForm extends ConfigFormBase {
     // Prepare the list of purchasable entity types and bundles.
     $entity_types = $entity_type_manager->getDefinitions();
     $purchasable_entity_types = array_filter($entity_types, function ($entity_type) {
-      return $entity_type->isSubclassOf('\Drupal\commerce\PurchasableEntityInterface');
+      return $entity_type->entityClassImplements('\Drupal\commerce\PurchasableEntityInterface');
     });
     $purchasable_entity_types = array_map(function ($entity_type) {
       return $entity_type->getLabel();

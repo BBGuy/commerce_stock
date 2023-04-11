@@ -21,7 +21,7 @@ class StockLevelWidgetsTest extends StockLevelFieldTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_stock_ui',
   ];
 

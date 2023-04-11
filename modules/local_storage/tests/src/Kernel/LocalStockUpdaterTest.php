@@ -61,7 +61,7 @@ class LocalStockUpdaterTest extends CommerceStockKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'entity_reference_revisions',
     'path',
     'profile',
@@ -78,7 +78,7 @@ class LocalStockUpdaterTest extends CommerceStockKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('commerce_product');

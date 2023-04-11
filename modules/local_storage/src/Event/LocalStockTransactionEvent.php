@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_stock_local\Event;
 
+use Drupal\commerce\EventBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Defines the stock location event.
  */
-class LocalStockTransactionEvent extends Event {
+class LocalStockTransactionEvent extends EventBase {
 
   /**
    * The stock transaction.

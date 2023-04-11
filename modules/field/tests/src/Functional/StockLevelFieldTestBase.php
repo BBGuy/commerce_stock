@@ -26,7 +26,7 @@ abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_stock_field',
     'commerce_stock_local',
     'commerce_stock_ui',
@@ -42,7 +42,7 @@ abstract class StockLevelFieldTestBase extends StockBrowserTestBase {
   /**
    * Setting up the test.
    */
-  protected function setup() {
+  protected function setup(): void {
     parent::setUp();
 
     $entity_type = "commerce_product_variation";

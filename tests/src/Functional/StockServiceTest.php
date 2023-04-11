@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\commerce_stock\Functional;
 
+use Drupal\commerce_product\Entity\ProductVariation;
+
 /**
  * Ensure the stock services work correctly.
  *
@@ -16,14 +18,14 @@ class StockServiceTest extends StockBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_stock_local',
   ];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->adminUser = $this->drupalCreateUser(['administer commerce stock']);
     $this->drupalLogin($this->adminUser);
@@ -36,7 +38,7 @@ class StockServiceTest extends StockBrowserTestBase {
    * @covers ::listServices
    */
   public function testServiceConfiguration() {
-    $this->assertEquals($this->config('commerce_stock.service_manager')->get('default_service_id'), 'always_in_stock');
+    $this->assertEquals($this->config('commerce_stock.service_manager')->get('default_service_id'), NULL);
     $this->drupalGet('admin/commerce/config/stock/settings');
     $this->assertSession()->pageTextContains('Stock services');
     $this->assertSession()->pageTextContains('Services per entity type');

@@ -19,6 +19,7 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
   public function loadEnabled(PurchasableEntityInterface $entity) {
     // Speed up loading by filtering out the IDs of disabled locations.
     $query = $this->getQuery()
+      ->accessCheck(FALSE)
       ->condition('status', TRUE);
     $result = $query->execute();
     if (empty($result)) {
@@ -28,7 +29,7 @@ class StockLocationStorage extends CommerceContentEntityStorage implements Stock
 
     // Allow modules to apply own filtering.
     $event = new FilterLocationsEvent($entity, $enabled_locations);
-    $this->eventDispatcher->dispatch(LocalStockEvents::FILTER_STOCK_LOCATIONS, $event);
+    $this->eventDispatcher->dispatch($event, LocalStockEvents::FILTER_STOCK_LOCATIONS);
     $enabled_locations = $event->getLocations();
 
     return $enabled_locations;

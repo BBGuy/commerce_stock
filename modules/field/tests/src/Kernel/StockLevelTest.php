@@ -29,7 +29,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'path',
     'commerce_product',
     'commerce_stock_field',
@@ -74,7 +74,7 @@ class StockLevelTest extends CommerceStockKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $this->fieldName = 'test_stock_level';
     parent::setUp();
 

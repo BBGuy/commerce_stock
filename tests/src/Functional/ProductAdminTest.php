@@ -17,7 +17,7 @@ class ProductAdminTest extends StockBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_stock_local',
   ];
 
@@ -73,6 +73,8 @@ class ProductAdminTest extends StockBrowserTestBase {
   public function testEditProduct() {
     $product = $this->createEntity('commerce_product', [
       'type' => 'default',
+      'title' => $this->randomMachineName(),
+      'stores' => [$this->store],
     ]);
     $original_sku = strtolower($this->randomMachineName());
     $variation = $this->createEntity('commerce_product_variation', [

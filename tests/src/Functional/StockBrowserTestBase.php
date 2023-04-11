@@ -32,7 +32,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_store',
     'commerce_product',
     'commerce_order',
@@ -96,7 +96,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->stockServiceManager = $this->container->get('commerce_stock.service_manager');
@@ -141,6 +141,7 @@ abstract class StockBrowserTestBase extends CommerceBrowserTestBase {
       'type' => 'default',
       'variations' => $variations,
       'stores' => $this->stores,
+      'title' => $this->randomMachineName(),
     ]);
     $product->save();
     $this->product = $product;

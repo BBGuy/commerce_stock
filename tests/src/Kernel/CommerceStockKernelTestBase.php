@@ -17,7 +17,7 @@ abstract class CommerceStockKernelTestBase extends CommerceKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_stock',
   ];
 

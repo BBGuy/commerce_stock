@@ -124,12 +124,12 @@ class LocalStockUpdater implements StockUpdateInterface {
 
     $event = new LocalStockTransactionEvent($this->entityTypeManager, $field_values);
 
-    $this->eventDispatcher->dispatch(LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_CREATE, $event);
+    $this->eventDispatcher->dispatch($event, LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_CREATE);
     $insert = $this->database->insert('commerce_stock_transaction')
       ->fields(array_keys($field_values))
       ->values(array_values($field_values))->execute();
 
-    $this->eventDispatcher->dispatch(LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_INSERT, $event);
+    $this->eventDispatcher->dispatch($event, LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_INSERT);
 
     // Find out if we have real-time aggregation turned on.
     $transactions_aggregation_mode = \Drupal::config('commerce_stock_local.transactions')->get('transactions_aggregation_mode');
