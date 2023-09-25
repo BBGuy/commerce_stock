@@ -135,8 +135,11 @@ function commerce_stock_enforcement_add_to_cart_form_validate(
     /** @var \Drupal\commerce\PurchasableEntityInterface $purchased_entity */
     $purchased_entity = ProductVariation::load($variation_id);
   }
-  else {
+  else if (isset($values['purchased_entity'][0]['target_id'])) {
     $purchased_entity = ProductVariation::load($values['purchased_entity'][0]['target_id']);
+  }
+  else {
+    $purchased_entity = $form_state->getFormObject()->getEntity()->getPurchasedEntity();
   }
 
   // ** @var Drupal\Core\Form\FormInterface $form_object */
