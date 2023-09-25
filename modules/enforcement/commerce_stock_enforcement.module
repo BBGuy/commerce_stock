@@ -17,6 +17,8 @@ use Drupal\Core\Url;
 use Drupal\views\Form\ViewsForm;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\Component\Utility\Tags;
+
 
 /**
  * Implements hook_form_alter().
@@ -68,7 +70,9 @@ function commerce_stock_enforcement_form_alter(
     /** @var \Drupal\views\ViewExecutable $view */
     $view = reset($form_state->getBuildInfo()['args']);
     // Only add the Checkout button if the cart form view has order items.
-    if ($view->storage->get('tag') == 'commerce_cart_form' && !empty($view->result)) {
+    $tags = Tags::explode($view->storage->get('tag'));
+    if (in_array('commerce_cart_form', $tags, TRUE) && !empty($view->result)) {
+
       // Get the order ID from the view argument.
       $order_id = $view->args[0];
       /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
