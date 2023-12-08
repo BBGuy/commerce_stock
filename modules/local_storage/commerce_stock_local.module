@@ -133,6 +133,7 @@ function _commerce_stock_local_update_stock_level_queue_legacy() {
 
 
   $result = $storage->getQuery()
+    ->accessCheck(FALSE)
     ->condition('variation_id', $level_last_id, '>')
     ->condition('status', 1, '=')
     ->sort('variation_id', 'ASC')
