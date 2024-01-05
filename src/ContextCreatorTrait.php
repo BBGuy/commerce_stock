@@ -71,8 +71,18 @@ trait ContextCreatorTrait {
       $store = reset($stores);
     }
     elseif (count($stores) === 0) {
-      // Malformed entity.
-      throw new \Exception('The given entity is not assigned to any store.');
+      // In case of a new variation or product, the stores might not be known
+      // yet. If the site only has a single store, assume that that's the one
+      // that will be used.
+      $store_count = \Drupal::entityQuery('commerce_store')->accessCheck(TRUE)->count()->execute();
+      if ($store_count == 1) {
+        $stores = \Drupal::entityTypeManager()->getStorage('commerce_store')->loadMultiple();
+        $store = reset($stores);
+      }
+      else {
+        // Malformed entity.
+        throw new \Exception('The given entity is not assigned to any store.');
+      }
     }
     else {
       foreach ($stores as $store) {

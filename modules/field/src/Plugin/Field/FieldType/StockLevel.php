@@ -139,6 +139,9 @@ class StockLevel extends FieldItemBase {
     if (!empty($values['adjustment'])) {
       // Create transaction.
       $this->createTransaction($entity, $values);
+      // Unset the adjustment to avoid creating a second transaction if the entity
+      // gets resaved.
+      $this->adjustment = 0;
     }
   }
 
