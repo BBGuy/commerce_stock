@@ -240,8 +240,9 @@ function commerce_stock_enforcement_cart_order_item_views_form_validate(
       $message_text = Drupal::config('commerce_stock_enforcement.settings')
         ->get('insufficient_stock_cart');
       $message_text = Xss::filter($message_text);
+      $element = $form['edit_quantity'][$id] ?? $form;
       $form_state->setError(
-        $form['edit_quantity'][$id],
+        $element,
         // t('Sorry we only have %qty in stock', array('%qty' => $stock_level))
         t($message_text, [
           '%name' => $name,
