@@ -6,5 +6,4 @@ dependencies:
   - commerce:commerce_product
   - commerce_stock:commerce_stock
   - commerce_stock:commerce_stock_local
-core: 8.x
-core_version_requirement: ^9.1 || ^10
+core_version_requirement: ^9.2 || ^10

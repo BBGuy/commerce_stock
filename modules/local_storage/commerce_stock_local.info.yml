@@ -3,6 +3,5 @@ description: 'Provides a local database storage service for Commerce Stock.'
 package: 'Commerce Stock'
 dependencies:
   - commerce_stock:commerce_stock
-core: 8.x
-core_version_requirement: ^9.1 || ^10
+core_version_requirement: ^9.2 || ^10
 type: module
